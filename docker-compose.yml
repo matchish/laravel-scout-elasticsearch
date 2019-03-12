@@ -1,0 +1,53 @@
+version: '3.4'
+
+services:
+  app:
+    build:
+      context: ./docker/app
+      dockerfile: Dockerfile
+    user: "1000:1000"
+    volumes:
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/group:/etc/group:ro
+      - ./:/app:rw
+      - home-dir:/home/user
+    working_dir: /app
+    environment:
+      HOME: /home/user
+      XDEBUG_CONFIG: "remote_port=9001 remote_host=172.23.0.1 remote_autostart=1 remote_log=/app/xdebug.log"
+      PHP_IDE_CONFIG: "serverName=Scout"
+    networks:
+      - default
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.6.0
+    user: "1000:1000"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    environment:
+      - cluster.name=docker-cluster
+      - cluster.routing.allocation.disk.threshold_enabled=true
+      - cluster.routing.allocation.disk.watermark.flood_stage=200mb
+      - cluster.routing.allocation.disk.watermark.low=500mb
+      - cluster.routing.allocation.disk.watermark.high=300mb
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9200:9200
+    networks:
+      - default
+  cerebro:
+    image: lmenezes/cerebro
+    ports:
+     - "9002:9000"
+
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  elasticsearch-data:
+  home-dir:

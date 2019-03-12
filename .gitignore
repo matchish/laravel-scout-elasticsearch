@@ -1,0 +1,7 @@
+.idea/*
+.phpintel
+composer.lock
+/vendor/
+build
+src/
+tests/
