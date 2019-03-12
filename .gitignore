@@ -3,5 +3,3 @@
 composer.lock
 /vendor/
 build
-src/
-tests/
