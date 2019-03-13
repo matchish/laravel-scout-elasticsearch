@@ -37,106 +37,21 @@ class ElasticSearchEngine extends Engine
     }
 
     /**
-     * Remove the given model from the index.
-     *
-     * @param  \Illuminate\Database\Eloquent\Collection $models
-     * @return void
+     * @inheritdoc
      */
     public function delete($models)
     {
-
+        $payload = new Bulk();
+        $payload->delete($models);
+        $this->elasticsearch->bulk($payload->toArray());
     }
 
-    /**
-     * Perform the given search on the engine.
-     *
-     * @param  \Laravel\Scout\Builder $builder
-     * @return mixed
-     */
-    public function search(Builder $builder)
-    {
-
-    }
 
     /**
-     * Perform the given search on the engine.
-     *
-     * @param  \Laravel\Scout\Builder $builder
-     * @param  int $perPage
-     * @param  int $page
-     * @return mixed
-     */
-    public function paginate(Builder $builder, $perPage, $page)
-    {
-
-    }
-
-    /**
-     * Perform the given search on the engine.
-     *
-     * @param  \Laravel\Scout\Builder $builder
-     * @param  array $options
-     * @return mixed
-     */
-    protected function performSearch(Builder $builder, array $options = [])
-    {
-
-    }
-
-    /**
-     * Get the filter array for the query.
-     *
-     * @param  \Laravel\Scout\Builder $builder
-     * @return array
-     */
-    protected function filters(Builder $builder)
-    {
-
-    }
-
-    /**
-     * Pluck and return the primary keys of the given results.
-     *
-     * @param  mixed $results
-     * @return \Illuminate\Support\Collection
-     */
-    public function mapIds($results)
-    {
-    }
-
-    /**
-     * Map the given results to instances of the given model.
-     *
-     * @param  \Laravel\Scout\Builder $builder
-     * @param  mixed $results
-     * @param  \Illuminate\Database\Eloquent\Model $model
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function map(Builder $builder, $results, $model)
-    {
-
-    }
-
-    /**
-     * Get the total count from a raw result returned by the engine.
-     *
-     * @param  mixed $results
-     * @return int
-     */
-    public function getTotalCount($results)
-    {
-    }
-
-    /**
-     * Flush all of the model's records from the engine.
-     *
-     * @param  Model $model
-     * @return void
+     * @inheritdoc
      */
     public function flush($model)
     {
-        /** @var Searchable $model */
-        $model = $model;//added to prevent false positive in phpstan
         $indexName = $model->searchableAs();
         $params = [
             'index' => $indexName,
@@ -147,12 +62,38 @@ class ElasticSearchEngine extends Engine
     }
 
     /**
-     * Determine if the given model uses soft deletes.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model $model
-     * @return bool
+     * @inheritdoc
      */
-    protected function usesSoftDelete($model)
+    public function search(Builder $builder)
+    {
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function paginate(Builder $builder, $perPage, $page)
+    {
+
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function mapIds($results)
+    {
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function map(Builder $builder, $results, $model)
+    {
+
+    }
+    /**
+     * @inheritdoc
+     */
+    public function getTotalCount($results)
     {
     }
 }
