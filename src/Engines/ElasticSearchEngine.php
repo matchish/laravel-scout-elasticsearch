@@ -2,11 +2,9 @@
 
 namespace Matchish\ScoutElasticSearch\Engines;
 
-use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Engines\Engine;
-use Laravel\Scout\Searchable;
-use Matchish\ScoutElasticSearch\Payloads\Bulk;
+use Matchish\ScoutElasticSearch\ElasticSearch\Payloads\Bulk;
 
 class ElasticSearchEngine extends Engine
 {
@@ -29,15 +27,13 @@ class ElasticSearchEngine extends Engine
     }
 
     /**
-     * Update the given model in the index.
-     *
-     * @param  \Illuminate\Database\Eloquent\Collection $models
-     * @return void
+     * @inheritdoc
      */
     public function update($models)
     {
-        $payload = (new Bulk($models))->toArray();
-        $this->elasticsearch->bulk($payload);
+        $payload = new Bulk();
+        $payload->index($models);
+        $this->elasticsearch->bulk($payload->toArray());
     }
 
     /**
