@@ -22,4 +22,9 @@ class ImportChainTest extends \Orchestra\Testbench\TestCase
         $this->assertInstanceOf(RefreshIndex::class, $chain[2]);
         $this->assertInstanceOf(SwitchToNewAndRemoveOldIndex::class, $chain[3]);
     }
+
+    public function testChainCreationWithCorrectPayload()
+    {
+        $this->assertTrue(false);
+    }
 }
