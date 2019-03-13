@@ -5,6 +5,7 @@ services:
     build:
       context: ./docker/app
       dockerfile: Dockerfile
+      target: php-${APP_ENV}
     user: "1000:1000"
     depends_on:
       - elasticsearch
@@ -16,8 +17,8 @@ services:
     working_dir: /app
     environment:
       HOME: /home/user
-      XDEBUG_CONFIG: "remote_port=9001 remote_host=172.23.0.1 remote_autostart=1 remote_log=/app/xdebug.log"
-      PHP_IDE_CONFIG: "serverName=Scout"
+      XDEBUG_CONFIG: ${XDEBUG_CONFIG}
+      PHP_IDE_CONFIG: ${PHP_IDE_CONFIG}
     networks:
       - default
   elasticsearch:
@@ -38,7 +39,7 @@ services:
         soft: -1
         hard: -1
     ports:
-      - 9200:9200
+      - "9200:9200"
     networks:
       - default
   cerebro:

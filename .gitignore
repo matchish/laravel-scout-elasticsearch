@@ -1,5 +1,6 @@
 .idea/*
 .phpintel
 composer.lock
+.env
 /vendor/
 build

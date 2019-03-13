@@ -1,5 +1,5 @@
 # See https://github.com/docker-library/php/blob/master/7.1/fpm/Dockerfile
-FROM php:7.2-fpm
+FROM php:7.2-fpm as php
 ARG TIMEZONE
 
 MAINTAINER Shliakhov Sergey <shlyakhov.up@gmail.com>
@@ -29,6 +29,7 @@ RUN "date"
 RUN apt-get update && apt-get install -y libmcrypt-dev mysql-client \
     && docker-php-ext-install pdo_mysql
 
+FROM php as php-development
 # install xdebug
 RUN pecl install xdebug
 RUN docker-php-ext-enable xdebug
@@ -45,4 +46,4 @@ RUN apt-get update && apt-get install -y procps
 RUN apt-get update && apt-get install -y netcat
 RUN apt-get update && apt-get install -y net-tools
 
-
+FROM php as php-testing
