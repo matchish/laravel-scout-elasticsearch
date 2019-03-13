@@ -6,10 +6,9 @@ namespace Tests\Feature;
 use App\Product;
 use Elasticsearch\Client;
 use Matchish\ScoutElasticSearch\Jobs\MakeAllSearchable;
-use Tests\TestCase;
-use Illuminate\Support\Facades\Artisan;
+use Tests\IntegrationTestCase;
 
-final class MakeAllSearchableTest extends TestCase
+final class MakeAllSearchableTest extends IntegrationTestCase
 {
     public function testPutAllEntitesToIndex(): void
     {

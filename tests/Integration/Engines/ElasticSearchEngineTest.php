@@ -9,25 +9,20 @@
 namespace Tests\Integration\Engines;
 
 use App\Product;
-use Elasticsearch\Client;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
-use Tests\TestCase;
+use Tests\IntegrationTestCase;
 
 /**
  * Class ElasticSearchEngineTest
  * @package Tests\Integration\Engines
  */
-final class ElasticSearchEngineTest extends TestCase
+final class ElasticSearchEngineTest extends IntegrationTestCase
 {
 
     /**
      * @var ElasticSearchEngine
      */
     private $engine;
-    /**
-     * @var Client
-     */
-    private $elasticsearch;
 
     /**
      *
@@ -44,7 +39,6 @@ final class ElasticSearchEngineTest extends TestCase
         factory(Product::class, $productsAmount)->create();
 
         Product::setEventDispatcher($dispatcher);
-        $this->elasticsearch = $this->app->make(Client::class);
         $this->engine = new ElasticSearchEngine($this->elasticsearch);
     }
 

@@ -3,13 +3,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Product;
 use Elasticsearch\Client;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Jobs\CreateWriteIndex;
-use Tests\TestCase;
+use Tests\IntegrationTestCase;
 
-final class CreateWriteIndexTest extends TestCase
+final class CreateWriteIndexTest extends IntegrationTestCase
 {
     /**
      * @testdox Create index and add write alias to it

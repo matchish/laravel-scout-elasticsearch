@@ -5,15 +5,11 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Product;
-use App\User;
-use App\Wall;
-use App\Thread;
 use Elasticsearch\Client;
-use Elasticsearch\ClientBuilder;
 use Illuminate\Support\Facades\Artisan;
-use Tests\TestCase;
+use Tests\IntegrationTestCase;
 
-final class FlushCommandTest extends TestCase
+final class FlushCommandTest extends IntegrationTestCase
 {
     public function testClearsIndex(): void
     {

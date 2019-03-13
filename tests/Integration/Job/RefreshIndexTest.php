@@ -3,14 +3,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Product;
 use Elasticsearch\Client;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
-use Matchish\ScoutElasticSearch\Jobs\CreateWriteIndex;
 use Matchish\ScoutElasticSearch\Jobs\RefreshIndex;
-use Tests\TestCase;
+use Tests\IntegrationTestCase;
 
-final class RefreshIndexTest extends TestCase
+final class RefreshIndexTest extends IntegrationTestCase
 {
 
     public function testRefreshIndex(): void

@@ -3,15 +3,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Product;
 use Elasticsearch\Client;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
-use Matchish\ScoutElasticSearch\Jobs\CreateWriteIndex;
-use Matchish\ScoutElasticSearch\Jobs\RefreshIndex;
 use Matchish\ScoutElasticSearch\Jobs\SwitchToNewAndRemoveOldIndex;
-use Tests\TestCase;
+use Tests\IntegrationTestCase;
 
-final class SwitchToNewAndRemoveOldIndexTest extends TestCase
+final class SwitchToNewAndRemoveOldIndexTest extends IntegrationTestCase
 {
 
     public function testSwitchToNewAndRemoveOldIndex(): void

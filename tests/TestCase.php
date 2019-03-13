@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 namespace Tests;
-use Elasticsearch\Client;
 use Illuminate\Support\Facades\Artisan;
 
 use Laravel\Scout\ScoutServiceProvider;
@@ -20,11 +19,6 @@ abstract class TestCase extends BaseTestCase
         $this->app->setBasePath(__DIR__.'/laravel');
 
         $this->withFactories(database_path('factories'));
-
-        /** @var Client $elasticsearch */
-        $elasticsearch = $this->app->make(Client::class);
-
-        $elasticsearch->indices()->delete(['index' => '_all']);
 
         Artisan::call('migrate:fresh', ['--database' => 'testbench']);
     }

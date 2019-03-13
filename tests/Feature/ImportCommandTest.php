@@ -6,10 +6,11 @@ namespace Tests\Feature;
 use App\Product;
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
+use Tests\IntegrationTestCase;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Artisan;
 
-final class ImportCommandTest extends TestCase
+final class ImportCommandTest extends IntegrationTestCase
 {
     public function testItImportsEntites(): void
     {
@@ -23,16 +24,15 @@ final class ImportCommandTest extends TestCase
         Product::setEventDispatcher($dispatcher);
 
         Artisan::call('scout:import');
-        $elasticsearch = $this->app->make(Client::class);
         $params = [
-            "index" => (new Product())->searchableAs(),
+            "index" => 'products',
             "body" => [
                 "query" => [
                     "match_all" => new \stdClass()
                 ]
             ]
         ];
-        $response = $elasticsearch->search($params);
+        $response = $this->elasticsearch->search($params);
         $this->assertEquals($productsAmount, $response['hits']['total']);
     }
 
@@ -50,16 +50,15 @@ final class ImportCommandTest extends TestCase
         Product::setEventDispatcher($dispatcher);
 
         Artisan::call('scout:import');
-        $elasticsearch = $this->app->make(Client::class);
         $params = [
-            "index" => (new Product())->searchableAs(),
+            "index" => 'products',
             "body" => [
                 "query" => [
                     "match_all" => new \stdClass()
                 ]
             ]
         ];
-        $response = $elasticsearch->search($params);
+        $response = $this->elasticsearch->search($params);
         $this->assertEquals($productsAmount, $response['hits']['total']);
     }
 
@@ -75,7 +74,6 @@ final class ImportCommandTest extends TestCase
         Product::setEventDispatcher($dispatcher);
 
         Artisan::call('scout:import');
-        $elasticsearch = $this->app->make(Client::class);
         $params = [
             "index" => (new Product())->searchableAs(),
             "body" => [
@@ -84,25 +82,23 @@ final class ImportCommandTest extends TestCase
                 ]
             ]
         ];
-        $response = $elasticsearch->search($params);
+        $response = $this->elasticsearch->search($params);
         $this->assertEquals($productsAmount, $response['hits']['total']);
     }
 
     public function testItRemovesOldIndexAfterSwitchingToNew(): void
     {
-        /** @var Client $elasticsearch */
-        $elasticsearch = $this->app->make(Client::class);
         $params = [
             "index" => 'products_old',
             "body" => [
-                "aliases" => [(new Product())->searchableAs() => new \stdClass()],
+                "aliases" => ['products' => new \stdClass()],
                 'settings' => [
                     "number_of_shards" => 1,
                     "number_of_replicas" => 0,
                 ]
             ]
         ];
-        $elasticsearch->indices()->create($params);
+        $this->elasticsearch->indices()->create($params);
         $dispatcher = Product::getEventDispatcher();
         Product::unsetEventDispatcher();
 
@@ -114,6 +110,6 @@ final class ImportCommandTest extends TestCase
 
         Artisan::call('scout:import');
 
-        $this->assertFalse($elasticsearch->indices()->exists(['index' => 'products_old']), "Old index must be deleted");
+        $this->assertFalse($this->elasticsearch->indices()->exists(['index' => 'products_old']), "Old index must be deleted");
     }
 }
