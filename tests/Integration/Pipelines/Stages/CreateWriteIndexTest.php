@@ -1,11 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Feature;
+namespace Tests\Integration\Pipelines\Stages;
 
+use App\Product;
 use Elasticsearch\Client;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
-use Matchish\ScoutElasticSearch\Jobs\CreateWriteIndex;
+use Matchish\ScoutElasticSearch\Pipelines\Stages\CreateWriteIndex;
 use Tests\IntegrationTestCase;
 
 final class CreateWriteIndexTest extends IntegrationTestCase
@@ -15,9 +16,9 @@ final class CreateWriteIndexTest extends IntegrationTestCase
      */
     public function testCreateWriteIndex(): void
     {
-        $job = new CreateWriteIndex(new Index('products'));
         $elasticsearch = $this->app->make(Client::class);
-        $job->handle($elasticsearch);
+        $stage = new CreateWriteIndex($elasticsearch);
+        $stage([Index::fromSearchable(new Product()), new Product()]);
         $response = $elasticsearch->indices()->getAliases(['index' => '*', 'name' => 'products']);
         $this->assertTrue($this->containsWriteIndex($response, 'products'));
     }
@@ -26,7 +27,7 @@ final class CreateWriteIndexTest extends IntegrationTestCase
     {
         foreach ($response as $index) {
             foreach ($index['aliases'] as $alias => $data) {
-                if ($alias == $requiredAlias && $data['is_write_index']) {
+                if ($alias == $requiredAlias && array_key_exists('is_write_index', $data) && $data['is_write_index']) {
                     return true;
                 }
             }

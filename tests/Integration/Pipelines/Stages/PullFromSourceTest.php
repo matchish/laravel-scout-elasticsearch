@@ -1,14 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Feature;
+namespace Tests\Integration\Pipelines\Stages;
 
 use App\Product;
 use Elasticsearch\Client;
-use Matchish\ScoutElasticSearch\Jobs\MakeAllSearchable;
+use Matchish\ScoutElasticSearch\ElasticSearch\Index;
+use Matchish\ScoutElasticSearch\Pipelines\Stages\PullFromSource;
 use Tests\IntegrationTestCase;
 
-final class MakeAllSearchableTest extends IntegrationTestCase
+final class PullFromSourceTest extends IntegrationTestCase
 {
     public function testPutAllEntitesToIndex(): void
     {
@@ -20,14 +21,13 @@ final class MakeAllSearchableTest extends IntegrationTestCase
         factory(Product::class, $productsAmount)->create();
 
         Product::setEventDispatcher($dispatcher);
-        $elasticsearch = $this->app->make(Client::class);
-        $elasticsearch->indices()->create([
+        $this->elasticsearch->indices()->create([
             'index' => 'products_index',
             'body' => ['aliases' => ['products' => new \stdClass()]]
         ]);
-        $job = new MakeAllSearchable(Product::class);
-        $job->handle();
-        $elasticsearch->indices()->refresh([
+        $stage = new PullFromSource($this->elasticsearch);
+        $stage([Index::fromSearchable(new Product()), new Product()]);
+        $this->elasticsearch->indices()->refresh([
             'index' => 'products',
         ]);
         $params = [
@@ -38,20 +38,19 @@ final class MakeAllSearchableTest extends IntegrationTestCase
                 ]
             ]
         ];
-        $response = $elasticsearch->search($params);
+        $response = $this->elasticsearch->search($params);
         $this->assertEquals($productsAmount, $response['hits']['total']);
     }
 
     public function testDontPutEntitiesIfNoEntitiesInCollection(): void
     {
-        $elasticsearch = $this->app->make(Client::class);
-        $elasticsearch->indices()->create([
+        $this->elasticsearch->indices()->create([
             'index' => 'products_index',
             'body' => ['aliases' => ['products' => new \stdClass()]]
         ]);
-        $job = new MakeAllSearchable(Product::class);
-        $job->handle();
-        $elasticsearch->indices()->refresh([
+        $stage = new PullFromSource($this->elasticsearch);
+        $stage([Index::fromSearchable(new Product()), new Product()]);
+        $this->elasticsearch->indices()->refresh([
             'index' => 'products',
         ]);
         $params = [
@@ -62,7 +61,7 @@ final class MakeAllSearchableTest extends IntegrationTestCase
                 ]
             ]
         ];
-        $response = $elasticsearch->search($params);
+        $response = $this->elasticsearch->search($params);
         $this->assertEquals(0, $response['hits']['total']);
     }
 
@@ -77,14 +76,13 @@ final class MakeAllSearchableTest extends IntegrationTestCase
         factory(Product::class, $productsAmount)->create();
 
         Product::setEventDispatcher($dispatcher);
-        $elasticsearch = $this->app->make(Client::class);
-        $elasticsearch->indices()->create([
+        $this->elasticsearch->indices()->create([
             'index' => 'products_index',
             'body' => ['aliases' => ['products' => new \stdClass()]]
         ]);
-        $job = new MakeAllSearchable(Product::class);
-        $job->handle();
-        $elasticsearch->indices()->refresh([
+        $stage = new PullFromSource($this->elasticsearch);
+        $stage([Index::fromSearchable(new Product()), new Product()]);
+        $this->elasticsearch->indices()->refresh([
             'index' => 'products',
         ]);
         $params = [
@@ -95,7 +93,7 @@ final class MakeAllSearchableTest extends IntegrationTestCase
                 ]
             ]
         ];
-        $response = $elasticsearch->search($params);
+        $response = $this->elasticsearch->search($params);
         $this->assertEquals($productsAmount, $response['hits']['total']);
     }
 }

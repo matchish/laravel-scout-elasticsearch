@@ -8,22 +8,17 @@
 
 namespace Tests\Unit\ElasticSearch;
 
+use App\Product;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Tests\TestCase;
 
-class IndexTest extends \Orchestra\Testbench\TestCase
+class IndexTest extends TestCase
 {
 
-    public function testName()
+    public function testCreationFromSearchable()
     {
-        $index = new Index('products');
+        $index = Index::fromSearchable(new Product());
         $this->assertEquals($index->name(), 'products_1525376494');
-    }
-
-    public function testAlias()
-    {
-        $index = new Index('products');
-        $this->assertEquals($index->alias(), 'products');
     }
 }
 

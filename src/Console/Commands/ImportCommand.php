@@ -4,8 +4,7 @@ declare(strict_types=1);
 namespace Matchish\ScoutElasticSearch\Console\Commands;
 
 use Illuminate\Console\Command;
-use Matchish\ScoutElasticSearch\Jobs\ImportChain;
-use Matchish\ScoutElasticSearch\Jobs\PendingChain;
+use Matchish\ScoutElasticSearch\Jobs\Import;
 use Matchish\ScoutElasticSearch\Searchable\SearchableListFactory;
 
 final class ImportCommand extends Command
@@ -26,18 +25,14 @@ final class ImportCommand extends Command
     {
         $command = $this;
         $searchables = (array)$command->argument('searchable');
-        $factory->make()->each(function ($searchable) {
-
-            $chain = ImportChain::from($searchable);
-
+        $factory->make()->each(function ($searchable){
+            $job = new Import($searchable);
             if (config('scout.queue')) {
-                (new PendingChain($chain->all()))->dispatch()->allOnQueue((new $searchable)->syncWithSearchUsingQueue())
+                dispatch($job)->allOnQueue((new $searchable)->syncWithSearchUsingQueue())
                     ->allOnConnection(config((new $searchable)->syncWithSearchUsing()));
                 $this->output->success('All [' . $searchable . '] records have been dispatched to import job.');
             } else {
-                foreach ($chain as $job) {
-                    dispatch_now($job);
-                }
+                dispatch_now($job);
                 $this->output->success('All [' . $searchable . '] records have been searchable.');
             }
         });

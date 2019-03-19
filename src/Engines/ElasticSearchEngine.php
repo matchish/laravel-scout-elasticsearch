@@ -4,7 +4,9 @@ namespace Matchish\ScoutElasticSearch\Engines;
 
 use Laravel\Scout\Builder;
 use Laravel\Scout\Engines\Engine;
-use Matchish\ScoutElasticSearch\ElasticSearch\Payloads\Bulk;
+use Matchish\ScoutElasticSearch\ElasticSearch\Index;
+use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
+use Matchish\ScoutElasticSearch\Pipelines\ImportPipeline;
 
 class ElasticSearchEngine extends Engine
 {
@@ -31,9 +33,9 @@ class ElasticSearchEngine extends Engine
      */
     public function update($models)
     {
-        $payload = new Bulk();
-        $payload->index($models);
-        $this->elasticsearch->bulk($payload->toArray());
+        $params = new Bulk();
+        $params->index($models);
+        $this->elasticsearch->bulk($params->toArray());
     }
 
     /**
@@ -95,5 +97,15 @@ class ElasticSearchEngine extends Engine
      */
     public function getTotalCount($results)
     {
+    }
+
+
+    /**
+     * @internal
+     */
+    public function sync($model)
+    {
+        $pipeline = new ImportPipeline($this->elasticsearch);
+        $pipeline->process([Index::fromSearchable($model), $model]);
     }
 }

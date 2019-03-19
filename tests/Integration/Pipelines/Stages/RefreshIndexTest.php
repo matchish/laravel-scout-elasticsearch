@@ -1,11 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Feature;
+namespace Tests\Integration\Pipelines\Stages;
 
+use App\Product;
 use Elasticsearch\Client;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
-use Matchish\ScoutElasticSearch\Jobs\RefreshIndex;
+use Matchish\ScoutElasticSearch\Pipelines\Stages\RefreshIndex;
 use Tests\IntegrationTestCase;
 
 final class RefreshIndexTest extends IntegrationTestCase
@@ -13,12 +14,11 @@ final class RefreshIndexTest extends IntegrationTestCase
 
     public function testRefreshIndex(): void
     {
-        $elasticsearch = $this->app->make(Client::class);
-        $elasticsearch->indices()->create([
+        $this->elasticsearch->indices()->create([
             'index' => 'products_index',
             'body' => ['aliases' => ['products' => new \stdClass()]]
         ]);
-        $elasticsearch->bulk(['body' => [
+        $this->elasticsearch->bulk(['body' => [
             ['index' => [
                 '_index' => 'products',
                 '_id' => 'id',
@@ -30,8 +30,8 @@ final class RefreshIndexTest extends IntegrationTestCase
             ]]
         ]);
 
-        $job = new RefreshIndex(new Index('products'));
-        $job->handle($elasticsearch);
+        $stage = new RefreshIndex($this->elasticsearch);
+        $stage([new Index('products_index'), new Product()]);
 
         $params = [
             "index" => 'products',
@@ -41,7 +41,7 @@ final class RefreshIndexTest extends IntegrationTestCase
                 ]
             ]
         ];
-        $response = $elasticsearch->search($params);
+        $response = $this->elasticsearch->search($params);
         $this->assertEquals(1, $response['hits']['total']);
     }
 

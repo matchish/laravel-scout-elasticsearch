@@ -1,10 +1,9 @@
 <?php
-namespace Tests\Unit\ElasticSearch\Payloads;
+namespace Tests\Unit\ElasticSearch\Params;
 
 use App\Product;
-use Matchish\ScoutElasticSearch\ElasticSearch\Index;
-use Matchish\ScoutElasticSearch\ElasticSearch\Payloads\Bulk;
-use Orchestra\Testbench\TestCase;
+use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
+use Tests\TestCase;
 
 class BulkTest extends TestCase
 {

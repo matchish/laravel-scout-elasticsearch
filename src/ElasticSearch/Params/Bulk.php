@@ -6,15 +6,7 @@
  * Time: 13:46
  */
 
-namespace Matchish\ScoutElasticSearch\ElasticSearch\Payloads;
-
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
-use Laravel\Scout\Searchable;
-use Matchish\ScoutElasticSearch\ElasticSearch\Index;
-use Traversable;
-
+namespace Matchish\ScoutElasticSearch\ElasticSearch\Params;
 
 /**
  * @internal
