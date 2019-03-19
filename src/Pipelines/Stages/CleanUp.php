@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: matchish
- * Date: 14.03.19
- * Time: 13:00
- */
 
 namespace Matchish\ScoutElasticSearch\Pipelines\Stages;
 

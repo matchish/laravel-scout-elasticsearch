@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: matchish
- * Date: 09.03.19
- * Time: 13:55
- */
 
 namespace Matchish\ScoutElasticSearch\Jobs;
 

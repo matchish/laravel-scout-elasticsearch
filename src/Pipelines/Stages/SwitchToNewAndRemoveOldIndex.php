@@ -1,16 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: matchish
- * Date: 14.03.19
- * Time: 13:00
- */
 
 namespace Matchish\ScoutElasticSearch\Pipelines\Stages;
 
 
 use Elasticsearch\Client;
-use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias\Update;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias\Get;
 
