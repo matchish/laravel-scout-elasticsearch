@@ -13,8 +13,6 @@
   </p>
 </p>
 
-**Full power of ElasticSearch in your Laravel application**.
-
 The package provides the perfect starting point to integrate
 ElasticSearch into your Laravel application. It is carefully crafted to simplify the usage
 of ElasticSearch within the [Laravel Framework](https://laravel.com).
