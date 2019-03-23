@@ -1,7 +1,7 @@
 language: php
 
 env:
-  - ELASTICSEARCH_HOST=127.0.0.1:9200
+  - ELASTICSEARCH_HOST=localhost:9200
 
 services:
   - elasticsearch
