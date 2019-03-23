@@ -23,28 +23,28 @@ It’s built on top of the latest release of [Laravel Scout](https://laravel.com
 package. Using Scout Extended, you are free to take advantage of all of Laravel Scout’s
 great features, and at the same time leverage the complete set of ElasticSearch’s search experience.
 
-## 💕 Features
+## :two_hearts: Features
 
 - [**Zero downtime** reimports]() - it’s a breeze to import data in production.
 - Bulk indexing.
 - A fully configurable mapping for each model.
 - Full power of ElasticSearch in your queries
 
-## ❕ Requirements
+## :warning: Requirements
 
 - PHP version >= 7.1.3
 - Laravel Framework version >= 5.6
 - Elasticsearch version >= 6
 
-## 🚀 Installation
+## :rocket: Installation
 
 Use composer to install the package:
 
 `composer require babenkoivan/scout-elasticsearch-driver`
 
-## 💡 Usage
+## :bulb: Usage
 
 > **Note:** This package adds functionalities to [Laravel Scout](https://github.com/laravel/scout), and for this reason, we encourage you to **read the Scout documentation first**. Documentation for Scout can be found on the [Laravel website](https://github.com/laravel/scout).
 
-## 🆓 License
+## :free: License
 Scout ElasticSearch is an open-sourced software licensed under the [MIT license](LICENSE.md).
