@@ -67,7 +67,7 @@ final class ImportCommandTest extends IntegrationTestCase
         $dispatcher = Product::getEventDispatcher();
         Product::unsetEventDispatcher();
 
-        $productsAmount = 1000;
+        $productsAmount = 10;
 
         factory(Product::class, $productsAmount)->create();
 
