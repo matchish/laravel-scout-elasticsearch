@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/matchish/laravel-scout-elasticsearch">
-    <img alt="Scout ElasticSearch" src="https://raw.githubusercontent.com/matchish/laravel-scout-elasticsearch/master/docs/banner.svg" >
+    <img alt="Scout ElasticSearch" src="docs/banner.svg" >
   </a>
 
   <p align="center">
