@@ -10,8 +10,6 @@ final class Index
 {
     private $aliases = [];
     private $name;
-    private $settings;
-    private $mappings;
 
     public function __construct(string $name)
     {
@@ -30,7 +28,7 @@ final class Index
 
     public function addAlias(Alias $alias): void
     {
-        $this->aliases[$alias->name()] =  $alias->config() ?: new \stdClass();
+        $this->aliases[$alias->name()] = $alias->config() ?: new \stdClass();
     }
 
     public function config(): array
@@ -39,54 +37,29 @@ final class Index
             'settings' => [
                 "number_of_shards" => 1,
                 "number_of_replicas" => 0,
-                'analysis' => [
-                    'analyzer' => [
-                        'default' => [
-                            'type' => "custom",
-                            'tokenizer' => "standard",
-                            "char_filter" => ["html_strip"],
-                            'filter' => ["standard", "lowercase", "asciifolding", "matchish_index_shingle", "matchish_stemmer",]
+            ],
+            "mappings" => [
+                "_doc" => [
+                    "properties" => [
+                        "type" => [
+                            "type" => "keyword"
                         ],
-                        'instantsearch_index' => [
-                            'type' => "custom",
-                            'tokenizer' => "standard",
-                            "char_filter" => ["html_strip"],
-                            'filter' => ["lowercase", "asciifolding", "synonym", "matchish_edge_ngram"]
+                        "title" => [
+                            "type" => "text",
+                            "copy_to" => "searchable"
                         ],
-                        'matchish_search' => [
-                            'type' => "custom",
-                            'tokenizer' => "standard",
-                            'filter' => ["standard", "lowercase", "asciifolding", "synonym", "matchish_stemmer",]
+                        "description" => [
+                            "type" => "text",
+                            "copy_to" => "searchable"
                         ],
-                        'matchish_word_search' => [
-                            'type' => "custom",
-                            'tokenizer' => "standard",
-                            'filter' => ["lowercase", "asciifolding", "synonym"]
+                        "searchable" => [
+                            "type" => "text"
                         ],
-                    ],
-                    'filter' => [
-                        'matchish_index_shingle' => [
-                            'type' => "shingle",
-                            'token_separator' => ""
-                        ],
-                        'matchish_edge_ngram' => [
-                            'type' => "edgeNGram",
-                            'min_gram' => 1,
-                            'max_gram' => 50
-                        ],
-                        'matchish_stemmer' => [
-                            'type' => "snowball",
-                            'language' => "Russian"
-                        ],
-                        "synonym" => [
-                            "type" => "synonym",
-                            "synonyms" => [
-                                'зарядка => зарядное устройство',
-                                'мобильник, мобила, труба => смартфон'
-                            ]
+                        "price" => [
+                            "type" => "integer"
                         ]
                     ]
-                ],
+                ]
             ]
         ];
         if ($this->aliases()) {
