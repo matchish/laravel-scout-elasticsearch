@@ -12,7 +12,7 @@ use Tests\IntegrationTestCase;
 final class SwitchToNewAndRemoveOldIndexTest extends IntegrationTestCase
 {
 
-    public function testSwitchToNewAndRemoveOldIndex(): void
+    public function test_switch_to_new_and_remove_old_index(): void
     {
         $this->elasticsearch->indices()->create([
             'index' => 'products_new',

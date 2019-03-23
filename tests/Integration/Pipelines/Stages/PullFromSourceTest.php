@@ -11,7 +11,7 @@ use Tests\IntegrationTestCase;
 
 final class PullFromSourceTest extends IntegrationTestCase
 {
-    public function testPutAllEntitesToIndex(): void
+    public function test_put_all_entites_to_index(): void
     {
         $dispatcher = Product::getEventDispatcher();
         Product::unsetEventDispatcher();
@@ -42,7 +42,7 @@ final class PullFromSourceTest extends IntegrationTestCase
         $this->assertEquals($productsAmount, $response['hits']['total']);
     }
 
-    public function testDontPutEntitiesIfNoEntitiesInCollection(): void
+    public function test_dont_put_entities_if_no_entities_in_collection(): void
     {
         $this->elasticsearch->indices()->create([
             'index' => 'products_index',
@@ -65,7 +65,7 @@ final class PullFromSourceTest extends IntegrationTestCase
         $this->assertEquals(0, $response['hits']['total']);
     }
 
-    public function testPutAllToIndexIfAmountOfEntitiesMoreThanChunkSize(): void
+    public function test_put_all_to_index_if_amount_of_entities_more_than_chunk_size(): void
     {
         $dispatcher = Product::getEventDispatcher();
         Product::unsetEventDispatcher();

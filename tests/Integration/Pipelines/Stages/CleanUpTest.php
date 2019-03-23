@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: matchish
- * Date: 18.03.19
- * Time: 11:48
- */
-
 namespace Tests\Integration\Pipelines\Stages;
 
 use App\Product;
@@ -16,7 +9,7 @@ use Tests\IntegrationTestCase;
 class CleanUpTest extends IntegrationTestCase
 {
 
-    public function testRemoveWriteIndex()
+    public function test_remove_write_index()
     {
         $this->elasticsearch->indices()->create([
             'index' => 'products_old',
@@ -40,7 +33,7 @@ class CleanUpTest extends IntegrationTestCase
         $this->assertTrue($readIndexExist);
     }
 
-    public function testReturnSamePayload()
+    public function test_return_same_payload()
     {
         $stage = new CleanUp($this->elasticsearch);
         $payload = [new Index(new Product()), new Product()];

@@ -1,21 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: matchish
- * Date: 12.03.19
- * Time: 15:49
- */
-
 namespace Tests\Integration\Engines;
 
 use App\Product;
+use Laravel\Scout\Builder;
+use Matchish\ScoutElasticSearch\ElasticSearch\SearchResults;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
 use Tests\IntegrationTestCase;
 
-/**
- * Class ElasticSearchEngineTest
- * @package Tests\Integration\Engines
- */
 final class ElasticSearchEngineTest extends IntegrationTestCase
 {
 
@@ -45,7 +36,7 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
     /**
      *
      */
-    public function testUpdate()
+    public function test_update()
     {
         $models = Product::all();
         $models->map(function ($model) {
@@ -72,7 +63,7 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
     /**
      *
      */
-    public function testDelete()
+    public function test_delete()
     {
         $models = Product::all();
         $this->engine->update($models);
@@ -95,18 +86,7 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
         }
     }
 
-    /**
-     *
-     */
-    public function testMapIds()
-    {
-
-    }
-
-    /**
-     *
-     */
-    public function testFlush()
+    public function test_flush()
     {
         $models = Product::all();
         $this->engine->update($models);
@@ -136,34 +116,6 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
         $this->assertEquals($models->map->id->all(), $mappedModels->map->id->all());
     }
 
-    /**
-     *
-     */
-    public function testMap()
-    {
-
-    }
-
-    /**
-     *
-     */
-    public function testGetTotalCount()
-    {
-
-    }
-
-    /**
-     *
-     */
-    public function testPaginate()
-    {
-
-    }
-
-    /**
-     * @param string $index
-     * @return void
-     */
     private function refreshIndex(string $index): void
     {
         $params = [

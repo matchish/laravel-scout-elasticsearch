@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Artisan;
 
 final class ImportCommandTest extends IntegrationTestCase
 {
-    public function testItImportsEntites(): void
+    public function test_import_entites(): void
     {
         $dispatcher = Product::getEventDispatcher();
         Product::unsetEventDispatcher();
@@ -33,7 +33,7 @@ final class ImportCommandTest extends IntegrationTestCase
         $this->assertEquals($productsAmount, $response['hits']['total']);
     }
 
-    public function testItImportsEntitesInQueue(): void
+    public function test_import_entites_in_queue(): void
     {
         $this->app['config']->set('scout.queue', ['connection' => 'sync', 'queue' => 'scout']);
 
@@ -59,7 +59,7 @@ final class ImportCommandTest extends IntegrationTestCase
         $this->assertEquals($productsAmount, $response['hits']['total']);
     }
 
-    public function testItImportsAllPages(): void
+    public function test_import_all_pages(): void
     {
         $dispatcher = Product::getEventDispatcher();
         Product::unsetEventDispatcher();
@@ -83,7 +83,7 @@ final class ImportCommandTest extends IntegrationTestCase
         $this->assertEquals($productsAmount, $response['hits']['total']);
     }
 
-    public function testItRemovesOldIndexAfterSwitchingToNew(): void
+    public function test_remove_old_index_after_switching_to_new(): void
     {
         $params = [
             "index" => 'products_old',

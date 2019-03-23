@@ -15,7 +15,7 @@ use Tests\TestCase;
 class IndexTest extends TestCase
 {
 
-    public function testCreationFromSearchable()
+    public function test_creation_from_searchable()
     {
         $index = Index::fromSearchable(new Product());
         $this->assertEquals($index->name(), 'products_1525376494');

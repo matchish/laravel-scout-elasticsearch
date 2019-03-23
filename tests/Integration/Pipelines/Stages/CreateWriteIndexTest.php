@@ -11,10 +11,7 @@ use Tests\IntegrationTestCase;
 
 final class CreateWriteIndexTest extends IntegrationTestCase
 {
-    /**
-     * @testdox Create index and add write alias to it
-     */
-    public function testCreateWriteIndex(): void
+    public function test_create_write_index(): void
     {
         $elasticsearch = $this->app->make(Client::class);
         $stage = new CreateWriteIndex($elasticsearch);

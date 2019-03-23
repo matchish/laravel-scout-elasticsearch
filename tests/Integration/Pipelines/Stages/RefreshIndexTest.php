@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Tests\Integration\Pipelines\Stages;
 
 use App\Product;
-use Elasticsearch\Client;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Pipelines\Stages\RefreshIndex;
 use Tests\IntegrationTestCase;
@@ -12,7 +11,7 @@ use Tests\IntegrationTestCase;
 final class RefreshIndexTest extends IntegrationTestCase
 {
 
-    public function testRefreshIndex(): void
+    public function test_refresh_index(): void
     {
         $this->elasticsearch->indices()->create([
             'index' => 'products_index',

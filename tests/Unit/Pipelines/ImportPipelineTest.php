@@ -21,7 +21,7 @@ use Tests\TestCase;
 class ImportPipelineTest extends TestCase
 {
 
-    public function testStages()
+    public function test_stages()
     {
         $elasticsearch = app(Client::class);
         $processor = new Processor();
