@@ -5,7 +5,3 @@ parameters:
     paths:
         - src
     reportUnmatchedIgnoredErrors: false
-    ignoreErrors:
-        - '#Cannot call static method create\(\) on string|null#'
-        - '#Cannot call method newCollection\(\) on mixed.#'
-        - '#Casting to string something that#'
