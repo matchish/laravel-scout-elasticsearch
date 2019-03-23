@@ -21,6 +21,10 @@ It’s built on top of the latest release of [Laravel Scout](https://laravel.com
 package. Using Scout Extended, you are free to take advantage of all of Laravel Scout’s
 great features, and at the same time leverage the complete set of ElasticSearch’s search experience.
 
+If you need any help, [stack overflow](https://stackoverflow.com/questions/tagged/laravel-scout%20laravel%20elasticsearch) is the preffered and recommended way to ask support questions.
+
+Don't forget :star: it if you like the package. :pray:
+
 ## :two_hearts: Features
 
 - [**Zero downtime** reimports]() - it’s a breeze to import data in production.
