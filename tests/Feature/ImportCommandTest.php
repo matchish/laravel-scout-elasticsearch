@@ -4,10 +4,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Product;
-use Elasticsearch\Client;
-use Elasticsearch\ClientBuilder;
 use Tests\IntegrationTestCase;
-use Tests\TestCase;
 use Illuminate\Support\Facades\Artisan;
 
 final class ImportCommandTest extends IntegrationTestCase
