@@ -125,12 +125,15 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
         $this->assertEquals(0, $response['hits']['total']);
     }
 
-    /**
-     *
-     */
-    public function testSearch()
+    public function test_map_with_custom_key_name()
     {
-
+        $this->app['config']['scout.key'] = 'custom_key';
+        $models = Product::all();
+        $keys = $models->map(function ($product) {
+            return ['_id' => $product->getScoutKey()];
+        })->all();
+        $mappedModels = $this->engine->map(new Builder(new Product(), 'zonga'), new SearchResults($keys), new Product());
+        $this->assertEquals($models->map->id->all(), $mappedModels->map->id->all());
     }
 
     /**
