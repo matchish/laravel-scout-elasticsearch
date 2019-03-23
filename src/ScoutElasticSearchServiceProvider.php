@@ -35,12 +35,11 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
     {
         $this->app->register(ScoutServiceProvider::class);
         $this->app->bind(Client::class, function () {
-            return ClientBuilder::create()->setHosts(["elasticsearch:9200"])->build();
+            return ClientBuilder::create()->setHosts([env('ELASTICSEARCH_HOST')])->build();
         });
         $this->app->bind(SearchableListFactory::class, function () {
             return new \Matchish\ScoutElasticSearch\Searchable\SearchableInNamespaceListFactory($this->app->getNamespace(), $this->app->path());
         });
-
         $this->registerCommands();
     }
 
