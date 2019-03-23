@@ -21,7 +21,7 @@ matrix:
     - php: nightly
 
 before_script:
-    - sleep 120
+    - curl -X GET "localhost:9200/_cluster/health?wait_for_status=yellow&timeout=50s"
     - travis_retry composer self-update
     - travis_retry composer update --no-interaction --no-suggest --prefer-source
 script:
