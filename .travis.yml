@@ -3,9 +3,6 @@ language: php
 env:
   - ELASTICSEARCH_HOST=localhost:9200
 
-services:
-  - elasticsearch
-
 php:
   - 7.1
   - 7.2
@@ -22,6 +19,7 @@ matrix:
 
 before_script:
   - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.6.2.deb && sudo dpkg -i --force-confnew elasticsearch-6.6.2.deb && sudo service elasticsearch restart
+  - sleep 10
   - curl -X GET "localhost:9200/_cluster/health?wait_for_status=yellow&timeout=50s"
   - travis_retry composer self-update
   - travis_retry composer update --no-interaction --no-suggest --prefer-source
