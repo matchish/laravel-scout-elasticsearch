@@ -25,7 +25,7 @@ final class FlushCommandTest extends IntegrationTestCase
         $params = new Bulk();
         $params->index(Product::all());
         $this->elasticsearch->bulk($params->toArray());
-        $this->elasticsearch->indices()->refresh(new Refresh('products'));
+        $this->elasticsearch->indices()->refresh((new Refresh('products'))->toArray());
         Artisan::call('scout:flush');
 
         $params = [
