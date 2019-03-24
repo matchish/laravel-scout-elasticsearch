@@ -4,7 +4,7 @@ namespace Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias;
 /**
  * @internal
  */
-class Update
+final class Update
 {
     /**
      * @var array

@@ -5,7 +5,7 @@ namespace Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias;
 /**
  * @internal
  */
-class Get
+final class Get
 {
 
     /**
