@@ -8,17 +8,17 @@ use Tests\TestCase;
 class BulkTest extends TestCase
 {
 
-    public function testDelete()
+    public function test_delete()
     {
         $bulk = new Bulk();
         $product = new Product(['title' => 'Scout']);
         $product->id = 2;
         $bulk->delete($product);
-        $payload = $bulk->toArray();
+        $params = $bulk->toArray();
 
         $this->assertEquals([
             'body' => [['delete' => ['_index' => 'products', '_type' => '_doc', '_id' => 2]]]
-        ], $payload);
+        ], $params);
     }
 
     public function test_delete_with_custom_key_name()
@@ -35,13 +35,13 @@ class BulkTest extends TestCase
         ], $params);
     }
 
-    public function testIndex()
+    public function test_index()
     {
         $bulk = new Bulk();
         $product = new Product(['title' => 'Scout']);
         $product->id = 2;
         $bulk->index($product);
-        $payload = $bulk->toArray();
+        $params = $bulk->toArray();
 
         $this->assertEquals([
             'body' => [
