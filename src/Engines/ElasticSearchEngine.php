@@ -8,6 +8,7 @@ use Laravel\Scout\Searchable;
 use Matchish\ScoutElasticSearch\ElasticSearch\DefaultSearchResults;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
+use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Refresh;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Search as SearchParams;
 use Matchish\ScoutElasticSearch\ElasticSearch\SearchFactory;
 use Matchish\ScoutElasticSearch\ElasticSearch\SearchResults;
@@ -65,6 +66,7 @@ final class ElasticSearchEngine extends Engine
         $body = (new Search())->addQuery(new MatchAllQuery())->toArray();
         $params = new SearchParams($indexName, $body);
         $this->elasticsearch->deleteByQuery($params->toArray());
+        $this->elasticsearch->indices()->refresh((new Refresh($indexName))->toArray());
     }
 
     /**

@@ -29,7 +29,7 @@ final class FlushCommandTest extends IntegrationTestCase
         Artisan::call('scout:flush');
 
         $params = [
-            "index" => (new Product())->searchableAs(),
+            "index" => 'products',
             "body" => [
                 "query" => [
                     "match_all" => new \stdClass()
