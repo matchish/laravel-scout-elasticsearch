@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Tests\Integration\Pipelines\Stages;
 
 use App\Product;
-use Elasticsearch\Client;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Pipelines\Stages\PullFromSource;
 use Tests\IntegrationTestCase;
