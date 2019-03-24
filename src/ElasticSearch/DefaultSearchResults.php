@@ -32,12 +32,12 @@ final class DefaultSearchResults extends Collection implements SearchResults
         parent::__construct($items);
     }
 
-    public function total()
+    public function total(): int
     {
         return $this->results['hits']['total'];
     }
 
-    public function mapTo($model, $builder)
+    public function mapTo($model, $builder): SearchResults
     {
         $keys = $this->pluck('_id')->values()->all();
 
@@ -51,8 +51,4 @@ final class DefaultSearchResults extends Collection implements SearchResults
         })->filter()->values();
     }
 
-    public function toArray(): array
-    {
-        return $this->results;
-    }
 }
