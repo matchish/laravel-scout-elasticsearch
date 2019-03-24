@@ -24,12 +24,18 @@ final class PullFromSource
     {
         [$index, $source] = $payload;
 
-        $totalSearchables = $source::count();
+        $softDelete = $source::usesSoftDelete() && config('scout.soft_delete', false);
+        $query = $source->newQuery()
+            ->when($softDelete, function ($query) {
+                $query->withTrashed();
+            })
+            ->orderBy($source->getKeyName());
+        $totalSearchables = $query->count();
         if ($totalSearchables) {
             $chunkSize = (int) config('scout.chunk.searchable', 500);
             $totalChunks = (int) ceil($totalSearchables / $chunkSize);
-            collect(range(1, $totalChunks))->each(function($page) use($source, $chunkSize) {
-                $results = $source->forPage($page, $chunkSize)->get();
+            collect(range(1, $totalChunks))->each(function($page) use($query, $chunkSize) {
+                $results = $query->forPage($page, $chunkSize)->get();
                 $countResults = $results->count();
                 if ($countResults == 0) {
                     return false;
