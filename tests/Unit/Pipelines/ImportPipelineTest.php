@@ -50,5 +50,6 @@ class Processor implements ProcessorInterface {
     public function process($payload, callable ...$stages)
     {
         $this->stages = $stages;
+        return $payload;
     }
 }
