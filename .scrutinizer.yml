@@ -14,9 +14,9 @@ build:
     variables:
       - ELASTICSEARCH_HOST=localhost:9200
   nodes:
-    services:
-      elasticsearch: 6.6.2
     analysis:
+      services:
+        elasticsearch: 6.6.2
       tests:
         override:
           - php-scrutinizer-run
