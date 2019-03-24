@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Product;
-use Elasticsearch\Client;
 use Illuminate\Support\Facades\Artisan;
+use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
+use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Refresh;
 use Tests\IntegrationTestCase;
 
 final class FlushCommandTest extends IntegrationTestCase
@@ -21,10 +22,12 @@ final class FlushCommandTest extends IntegrationTestCase
         factory(Product::class, $productsAmount)->create();
 
         Product::setEventDispatcher($dispatcher);
-
+        $params = new Bulk();
+        $params->index(Product::all());
+        $this->elasticsearch->bulk($params);
+        $this->elasticsearch->indices()->refresh(new Refresh('products'));
         Artisan::call('scout:flush');
 
-        $elasticsearch = $this->app->make(Client::class);
         $params = [
             "index" => (new Product())->searchableAs(),
             "body" => [
@@ -34,8 +37,7 @@ final class FlushCommandTest extends IntegrationTestCase
             ]
         ];
 
-        /** @var Client $elasticseearch */
-        $response = $elasticsearch->search($params);
+        $response = $this->elasticsearch->search($params);
         $this->assertEquals(0, $response['hits']['total']);
     }
 }
