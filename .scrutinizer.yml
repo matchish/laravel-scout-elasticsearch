@@ -11,10 +11,11 @@ build:
   environment:
     php:
       version: '7.2'
-    variables:
-      - ELASTICSEARCH_HOST=localhost:9200
   nodes:
     analysis:
+      environment:
+        variables:
+          ELASTICSEARCH_HOST: 'localhost:9200'
       services:
         elasticsearch: 6.6.2
       tests:
