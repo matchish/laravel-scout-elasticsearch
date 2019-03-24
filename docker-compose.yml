@@ -19,6 +19,7 @@ services:
       HOME: /home/user
       XDEBUG_CONFIG: ${XDEBUG_CONFIG}
       PHP_IDE_CONFIG: ${PHP_IDE_CONFIG}
+      ELASTICSEARCH_HOST: ${ELASTICSEARCH_HOST}
     networks:
       - default
   elasticsearch:
