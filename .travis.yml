@@ -14,16 +14,17 @@ php:
 
 cache:
   directories:
-  - "$HOME/.composer/cache/files"
+    - "$HOME/.composer/cache/files"
 
 matrix:
   allow_failures:
     - php: nightly
 
 before_script:
-    - curl -X GET "localhost:9200/_cluster/health?wait_for_status=yellow&timeout=50s"
-    - travis_retry composer self-update
-    - travis_retry composer update --no-interaction --no-suggest --prefer-source
+  - curl -O https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/6.6.2/elasticsearch-2.3.0.deb && sudo dpkg -i --force-confnew elasticsearch-2.3.0.deb && sudo service elasticsearch restart
+  - curl -X GET "localhost:9200/_cluster/health?wait_for_status=yellow&timeout=50s"
+  - travis_retry composer self-update
+  - travis_retry composer update --no-interaction --no-suggest --prefer-source
 script:
-    - vendor/bin/phpunit --testdox
-    - vendor/bin/phpstan analyse
+  - vendor/bin/phpunit --testdox
+  - vendor/bin/phpstan analyse
