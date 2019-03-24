@@ -20,7 +20,7 @@ final class SearchFactory
     {
         $search = new Search();
         $query = new MatchQuery('searchable', $builder->query);
-        if ($builder->wheres) {
+        if (!empty($builder->wheres)) {
             $boolQuery = new BoolQuery();
             foreach ($builder->wheres as $field => $value) {
                 $boolQuery->add(new TermQuery((string)$field, $value), BoolQuery::FILTER);
@@ -36,7 +36,7 @@ final class SearchFactory
         if (array_key_exists('size', $options)) {
             $search->setSize($options['size']);
         }
-        if ($builder->orders) {
+        if (!empty($builder->orders)) {
             foreach ($builder->orders as $order) {
                 $search->addSort(new FieldSort($order['column'], $order['direction']));
             }
