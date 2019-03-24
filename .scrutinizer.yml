@@ -12,7 +12,7 @@ build:
     php:
       version: '7.2'
     variables:
-      ELASTICSEARCH_HOST=localhost:9200
+      - ELASTICSEARCH_HOST=localhost:9200
   nodes:
     services:
       elasticsearch: 6.6.2
