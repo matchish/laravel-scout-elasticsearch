@@ -24,7 +24,7 @@ final class FlushCommandTest extends IntegrationTestCase
         Product::setEventDispatcher($dispatcher);
         $params = new Bulk();
         $params->index(Product::all());
-        $this->elasticsearch->bulk($params);
+        $this->elasticsearch->bulk($params->toArray());
         $this->elasticsearch->indices()->refresh(new Refresh('products'));
         Artisan::call('scout:flush');
 
