@@ -1,7 +1,6 @@
 <?php
 namespace Tests\Unit\Engines;
 
-use Matchish\ScoutElasticSearch\ElasticSearch\DefaultSearchResults;
 use Mockery as m;
 use App\Product;
 use Elasticsearch\Client;
@@ -16,7 +15,7 @@ class ElasticSearchEngineTest extends TestCase
     public function test_map_ids()
     {
         $sut = new ElasticSearchEngine(app(Client::class));
-        $ids = $sut->mapIds((new DefaultSearchResults([['_id' => 1], ['_id' => 15]])));
+        $ids = $sut->mapIds(['hits' => [ 'hits' => [['_id' => 1], ['_id' => 15]]]]);
 
         $this->assertEquals([1, 15], $ids->all());
     }
@@ -54,10 +53,10 @@ class ElasticSearchEngineTest extends TestCase
             return $query;
         });
         $engine = new ElasticSearchEngine(app(Client::class));
-        $engine->map($builder, new DefaultSearchResults(['hits' => ['hits' =>
+        $engine->map($builder, ['hits' => ['hits' =>
             ['_id' => 1],
             ['_id' => 2],
-        ]]), new Product());
+        ]], new Product());
         $this->assertTrue($spy->executed);
     }
 }

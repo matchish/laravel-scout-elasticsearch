@@ -3,7 +3,6 @@ namespace Tests\Integration\Engines;
 
 use App\Product;
 use Laravel\Scout\Builder;
-use Matchish\ScoutElasticSearch\ElasticSearch\DefaultSearchResults;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
 use Tests\IntegrationTestCase;
 
@@ -112,7 +111,8 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
         $keys = $models->map(function ($product) {
             return ['_id' => $product->getScoutKey()];
         })->all();
-        $mappedModels = $this->engine->map(new Builder(new Product(), 'zonga'), new DefaultSearchResults($keys), new Product());
+        $results = ['hits' => ['hits' => $keys]];
+        $mappedModels = $this->engine->map(new Builder(new Product(), 'zonga'), $results, new Product());
         $this->assertEquals($models->map->id->all(), $mappedModels->map->id->all());
     }
 

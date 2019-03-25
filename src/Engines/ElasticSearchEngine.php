@@ -5,7 +5,7 @@ namespace Matchish\ScoutElasticSearch\Engines;
 use Laravel\Scout\Builder as BaseBuilder;
 use Laravel\Scout\Engines\Engine;
 use Laravel\Scout\Searchable;
-use Matchish\ScoutElasticSearch\ElasticSearch\DefaultSearchResults;
+use Matchish\ScoutElasticSearch\ElasticSearch\EloquentHitsIteratorAggregate;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Refresh;
@@ -93,7 +93,7 @@ final class ElasticSearchEngine extends Engine
      */
     public function mapIds($results)
     {
-        return $results->pluck('_id');
+        return collect($results['hits']['hits'])->pluck('_id');
     }
 
     /**
@@ -101,7 +101,9 @@ final class ElasticSearchEngine extends Engine
      */
     public function map(BaseBuilder $builder, $results, $model)
     {
-        return $results->mapTo($model, $builder);
+        $ids = $this->mapIds($results)->all();
+        $hits = new EloquentHitsIteratorAggregate($ids, $model, $builder->queryCallback);
+        return new \Illuminate\Database\Eloquent\Collection($hits);
     }
 
     /**
@@ -109,7 +111,7 @@ final class ElasticSearchEngine extends Engine
      */
     public function getTotalCount($results)
     {
-        return $results->total();
+        return $results['hits']['total'];
     }
 
 
@@ -143,7 +145,7 @@ final class ElasticSearchEngine extends Engine
         $model = $builder->model;
         $indexName = $builder->index ?: $model->searchableAs();
         $params = new SearchParams($indexName, $searchBody->toArray());
-        return new DefaultSearchResults($this->elasticsearch->search($params->toArray()));
+        return $this->elasticsearch->search($params->toArray());
     }
 
 }
