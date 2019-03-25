@@ -4,7 +4,7 @@ namespace Matchish\ScoutElasticSearch\ElasticSearch;
 
 use Laravel\Scout\Builder;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
-use ONGR\ElasticsearchDSL\Query\FullText\MatchQuery;
+use ONGR\ElasticsearchDSL\Query\FullText\QueryStringQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use ONGR\ElasticsearchDSL\Search;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
@@ -19,7 +19,7 @@ final class SearchFactory
     public static function create(Builder $builder, array $options = []): Search
     {
         $search = new Search();
-        $query = new MatchQuery('searchable', $builder->query);
+        $query = new QueryStringQuery($builder->query);
         if (!empty($builder->wheres)) {
             $boolQuery = new BoolQuery();
             foreach ($builder->wheres as $field => $value) {
