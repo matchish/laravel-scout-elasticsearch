@@ -41,6 +41,18 @@ abstract class TestCase extends BaseTestCase
                 'database' => ':memory:',
                 'prefix' => '',
             ]);
+            $app['config']->set('elasticsearch.indices.mappings.products', [
+                "_doc" => [
+                    "properties" => [
+                        "type" => [
+                            "type" => "keyword"
+                        ],
+                        "price" => [
+                            "type" => "integer"
+                        ]
+                    ]
+                ]
+            ]);
         }
 
     protected function getPackageProviders($app)

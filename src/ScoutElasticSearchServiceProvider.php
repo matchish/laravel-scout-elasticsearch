@@ -35,6 +35,12 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
         $this->app->bind(Client::class, function () {
             return ClientBuilder::create()->setHosts([env('ELASTICSEARCH_HOST')])->build();
         });
+        config()->set('elasticsearch.indices.settings.default', [
+                "number_of_shards" => 1,
+                "number_of_replicas" => 0,
+
+        ]);
+
         $this->registerCommands();
     }
 

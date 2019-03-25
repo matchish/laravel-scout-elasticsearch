@@ -25,7 +25,7 @@ class CleanUpTest extends IntegrationTestCase
         ]);
 
         $stage = new CleanUp($this->elasticsearch);
-        $stage([new Index(new Product()), new Product()]);
+        $stage([new Index(new Product(), []), new Product()]);
         $writeIndexExist = $this->elasticsearch->indices()->exists(['index' => 'products_new']);
         $readIndexExist = $this->elasticsearch->indices()->exists(['index' => 'products_old']);
 
@@ -36,7 +36,7 @@ class CleanUpTest extends IntegrationTestCase
     public function test_return_same_payload()
     {
         $stage = new CleanUp($this->elasticsearch);
-        $payload = [new Index(new Product()), new Product()];
+        $payload = [new Index(new Product(), []), new Product()];
         $nextPayload = $stage($payload);
         $this->assertEquals(2, count($nextPayload));
         $this->assertSame($payload[0], $nextPayload[0]);
