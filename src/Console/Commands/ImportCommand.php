@@ -12,7 +12,7 @@ final class ImportCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected $signature = 'scout:import {searchable? : The name of the searchable}';
+    protected $signature = 'scout:import {searchable?* : The name of the searchable}';
     /**
      * {@inheritdoc}
      */
@@ -21,11 +21,14 @@ final class ImportCommand extends Command
     /**
      * {@inheritdoc}
      */
-    public function handle(SearchableListFactory $factory): void
+    public function handle(): void
     {
         $command = $this;
-        $searchables = (array)$command->argument('searchable');
-        $factory->make()->each(function ($searchable){
+        $searchableList = collect($command->argument('searchable'))->whenEmpty(function () {
+            $factory = new SearchableListFactory(app()->getNamespace(), app()->path());
+            return $factory->make();
+        });
+        $searchableList->each(function ($searchable){
             $job = new Import($searchable);
             if (config('scout.queue')) {
                 dispatch($job)->allOnQueue((new $searchable)->syncWithSearchUsingQueue())

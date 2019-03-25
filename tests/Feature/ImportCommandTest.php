@@ -20,7 +20,9 @@ final class ImportCommandTest extends IntegrationTestCase
 
         Product::setEventDispatcher($dispatcher);
 
-        Artisan::call('scout:import');
+        Artisan::call('scout:import', [
+            'searchable' => [Product::class]
+        ]);
         $params = [
             "index" => 'products',
             "body" => [

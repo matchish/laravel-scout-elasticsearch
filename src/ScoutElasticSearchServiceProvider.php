@@ -11,9 +11,7 @@ use Illuminate\Support\ServiceProvider;
 use Laravel\Scout\ScoutServiceProvider;
 use Matchish\ScoutElasticSearch\Console\Commands\FlushCommand;
 use Matchish\ScoutElasticSearch\Console\Commands\ImportCommand;
-use Matchish\ScoutElasticSearch\Searchable\SearchableList;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
-use Matchish\ScoutElasticSearch\Searchable\SearchableListFactory;
 
 final class ScoutElasticSearchServiceProvider extends ServiceProvider
 {
@@ -36,9 +34,6 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
         $this->app->register(ScoutServiceProvider::class);
         $this->app->bind(Client::class, function () {
             return ClientBuilder::create()->setHosts([env('ELASTICSEARCH_HOST')])->build();
-        });
-        $this->app->bind(SearchableListFactory::class, function () {
-            return new \Matchish\ScoutElasticSearch\Searchable\SearchableInNamespaceListFactory($this->app->getNamespace(), $this->app->path());
         });
         $this->registerCommands();
     }
