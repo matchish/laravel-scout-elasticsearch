@@ -103,11 +103,11 @@ $results = Product::search('zonga', function($client, $body) {
     $body->addAggregation($brandTermAggregation);
     
     $client->search(['index' => 'products', 'body' => $body->toArray()]);
-});
+})->raw();
 ```
 
 `$client` is `\ElasticSearch\Client` object from [`elasticsearch/elasticsearch`](https://packagist.org/packages/elasticsearch/elasticsearch) package  
- And `$body` is `ONGR\ElasticsearchDSL` from [ongr/elasticsearch-dsl](https://packagist.org/packages/ongr/elasticsearch-dsl) package  
+ And `$body` is `ONGR\ElasticsearchDSL\Search` from [ongr/elasticsearch-dsl](https://packagist.org/packages/ongr/elasticsearch-dsl) package  
 
 ## :free: License
 Scout ElasticSearch is an open-sourced software licensed under the [MIT license](LICENSE.md).
