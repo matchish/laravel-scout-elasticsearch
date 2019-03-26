@@ -85,13 +85,25 @@ By default when you pass query to `search` method the engine builds [query_strin
 
 If it's not enough in your case you can pass callback to query builder
 
-`Product::search('zonga', function($client, $body) {  
-    //... build your fancy query
-    $client->search(['index' => 'products', 'body' => $body->toArray()]);
-})`  
+`$results = Product::search('zonga', function($client, $body) {
 
-`$client` here is `\ElasticSearch\Client` object from [`elastic/elasticsearch-php`](https://github.com/elastic/elasticsearch-php) package
-  
+    $minPriceAggregation = new MinAggregation('min_price');
+    $minPriceAggregation->setField('price');
+    
+    $maxPriceAggregation = new MaxAggregation('max_price');
+    $maxPriceAggregation->setField('price');
+    
+    $brandTermAggregation = new TermsAggregation('brand');
+    $brandTermAggregation->setField('brand');
+
+    $body->addAggregation($minPriceAggregation);
+    $body->addAggregation($brandTermAggregation);
+    
+    $client->search(['index' => 'products', 'body' => $body->toArray()]);
+});`
+
+`$client` is `\ElasticSearch\Client` object from [`elasticsearch/elasticsearch`](https://packagist.org/packages/elasticsearch/elasticsearch) package  
+ And `$body` is `ONGR\ElasticsearchDSL` from [ongr/elasticsearch-dsl](https://packagist.org/packages/ongr/elasticsearch-dsl) package  
 
 ## :free: License
 Scout ElasticSearch is an open-sourced software licensed under the [MIT license](LICENSE.md).
