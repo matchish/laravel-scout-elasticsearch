@@ -81,11 +81,14 @@ So how we can build complex queries?
 There is two ways.   
 By default when you pass query to `search` method the engine builds [query_string](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html) query, so you can build queries like this
 
-`Product::search('title:this OR description:this) AND (title:that OR description:that')`
+```php
+Product::search('title:this OR description:this) AND (title:that OR description:that')`
+```
 
 If it's not enough in your case you can pass callback to query builder
 
-`$results = Product::search('zonga', function($client, $body) {
+```php
+$results = Product::search('zonga', function($client, $body) {
 
     $minPriceAggregation = new MinAggregation('min_price');
     $minPriceAggregation->setField('price');
@@ -100,7 +103,8 @@ If it's not enough in your case you can pass callback to query builder
     $body->addAggregation($brandTermAggregation);
     
     $client->search(['index' => 'products', 'body' => $body->toArray()]);
-});`
+});
+```
 
 `$client` is `\ElasticSearch\Client` object from [`elasticsearch/elasticsearch`](https://packagist.org/packages/elasticsearch/elasticsearch) package  
  And `$body` is `ONGR\ElasticsearchDSL` from [ongr/elasticsearch-dsl](https://packagist.org/packages/ongr/elasticsearch-dsl) package  
