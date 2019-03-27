@@ -1,27 +1,27 @@
 <?php
+
 namespace Tests\Integration\Pipelines\Stages;
 
 use App\Product;
+use Tests\IntegrationTestCase;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Pipelines\Stages\CleanUp;
-use Tests\IntegrationTestCase;
 
 class CleanUpTest extends IntegrationTestCase
 {
-
     public function test_remove_write_index()
     {
         $this->elasticsearch->indices()->create([
             'index' => 'products_old',
-            'body' => ['aliases' => ['products' => new \stdClass()]]
+            'body' => ['aliases' => ['products' => new \stdClass()]],
         ]);
         $this->elasticsearch->indices()->create([
             'index' => 'products_new',
-            'body' => ['aliases' => ['products' => ['is_write_index' => true], 'products1' => ['is_write_index' => true]]]
+            'body' => ['aliases' => ['products' => ['is_write_index' => true], 'products1' => ['is_write_index' => true]]],
         ]);
         $this->elasticsearch->indices()->create([
             'index' => 'products_third',
-            'body' => ['aliases' => ['products' => ['is_write_index' => false]]]
+            'body' => ['aliases' => ['products' => ['is_write_index' => false]]],
         ]);
 
         $stage = new CleanUp($this->elasticsearch);

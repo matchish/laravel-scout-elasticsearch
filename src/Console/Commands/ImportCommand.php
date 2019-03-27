@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Matchish\ScoutElasticSearch\Console\Commands;
@@ -26,20 +27,19 @@ final class ImportCommand extends Command
         $command = $this;
         $searchableList = collect($command->argument('searchable'))->whenEmpty(function () {
             $factory = new SearchableListFactory(app()->getNamespace(), app()->path());
+
             return $factory->make();
         });
-        $searchableList->each(function ($searchable){
+        $searchableList->each(function ($searchable) {
             $job = new Import($searchable);
             if (config('scout.queue')) {
                 dispatch($job)->allOnQueue((new $searchable)->syncWithSearchUsingQueue())
                     ->allOnConnection(config((new $searchable)->syncWithSearchUsing()));
-                $this->output->success('All [' . $searchable . '] records have been dispatched to import job.');
+                $this->output->success('All ['.$searchable.'] records have been dispatched to import job.');
             } else {
                 dispatch_now($job);
-                $this->output->success('All [' . $searchable . '] records have been searchable.');
+                $this->output->success('All ['.$searchable.'] records have been searchable.');
             }
         });
-
     }
-
 }

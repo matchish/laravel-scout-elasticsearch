@@ -3,16 +3,15 @@
  * Created by PhpStorm.
  * User: matchish
  * Date: 20.03.19
- * Time: 12:39
+ * Time: 12:39.
  */
 
 namespace Matchish\ScoutElasticSearch\ElasticSearch;
 
-use Illuminate\Database\Eloquent\Model;
+use Traversable;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Searchable;
-use Traversable;
-
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * @internal
@@ -45,7 +44,7 @@ final class EloquentHitsIteratorAggregate implements \IteratorAggregate
     }
 
     /**
-     * Retrieve an external iterator
+     * Retrieve an external iterator.
      * @link https://php.net/manual/en/iteratoraggregate.getiterator.php
      * @return Traversable An instance of an object implementing <b>Iterator</b> or
      * <b>Traversable</b>
@@ -56,7 +55,7 @@ final class EloquentHitsIteratorAggregate implements \IteratorAggregate
         /** @var Searchable $model */
         $model = $this->model;
         $builder = new Builder($this->model, '');
-        if (!empty($this->callback)) {
+        if (! empty($this->callback)) {
             $builder->query($this->callback);
         }
         $models = $model->getScoutModelsByIds(
@@ -67,6 +66,7 @@ final class EloquentHitsIteratorAggregate implements \IteratorAggregate
         $hits = collect($this->keys)->map(function ($key) use ($models) {
             return isset($models[$key]) ? $models[$key] : null;
         })->filter()->all();
+
         return new \ArrayIterator($hits);
     }
 }

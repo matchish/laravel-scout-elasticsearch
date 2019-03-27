@@ -3,24 +3,23 @@
  * Created by PhpStorm.
  * User: matchish
  * Date: 18.03.19
- * Time: 11:23
+ * Time: 11:23.
  */
 
 namespace Tests\Unit\Pipelines;
 
+use Tests\TestCase;
 use Elasticsearch\Client;
 use League\Pipeline\ProcessorInterface;
 use Matchish\ScoutElasticSearch\Pipelines\ImportPipeline;
 use Matchish\ScoutElasticSearch\Pipelines\Stages\CleanUp;
-use Matchish\ScoutElasticSearch\Pipelines\Stages\CreateWriteIndex;
-use Matchish\ScoutElasticSearch\Pipelines\Stages\PullFromSource;
 use Matchish\ScoutElasticSearch\Pipelines\Stages\RefreshIndex;
+use Matchish\ScoutElasticSearch\Pipelines\Stages\PullFromSource;
+use Matchish\ScoutElasticSearch\Pipelines\Stages\CreateWriteIndex;
 use Matchish\ScoutElasticSearch\Pipelines\Stages\SwitchToNewAndRemoveOldIndex;
-use Tests\TestCase;
 
 class ImportPipelineTest extends TestCase
 {
-
     public function test_stages()
     {
         $elasticsearch = app(Client::class);
@@ -36,8 +35,8 @@ class ImportPipelineTest extends TestCase
     }
 }
 
-class Processor implements ProcessorInterface {
-
+class Processor implements ProcessorInterface
+{
     public $stages;
 
     /**
@@ -50,6 +49,7 @@ class Processor implements ProcessorInterface {
     public function process($payload, callable ...$stages)
     {
         $this->stages = $stages;
+
         return $payload;
     }
 }

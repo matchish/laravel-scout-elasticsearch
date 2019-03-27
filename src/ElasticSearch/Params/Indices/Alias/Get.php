@@ -1,13 +1,12 @@
 <?php
-namespace Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias;
 
+namespace Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias;
 
 /**
  * @internal
  */
 final class Get
 {
-
     /**
      * @var string
      */
@@ -35,7 +34,7 @@ final class Get
     {
         return [
             'index' => $this->index,
-            'name' => $this->alias
+            'name' => $this->alias,
         ];
     }
 

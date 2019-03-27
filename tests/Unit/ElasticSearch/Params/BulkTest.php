@@ -1,13 +1,13 @@
 <?php
+
 namespace Tests\Unit\ElasticSearch\Params;
 
 use App\Product;
-use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
 use Tests\TestCase;
+use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
 
 class BulkTest extends TestCase
 {
-
     public function test_delete()
     {
         $bulk = new Bulk();
@@ -17,7 +17,7 @@ class BulkTest extends TestCase
         $params = $bulk->toArray();
 
         $this->assertEquals([
-            'body' => [['delete' => ['_index' => 'products', '_type' => '_doc', '_id' => 2]]]
+            'body' => [['delete' => ['_index' => 'products', '_type' => '_doc', '_id' => 2]]],
         ], $params);
     }
 
@@ -31,7 +31,7 @@ class BulkTest extends TestCase
         $params = $bulk->toArray();
 
         $this->assertEquals([
-            'body' => [['delete' => ['_index' => 'products', '_type' => '_doc', '_id' => 'Scout']]]
+            'body' => [['delete' => ['_index' => 'products', '_type' => '_doc', '_id' => 'Scout']]],
         ], $params);
     }
 
@@ -47,7 +47,7 @@ class BulkTest extends TestCase
             'body' => [
                 ['index' => ['_index' => 'products', '_type' => '_doc', '_id' => 2]],
                 ['title' => 'Scout', 'id' => 2],
-            ]
+            ],
         ], $params);
     }
 
@@ -64,7 +64,7 @@ class BulkTest extends TestCase
             'body' => [
                 ['index' => ['_index' => 'products', '_type' => '_doc', '_id' => 'Scout']],
                 ['title' => 'Scout', 'id' => 2],
-            ]
+            ],
         ], $params);
     }
 
@@ -80,7 +80,7 @@ class BulkTest extends TestCase
             'body' => [
                 ['index' => ['_index' => 'products', '_type' => '_doc', '_id' => 2]],
                 ['title' => 'Scout', '__soft_deleted' => 0, 'id' => 2],
-            ]
+            ],
         ], $params);
     }
 }

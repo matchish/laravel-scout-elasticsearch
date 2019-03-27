@@ -9,9 +9,9 @@ use Elasticsearch\ClientBuilder;
 use Laravel\Scout\EngineManager;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Scout\ScoutServiceProvider;
+use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
 use Matchish\ScoutElasticSearch\Console\Commands\FlushCommand;
 use Matchish\ScoutElasticSearch\Console\Commands\ImportCommand;
-use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
 
 final class ScoutElasticSearchServiceProvider extends ServiceProvider
 {
@@ -22,6 +22,7 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
     {
         resolve(EngineManager::class)->extend(ElasticSearchEngine::class, function () {
             $elasticsearch = resolve(Client::class);
+
             return new ElasticSearchEngine($elasticsearch);
         });
     }
@@ -36,14 +37,13 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
             return ClientBuilder::create()->setHosts([env('ELASTICSEARCH_HOST')])->build();
         });
         config()->set('elasticsearch.indices.settings.default', [
-                "number_of_shards" => 1,
-                "number_of_replicas" => 0,
+                'number_of_shards' => 1,
+                'number_of_replicas' => 0,
 
         ]);
 
         $this->registerCommands();
     }
-
 
     /**
      * Register artisan commands.
@@ -59,5 +59,4 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
             ]);
         }
     }
-
 }

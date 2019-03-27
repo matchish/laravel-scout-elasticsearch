@@ -1,25 +1,25 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Integration\Pipelines\Stages;
 
 use App\Product;
+use Tests\IntegrationTestCase;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Pipelines\Stages\SwitchToNewAndRemoveOldIndex;
-use Tests\IntegrationTestCase;
 
 final class SwitchToNewAndRemoveOldIndexTest extends IntegrationTestCase
 {
-
     public function test_switch_to_new_and_remove_old_index(): void
     {
         $this->elasticsearch->indices()->create([
             'index' => 'products_new',
-            'body' => ['aliases' => ['products' => ['is_write_index' => true]]]
+            'body' => ['aliases' => ['products' => ['is_write_index' => true]]],
         ]);
         $this->elasticsearch->indices()->create([
             'index' => 'products_old',
-            'body' => ['aliases' => ['products' => new \stdClass()]]
+            'body' => ['aliases' => ['products' => new \stdClass()]],
         ]);
 
         $stage = new SwitchToNewAndRemoveOldIndex($this->elasticsearch);
@@ -32,9 +32,7 @@ final class SwitchToNewAndRemoveOldIndexTest extends IntegrationTestCase
         $this->assertTrue($newIndexExist);
         $this->assertFalse($oldIndexExist);
         $this->assertEquals(['products_new' => [
-            'aliases' => ['products' => []]
+            'aliases' => ['products' => []],
         ]], $alias);
-
     }
-
 }

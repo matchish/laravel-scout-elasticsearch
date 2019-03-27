@@ -1,4 +1,5 @@
 <?php
+
 namespace Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices;
 
 /**
@@ -6,7 +7,6 @@ namespace Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices;
  */
 final class Create
 {
-
     /**
      * @var string
      */
@@ -34,7 +34,7 @@ final class Create
     {
         return [
             'index' => $this->index,
-            'body' => $this->config
+            'body' => $this->config,
         ];
     }
 }

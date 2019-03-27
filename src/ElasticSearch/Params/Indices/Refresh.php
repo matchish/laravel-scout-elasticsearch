@@ -1,4 +1,5 @@
 <?php
+
 namespace Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices;
 
 /**

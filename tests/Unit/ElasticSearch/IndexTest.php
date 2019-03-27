@@ -3,18 +3,17 @@
  * Created by PhpStorm.
  * User: matchish
  * Date: 12.03.19
- * Time: 8:29
+ * Time: 8:29.
  */
 
 namespace Tests\Unit\ElasticSearch;
 
 use App\Product;
-use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Tests\TestCase;
+use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 
 class IndexTest extends TestCase
 {
-
     public function test_creation_from_searchable()
     {
         $index = Index::fromSearchable(new Product());
@@ -23,6 +22,8 @@ class IndexTest extends TestCase
 }
 
 namespace Matchish\ScoutElasticSearch\ElasticSearch;
-function time():int {
+
+function time():int
+{
     return 1525376494;
 }

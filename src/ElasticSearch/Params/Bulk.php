@@ -12,7 +12,6 @@ final class Bulk
      */
     private $indexDocs = [];
 
-
     /**
      * @var array
      */
@@ -47,8 +46,8 @@ final class Bulk
                     'index' => [
                         '_index' => $model->searchableAs(),
                         '_id' => $model->getScoutKey(),
-                        '_type' => '_doc'
-                    ]
+                        '_type' => '_doc',
+                    ],
                 ];
 
                 $payload['body'][] = array_merge(
@@ -64,12 +63,13 @@ final class Bulk
                     'delete' => [
                         '_index' => $model->searchableAs(),
                         '_id' => $model->getScoutKey(),
-                        '_type' => '_doc'
-                    ]
+                        '_type' => '_doc',
+                    ],
                 ];
 
                 return $payload;
             }, $payload);
+
         return $payload;
     }
 
@@ -86,5 +86,4 @@ final class Bulk
             $this->indexDocs[$docs->getScoutKey()] = $docs;
         }
     }
-
 }

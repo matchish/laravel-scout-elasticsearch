@@ -1,11 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Feature;
 
 use App\Product;
-use Illuminate\Pagination\Paginator;
 use Tests\IntegrationTestCase;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Artisan;
 
 final class SearchTest extends IntegrationTestCase
@@ -32,7 +33,7 @@ final class SearchTest extends IntegrationTestCase
         Artisan::call('scout:import');
 
         $iphonePromoNew = Product::search('iphone')
-            ->where('price', "100")
+            ->where('price', '100')
             ->where('type', 'new')
             ->get();
         $this->assertEquals($iphonePromoNewAmount, $iphonePromoNew->count());
@@ -87,5 +88,4 @@ final class SearchTest extends IntegrationTestCase
             ->get();
         $this->assertEquals($kindleAmount, $kindle->count());
     }
-
 }

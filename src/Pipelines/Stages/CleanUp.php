@@ -2,7 +2,6 @@
 
 namespace Matchish\ScoutElasticSearch\Pipelines\Stages;
 
-
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Delete;
@@ -38,12 +37,13 @@ final class CleanUp
         foreach ($response as $indexName => $data) {
             foreach ($data['aliases'] as $alias => $config) {
                 if (array_key_exists('is_write_index', $config) && $config['is_write_index']) {
-                    $params = new Delete((string)$indexName);
+                    $params = new Delete((string) $indexName);
                     $this->elasticsearch->indices()->delete($params->toArray());
                     continue 2;
                 }
             }
         }
+
         return [$index, $source];
     }
 }

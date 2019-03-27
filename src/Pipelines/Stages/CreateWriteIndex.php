@@ -2,11 +2,10 @@
 
 namespace Matchish\ScoutElasticSearch\Pipelines\Stages;
 
-
 use Elasticsearch\Client;
+use Matchish\ScoutElasticSearch\ElasticSearch\WriteAlias;
 use Matchish\ScoutElasticSearch\ElasticSearch\DefaultAlias;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Create;
-use Matchish\ScoutElasticSearch\ElasticSearch\WriteAlias;
 
 /**
  * @internal

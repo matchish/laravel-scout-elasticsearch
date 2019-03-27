@@ -27,9 +27,10 @@ final class FlushCommand extends Command
         $command = $this;
         $searchableList = collect($command->argument('searchable'))->whenEmpty(function () {
             $factory = new SearchableListFactory(app()->getNamespace(), app()->path());
+
             return $factory->make();
         });
-        $searchableList->each(function ($searchable){
+        $searchableList->each(function ($searchable) {
             $searchable::removeAllFromSearch();
             $this->output->success('All ['.$searchable.'] records have been flushed.');
         });

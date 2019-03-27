@@ -1,22 +1,19 @@
 <?php
+
 namespace Tests\Integration\Engines;
 
 use App\Product;
 use Laravel\Scout\Builder;
-use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
 use Tests\IntegrationTestCase;
+use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
 
 final class ElasticSearchEngineTest extends IntegrationTestCase
 {
-
     /**
      * @var ElasticSearchEngine
      */
     private $engine;
 
-    /**
-     *
-     */
     public function setUp(): void
     {
         parent::setUp();
@@ -32,25 +29,23 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
         $this->engine = new ElasticSearchEngine($this->elasticsearch);
     }
 
-    /**
-     *
-     */
     public function test_update()
     {
         $models = Product::all();
         $models->map(function ($model) {
             $model->title = 'Scout';
+
             return $model;
         });
         $this->engine->update($models);
         $this->refreshIndex('products');
         $params = [
-            "index" => 'products',
-            "body" => [
-                "query" => [
-                    "match_all" => new \stdClass()
-                ]
-            ]
+            'index' => 'products',
+            'body' => [
+                'query' => [
+                    'match_all' => new \stdClass(),
+                ],
+            ],
         ];
         $response = $this->elasticsearch->search($params);
         $this->assertEquals($models->count(), $response['hits']['total']);
@@ -59,9 +54,6 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
         }
     }
 
-    /**
-     *
-     */
     public function test_delete()
     {
         $models = Product::all();
@@ -71,12 +63,12 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
         $this->engine->delete($models);
         $this->refreshIndex('products');
         $params = [
-            "index" => 'products',
-            "body" => [
-                "query" => [
-                    "match_all" => new \stdClass()
-                ]
-            ]
+            'index' => 'products',
+            'body' => [
+                'query' => [
+                    'match_all' => new \stdClass(),
+                ],
+            ],
         ];
         $response = $this->elasticsearch->search($params);
         $this->assertEquals(1, $response['hits']['total']);
@@ -93,12 +85,12 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
         $this->engine->flush(new Product());
         $this->refreshIndex('products');
         $params = [
-            "index" => 'products',
-            "body" => [
-                "query" => [
-                    "match_all" => new \stdClass()
-                ]
-            ]
+            'index' => 'products',
+            'body' => [
+                'query' => [
+                    'match_all' => new \stdClass(),
+                ],
+            ],
         ];
         $response = $this->elasticsearch->search($params);
         $this->assertEquals(0, $response['hits']['total']);
@@ -119,7 +111,7 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
     private function refreshIndex(string $index): void
     {
         $params = [
-            "index" => $index,
+            'index' => $index,
         ];
         $this->elasticsearch->indices()->refresh($params);
     }

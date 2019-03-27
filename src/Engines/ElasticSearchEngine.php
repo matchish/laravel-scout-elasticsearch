@@ -2,19 +2,19 @@
 
 namespace Matchish\ScoutElasticSearch\Engines;
 
-use Laravel\Scout\Builder as BaseBuilder;
-use Laravel\Scout\Engines\Engine;
 use Laravel\Scout\Searchable;
-use Matchish\ScoutElasticSearch\ElasticSearch\EloquentHitsIteratorAggregate;
+use Laravel\Scout\Engines\Engine;
+use ONGR\ElasticsearchDSL\Search;
+use Laravel\Scout\Builder as BaseBuilder;
+use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
+use Matchish\ScoutElasticSearch\Pipelines\ImportPipeline;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
-use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Refresh;
-use Matchish\ScoutElasticSearch\ElasticSearch\Params\Search as SearchParams;
 use Matchish\ScoutElasticSearch\ElasticSearch\SearchFactory;
 use Matchish\ScoutElasticSearch\ElasticSearch\SearchResults;
-use Matchish\ScoutElasticSearch\Pipelines\ImportPipeline;
-use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
-use ONGR\ElasticsearchDSL\Search;
+use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Refresh;
+use Matchish\ScoutElasticSearch\ElasticSearch\EloquentHitsIteratorAggregate;
+use Matchish\ScoutElasticSearch\ElasticSearch\Params\Search as SearchParams;
 
 final class ElasticSearchEngine extends Engine
 {
@@ -37,7 +37,7 @@ final class ElasticSearchEngine extends Engine
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function update($models)
     {
@@ -47,7 +47,7 @@ final class ElasticSearchEngine extends Engine
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function delete($models)
     {
@@ -56,9 +56,8 @@ final class ElasticSearchEngine extends Engine
         $this->elasticsearch->bulk($params->toArray());
     }
 
-
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function flush($model)
     {
@@ -70,7 +69,7 @@ final class ElasticSearchEngine extends Engine
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function search(BaseBuilder $builder)
     {
@@ -78,18 +77,18 @@ final class ElasticSearchEngine extends Engine
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function paginate(BaseBuilder $builder, $perPage, $page)
     {
         return $this->performSearch($builder, [
             'from' => ($page - 1) * $perPage,
-            'size' => $perPage
+            'size' => $perPage,
         ]);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function mapIds($results)
     {
@@ -97,23 +96,23 @@ final class ElasticSearchEngine extends Engine
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function map(BaseBuilder $builder, $results, $model)
     {
         $ids = $this->mapIds($results)->all();
         $hits = new EloquentHitsIteratorAggregate($ids, $model, $builder->queryCallback);
+
         return new \Illuminate\Database\Eloquent\Collection($hits);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getTotalCount($results)
     {
         return $results['hits']['total'];
     }
-
 
     /**
      * @internal
@@ -135,6 +134,7 @@ final class ElasticSearchEngine extends Engine
         if ($builder->callback) {
             /** @var callable */
             $callback = $builder->callback;
+
             return call_user_func(
                 $callback,
                 $this->elasticsearch,
@@ -145,7 +145,7 @@ final class ElasticSearchEngine extends Engine
         $model = $builder->model;
         $indexName = $builder->index ?: $model->searchableAs();
         $params = new SearchParams($indexName, $searchBody->toArray());
+
         return $this->elasticsearch->search($params->toArray());
     }
-
 }
