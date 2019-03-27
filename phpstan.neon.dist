@@ -5,3 +5,8 @@ parameters:
     paths:
         - src
     reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        -
+            path: %currentWorkingDirectory%/src/Engines/ElasticSearchEngine.php
+            message: '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::searchableAs\(\)\.#'
+
