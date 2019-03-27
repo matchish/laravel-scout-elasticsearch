@@ -2,7 +2,6 @@
 
 namespace Matchish\ScoutElasticSearch\ElasticSearch;
 
-
 /**
  * @internal
  */

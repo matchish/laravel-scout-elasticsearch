@@ -2,7 +2,6 @@
 
 namespace Matchish\ScoutElasticSearch\Pipelines\Stages;
 
-
 use Elasticsearch\Client;
 
 /**
@@ -34,7 +33,7 @@ final class PullFromSource
         if ($totalSearchables) {
             $chunkSize = (int) config('scout.chunk.searchable', 500);
             $totalChunks = (int) ceil($totalSearchables / $chunkSize);
-            collect(range(1, $totalChunks))->each(function($page) use($query, $chunkSize) {
+            collect(range(1, $totalChunks))->each(function ($page) use ($query, $chunkSize) {
                 $results = $query->forPage($page, $chunkSize)->get();
                 $countResults = $results->count();
                 if ($countResults == 0) {

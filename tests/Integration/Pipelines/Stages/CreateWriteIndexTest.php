@@ -1,13 +1,14 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Integration\Pipelines\Stages;
 
 use App\Product;
 use Elasticsearch\Client;
+use Tests\IntegrationTestCase;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Pipelines\Stages\CreateWriteIndex;
-use Tests\IntegrationTestCase;
 
 final class CreateWriteIndexTest extends IntegrationTestCase
 {
@@ -29,7 +30,7 @@ final class CreateWriteIndexTest extends IntegrationTestCase
                 }
             }
         }
+
         return false;
     }
-
 }

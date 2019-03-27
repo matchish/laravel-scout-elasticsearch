@@ -3,17 +3,15 @@
  * Created by PhpStorm.
  * User: matchish
  * Date: 13.03.19
- * Time: 15:18
+ * Time: 15:18.
  */
 
 namespace Tests;
 
-
 use Elasticsearch\Client;
 
 /**
- * Class IntegrationTestCase
- * @package Tests
+ * Class IntegrationTestCase.
  */
 class IntegrationTestCase extends TestCase
 {
@@ -23,7 +21,7 @@ class IntegrationTestCase extends TestCase
     protected $elasticsearch;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

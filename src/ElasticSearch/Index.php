@@ -31,7 +31,7 @@ final class Index
      * @param array $settings
      * @param array $mappings
      */
-    public function __construct(string $name, array $settings = null , array $mappings = null)
+    public function __construct(string $name, array $settings = null, array $mappings = null)
     {
         $this->name = $name;
         $this->settings = $settings;
@@ -68,26 +68,27 @@ final class Index
     public function config(): array
     {
         $config = [];
-        if (!empty($this->settings)) {
+        if (! empty($this->settings)) {
             $config['settings'] = $this->settings;
         }
-        if (!empty($this->mappings)) {
+        if (! empty($this->mappings)) {
             $config['mappings'] = $this->mappings;
         }
-        if (!empty($this->aliases())) {
+        if (! empty($this->aliases())) {
             $config['aliases'] = $this->aliases();
         }
+
         return $config;
     }
 
     public static function fromSearchable($searchable): Index
     {
-        $name = $searchable->searchableAs() . '_' . time();
+        $name = $searchable->searchableAs().'_'.time();
         $settingsConfigKey = "elasticsearch.indices.settings.{$searchable->searchableAs()}";
         $mappingsConfigKey = "elasticsearch.indices.mappings.{$searchable->searchableAs()}";
         $settings = config($settingsConfigKey, config('elasticsearch.indices.settings.default'));
         $mappings = config($mappingsConfigKey);
+
         return new static($name, $settings, $mappings);
     }
-
 }

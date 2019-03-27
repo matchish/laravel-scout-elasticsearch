@@ -30,7 +30,7 @@ final class Search
     {
         return [
             'index' => $this->index,
-            'body' => $this->body
+            'body' => $this->body,
         ];
     }
 }

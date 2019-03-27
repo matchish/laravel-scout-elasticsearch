@@ -1,11 +1,13 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Matchish\ScoutElasticSearch\Searchable;
-use Illuminate\Support\Collection;
+
 use function in_array;
 use Illuminate\Support\Str;
 use Laravel\Scout\Searchable;
+use Illuminate\Support\Collection;
 use Symfony\Component\Finder\Finder;
 
 final class SearchableListFactory
@@ -28,6 +30,7 @@ final class SearchableListFactory
         $this->namespace = $namespace;
         $this->appPath = $appPath;
     }
+
     /**
      * Get a list of searchable models.
      *
@@ -36,10 +39,12 @@ final class SearchableListFactory
     private function find(): array
     {
         $appNamespace = $this->namespace;
+
         return array_values(array_filter($this->getProjectClasses(), function (string $class) use ($appNamespace) {
             return Str::startsWith($class, $appNamespace) && $this->isSearchableModel($class);
         }));
     }
+
     /**
      * @param  string $class
      *
@@ -49,6 +54,7 @@ final class SearchableListFactory
     {
         return in_array(Searchable::class, class_uses_recursive($class), true);
     }
+
     /**
      * @return array
      */
@@ -61,6 +67,7 @@ final class SearchableListFactory
             }
             self::$declaredClasses = get_declared_classes();
         }
+
         return self::$declaredClasses;
     }
 

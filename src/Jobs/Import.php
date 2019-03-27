@@ -2,12 +2,8 @@
 
 namespace Matchish\ScoutElasticSearch\Jobs;
 
-
-use Elasticsearch\Client;
-use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
 
 /**
@@ -37,5 +33,4 @@ final class Import implements ShouldQueue
     {
         $engine->sync(new $this->searchable);
     }
-
 }

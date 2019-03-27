@@ -1,4 +1,5 @@
 <?php
+
 namespace Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias;
 
 /**
@@ -26,8 +27,8 @@ final class Update
     {
         return [
             'body' => [
-                'actions' => $this->actions
-            ]
+                'actions' => $this->actions,
+            ],
         ];
     }
 
@@ -35,11 +36,12 @@ final class Update
     {
         $this->actions[] = ['add' => [
             'index' => $index,
-            'alias' => $alias
+            'alias' => $alias,
         ]];
     }
 
-    public function removeIndex($index) {
+    public function removeIndex($index)
+    {
         $this->actions[] = ['remove_index' => ['index' => $index]];
     }
 }

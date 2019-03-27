@@ -2,10 +2,9 @@
 
 namespace Matchish\ScoutElasticSearch\Pipelines\Stages;
 
-
 use Elasticsearch\Client;
-use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias\Update;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias\Get;
+use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias\Update;
 
 /**
  * @internal
@@ -34,7 +33,7 @@ final class SwitchToNewAndRemoveOldIndex
             if ($indexName != $index->name()) {
                 $params->removeIndex($indexName);
             } else {
-                $params->add((string)$indexName, $source->searchableAs());
+                $params->add((string) $indexName, $source->searchableAs());
             }
         }
         $this->elasticsearch->indices()->updateAliases($params->toArray());

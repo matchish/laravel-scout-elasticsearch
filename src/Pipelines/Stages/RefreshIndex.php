@@ -2,7 +2,6 @@
 
 namespace Matchish\ScoutElasticSearch\Pipelines\Stages;
 
-
 use Elasticsearch\Client;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Refresh;
 
