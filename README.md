@@ -42,6 +42,15 @@ Use composer to install the package:
 
 `composer require matchish/laravel-scout-elasticsearch`
 
+Set env variables
+```
+SCOUT_DRIVER=Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine
+```
+Config `\ElasticSearch\Client` in your app service provider or just set `ELASTICSEARCH_HOST` env variable
+```
+ELASTICSEARCH_HOST=host:port
+```
+
 ## :bulb: Usage
 
 > **Note:** This package adds functionalities to [Laravel Scout](https://github.com/laravel/scout), and for this reason, we encourage you to **read the Scout documentation first**. Documentation for Scout can be found on the [Laravel website](https://github.com/laravel/scout).
@@ -108,6 +117,8 @@ $results = Product::search('zonga', function($client, $body) {
 
 `$client` is `\ElasticSearch\Client` object from [`elasticsearch/elasticsearch`](https://packagist.org/packages/elasticsearch/elasticsearch) package  
  And `$body` is `ONGR\ElasticsearchDSL\Search` from [ongr/elasticsearch-dsl](https://packagist.org/packages/ongr/elasticsearch-dsl) package  
+
+>Don't forget :star: the package if you like it. :pray
 
 ## :free: License
 Scout ElasticSearch is an open-sourced software licensed under the [MIT license](LICENSE.md).
