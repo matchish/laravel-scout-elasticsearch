@@ -1,12 +1,12 @@
 <p align="center">
   <a href="https://github.com/matchish/laravel-scout-elasticsearch">
-    <img alt="Scout ElasticSearch" src="docs/banner.svg" >
+    <img alt="Scout ElasticSearch" src="https://raw.githubusercontent.com/matchish/laravel-scout-elasticsearch/master/docs/banner.svg?sanitize=true" >
   </a>
 
   <p align="center">
-    <a href="https://travis-ci.org/matchish/laravel-scout-elasticsearch"><img src="https://travis-ci.com/matchish/laravel-scout-elasticsearch.svg?token=BygWG5QtD24PK5xsCgKE&branch=master" alt="Build Status"></img></a>
-    <a href="https://scrutinizer-ci.com/g/matchish/laravel-scout-elasticsearch"><img src="https://img.shields.io/scrutinizer/g/matchish/laravel-scout-elasticsearch.svg" alt="Quality Score"></img></a>
-    <a href="https://scrutinizer-ci.com/g/matchish/laravel-scout-elasticsearch"><img src="https://scrutinizer-ci.com/g/matchish/laravel-scout-elasticsearch/badges/coverage.png?b=master" alt="Coverage"></img></a>
+    <a href="https://travis-ci.com/matchish/laravel-scout-elasticsearch"><img src="https://img.shields.io/travis/com/matchish/laravel-scout-elasticsearch.svg" alt="Build Status"></img></a>
+    <a href="https://scrutinizer-ci.com/g/matchish/laravel-scout-elasticsearch"><img alt="Code quality" src="https://img.shields.io/scrutinizer/g/matchish/laravel-scout-elasticsearch.svg?label=quality"></img></a>
+    <a href="https://scrutinizer-ci.com/g/matchish/laravel-scout-elasticsearch"><img src="https://img.shields.io/scrutinizer/coverage/g/matchish/laravel-scout-elasticsearch.svg" alt="Coverage"></img></a>
     <a href="https://packagist.org/packages/matchish/laravel-scout-elasticsearch"><img src="https://poser.pugx.org/matchish/laravel-scout-elasticsearch/d/total.svg" alt="Total Downloads"></a>
     <a href="https://packagist.org/packages/matchish/laravel-scout-elasticsearch"><img src="https://poser.pugx.org/matchish/laravel-scout-elasticsearch/v/stable.svg" alt="Latest Version"></a>
     <a href="https://packagist.org/packages/matchish/laravel-scout-elasticsearch"><img src="https://poser.pugx.org/matchish/laravel-scout-elasticsearch/license.svg" alt="License"></a>
@@ -25,7 +25,7 @@ If you need any help, [stack overflow](https://stackoverflow.com/questions/tagge
 
 ## :two_hearts: Features
 
-- [**Zero downtime** reimports]() - it’s a breeze to import data in production.
+- [**Zero downtime** reimport](#zero-downtime-reimport) - it’s a breeze to import data in production.
 - Bulk indexing.
 - A fully configurable mapping for each model.
 - Full power of ElasticSearch in your queries
@@ -76,7 +76,7 @@ For index `products` it will be
 And for default settings  
 `elasticsearch.indices.settigs.default
 `
-### Zero downtime reimports
+### Zero downtime reimport
 While working in production, to keep your existing search experience available while reimporting your data, you also can use `scout:import` Artisan command:  
 
 `php artisan scout:import`
@@ -118,7 +118,7 @@ $results = Product::search('zonga', function($client, $body) {
 `$client` is `\ElasticSearch\Client` object from [`elasticsearch/elasticsearch`](https://packagist.org/packages/elasticsearch/elasticsearch) package  
  And `$body` is `ONGR\ElasticsearchDSL\Search` from [ongr/elasticsearch-dsl](https://packagist.org/packages/ongr/elasticsearch-dsl) package  
 
->Don't forget :star: the package if you like it. :pray
+>Don't forget :star: the package if you like it. :pray:
 
 ## :free: License
 Scout ElasticSearch is an open-sourced software licensed under the [MIT license](LICENSE.md).
