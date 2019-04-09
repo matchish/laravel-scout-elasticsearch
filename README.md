@@ -74,8 +74,10 @@ For index `products` it will be
 `elasticsearch.indices.settigs.products`  
 
 And for default settings  
-`elasticsearch.indices.settigs.default
-`
+`elasticsearch.indices.settigs.default`
+
+If you need example you can publish default config with artisan command
+`php artisan vendor:publish --tag config`
 ### Zero downtime reimport
 While working in production, to keep your existing search experience available while reimporting your data, you also can use `scout:import` Artisan command:  
 

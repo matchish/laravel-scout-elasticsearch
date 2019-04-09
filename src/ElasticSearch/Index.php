@@ -87,7 +87,7 @@ final class Index
         $settingsConfigKey = "elasticsearch.indices.settings.{$searchable->searchableAs()}";
         $mappingsConfigKey = "elasticsearch.indices.mappings.{$searchable->searchableAs()}";
         $settings = config($settingsConfigKey, config('elasticsearch.indices.settings.default'));
-        $mappings = config($mappingsConfigKey);
+        $mappings = config($mappingsConfigKey, config('elasticsearch.indices.mappings.default'));
 
         return new static($name, $settings, $mappings);
     }
