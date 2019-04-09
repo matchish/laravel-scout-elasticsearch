@@ -2,14 +2,12 @@
 
 namespace Matchish\ScoutElasticSearch;
 
-
 use App\Product;
-use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Tests\TestCase;
+use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 
 class ScoutElasticSearchServiceProviderTest extends TestCase
 {
-
     public function testConfigPublishing()
     {
         \File::delete(config_path('elasticsearch.php'));
@@ -17,7 +15,7 @@ class ScoutElasticSearchServiceProviderTest extends TestCase
         $provider->boot();
 
         \Artisan::call('vendor:publish', [
-            '--tag' => 'config'
+            '--tag' => 'config',
         ]);
 
         app('config')->set('elasticsearch', require config_path('elasticsearch.php'));
@@ -39,11 +37,11 @@ class ScoutElasticSearchServiceProviderTest extends TestCase
                             'type' => 'date',
                         ],
                     ],
-                ],],
+                ], ],
             'settings' => [
                 'number_of_shards' => 1,
                 'number_of_replicas' => 0,
-            ]
+            ],
         ], $index->config());
     }
 }
