@@ -27,7 +27,7 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
         });
 
         $this->publishes([
-            __DIR__.'/../config/elasticsearch.php' => config_path('elasticsearch.php')
+            __DIR__.'/../config/elasticsearch.php' => config_path('elasticsearch.php'),
         ], 'config');
     }
 
