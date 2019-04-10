@@ -86,7 +86,12 @@ final class Index
         $name = $searchable->searchableAs().'_'.time();
         $settingsConfigKey = "elasticsearch.indices.settings.{$searchable->searchableAs()}";
         $mappingsConfigKey = "elasticsearch.indices.mappings.{$searchable->searchableAs()}";
-        $settings = config($settingsConfigKey, config('elasticsearch.indices.settings.default'));
+        $defaultSettings = [
+            'number_of_shards' => 1,
+            'number_of_replicas' => 0,
+
+        ];
+        $settings = config($settingsConfigKey, config('elasticsearch.indices.settings.default', $defaultSettings));
         $mappings = config($mappingsConfigKey, config('elasticsearch.indices.mappings.default'));
 
         return new static($name, $settings, $mappings);
