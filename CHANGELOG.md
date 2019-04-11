@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [1.1.0] - 2019-04-09
+### Added
+- Default config
+
 ## [1.0.0] - 2019-03-30
 ### Added
 - Import console command
