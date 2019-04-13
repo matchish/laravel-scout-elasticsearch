@@ -25,10 +25,6 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
 
             return new ElasticSearchEngine($elasticsearch);
         });
-
-        $this->publishes([
-            __DIR__.'/../config/elasticsearch.php' => config_path('elasticsearch.php'),
-        ], 'config');
     }
 
     /**
@@ -37,9 +33,6 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->register(ScoutServiceProvider::class);
-        $this->app->bind(Client::class, function () {
-            return ClientBuilder::create()->setHosts([env('ELASTICSEARCH_HOST')])->build();
-        });
 
         $this->registerCommands();
     }

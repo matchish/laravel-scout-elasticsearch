@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'host' => env('ELASTICSEARCH_HOST'),
     'indices' => [
         'mappings' => [
             'default' => [
