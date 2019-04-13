@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Matchish\ScoutElasticSearch;
 
 use Elasticsearch\Client;
-use Elasticsearch\ClientBuilder;
 use Laravel\Scout\EngineManager;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Scout\ScoutServiceProvider;
