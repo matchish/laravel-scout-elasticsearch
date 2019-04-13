@@ -17,6 +17,5 @@ class ScoutElasticSearchServiceProviderTest extends TestCase
         ]);
 
         $this->assertFileExists(config_path('elasticsearch.php'));
-
     }
 }

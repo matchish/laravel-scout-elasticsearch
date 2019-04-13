@@ -9,7 +9,7 @@ return [
                     'properties' => [
                         'id' => [
                             'type' => 'keyword',
-                        ]
+                        ],
                     ],
                 ],
             ],
