@@ -9,7 +9,7 @@ class ScoutElasticSearchServiceProviderTest extends TestCase
     public function testConfigPublishing()
     {
         \File::delete(config_path('elasticsearch.php'));
-        $provider = new ScoutElasticSearchServiceProvider($this->app);
+        $provider = new ElasticSearchServiceProvider($this->app);
         $provider->boot();
 
         \Artisan::call('vendor:publish', [
