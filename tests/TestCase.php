@@ -6,9 +6,9 @@ namespace Tests;
 
 use Illuminate\Support\Facades\Artisan;
 use Laravel\Scout\ScoutServiceProvider;
-use Matchish\ScoutElasticSearch\ElasticSearchServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
+use Matchish\ScoutElasticSearch\ElasticSearchServiceProvider;
 use Matchish\ScoutElasticSearch\ScoutElasticSearchServiceProvider;
 
 abstract class TestCase extends BaseTestCase
