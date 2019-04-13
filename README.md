@@ -26,7 +26,7 @@ If you need any help, [stack overflow](https://stackoverflow.com/questions/tagge
 ## :two_hearts: Features
 
 - [**Zero downtime** reimport](#zero-downtime-reimport) - it’s a breeze to import data in production.
-- Bulk indexing.
+- Import all searchable models at once.
 - A fully configurable mapping for each model.
 - Full power of ElasticSearch in your queries
 
@@ -46,10 +46,27 @@ Set env variables
 ```
 SCOUT_DRIVER=Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine
 ```
-Config `\ElasticSearch\Client` in your app service provider or just set `ELASTICSEARCH_HOST` env variable
+
+The package uses `\ElasticSearch\Client` from official package, but don't try to config it, 
+so you feel free do it in your app service provider. 
+But if you don't want to do it write now, 
+you can use `Matchish\ElasticSearchServiceProvider` from package.  
+Add the service provider to composer.json
+```
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Matchish\\ScoutElasticSearch\\Matchish\\ScoutElasticSearch\\ElasticSearchServiceProvider"
+            ]
+        }
+    },
+```
+Set `ELASTICSEARCH_HOST` env variable
 ```
 ELASTICSEARCH_HOST=host:port
 ```
+And publish config example for elasticsearch  
+`php artisan vendor:publish --tag config`
 
 ## :bulb: Usage
 
@@ -76,8 +93,6 @@ For index `products` it will be
 And for default settings  
 `elasticsearch.indices.settigs.default`
 
-If you need example you can publish default config with artisan command
-`php artisan vendor:publish --tag config`
 ### Zero downtime reimport
 While working in production, to keep your existing search experience available while reimporting your data, you also can use `scout:import` Artisan command:  
 
