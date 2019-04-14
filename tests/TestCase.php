@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Artisan;
 use Laravel\Scout\ScoutServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
+use Matchish\ScoutElasticSearch\ElasticSearchServiceProvider;
 use Matchish\ScoutElasticSearch\ScoutElasticSearchServiceProvider;
 
 abstract class TestCase extends BaseTestCase
@@ -41,6 +42,7 @@ abstract class TestCase extends BaseTestCase
                 'database' => ':memory:',
                 'prefix' => '',
             ]);
+        $app['config']->set('elasticsearch', require(__DIR__.'/../config/elasticsearch.php'));
         $app['config']->set('elasticsearch.indices.mappings.products', [
                 '_doc' => [
                     'properties' => [
@@ -60,6 +62,7 @@ abstract class TestCase extends BaseTestCase
         return [
             ScoutServiceProvider::class,
             ScoutElasticSearchServiceProvider::class,
+            ElasticSearchServiceProvider::class,
         ];
     }
 }
