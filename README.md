@@ -51,15 +51,13 @@ The package uses `\ElasticSearch\Client` from official package, but don't try to
 so you feel free do it in your app service provider. 
 But if you don't want to do it write now, 
 you can use `Matchish\ElasticSearchServiceProvider` from package.  
-Add the service provider to composer.json
+Register the provider, adding to `config/app.php`
 ```
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Matchish\\ScoutElasticSearch\\Matchish\\ScoutElasticSearch\\ElasticSearchServiceProvider"
-            ]
-        }
-    },
+'providers' => [
+    // Other Service Providers
+
+    \Matchish\ScoutElasticSearch\ElasticSearchServiceProvider::class
+],
 ```
 Set `ELASTICSEARCH_HOST` env variable
 ```
