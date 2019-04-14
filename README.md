@@ -49,7 +49,7 @@ SCOUT_DRIVER=Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine
 
 The package uses `\ElasticSearch\Client` from official package, but don't try to config it, 
 so you feel free do it in your app service provider. 
-But if you don't want to do it write now, 
+But if you don't want to do it right now, 
 you can use `Matchish\ElasticSearchServiceProvider` from package.  
 Register the provider, adding to `config/app.php`
 ```
