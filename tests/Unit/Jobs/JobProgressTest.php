@@ -2,6 +2,8 @@
 
 namespace Matchish\ScoutElasticSearch\Jobs;
 
+use Illuminate\Console\OutputStyle;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
 use Tests\TestCase;
 
@@ -20,7 +22,8 @@ class JobProgressTest extends TestCase
             new ProgressReport(1, 'Fitth', $jobId),
         ]);
         $output = new DummyOutput();
-        $sut = new JobProgress($job, $output, $events);
+        $outputStyle = new OutputStyle(new ArrayInput([]), new DummyOutput());
+        $sut = new JobProgress($job, $outputStyle, $events);
         $sut->start();
         while ($event = $job->next()) {
             $events->dispatch($event);
