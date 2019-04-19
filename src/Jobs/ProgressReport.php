@@ -12,7 +12,7 @@ class ProgressReport
      */
     public $advance;
     /**
-     * @var string
+     * @var string|null
      */
     public $message;
     /**
