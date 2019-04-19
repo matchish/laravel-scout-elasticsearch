@@ -3,6 +3,8 @@
 namespace Matchish\ScoutElasticSearch\Jobs;
 
 use Illuminate\Console\OutputStyle;
+use Matchish\ScoutElasticSearch\Console\Commands\DefaultProgressBar;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
 use Tests\TestCase;
@@ -23,7 +25,8 @@ class JobProgressTest extends TestCase
         ]);
         $output = new DummyOutput();
         $outputStyle = new OutputStyle(new ArrayInput([]), new DummyOutput());
-        $sut = new JobProgress($job, $outputStyle, $events);
+        $progressBar = new DefaultProgressBar(new ProgressBar($outputStyle, $job->estimate()));
+        $sut = new JobProgress($progressBar, $events);
         $sut->start();
         while ($event = $job->next()) {
             $events->dispatch($event);
@@ -57,7 +60,7 @@ class Job
         return $estimate;
     }
 
-    public function next(): ProgressReport
+    public function next()
     {
         return array_pop($this->stack);
     }
