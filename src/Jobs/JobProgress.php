@@ -4,7 +4,7 @@
 namespace Matchish\ScoutElasticSearch\Jobs;
 
 use Illuminate\Contracts\Events\Dispatcher;
-use Matchish\ScoutElasticSearch\Console\Commands\DefaultProgressBar;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class JobProgress
 {
@@ -13,15 +13,15 @@ class JobProgress
      */
     private $events;
     /**
-     * @var DefaultProgressBar
+     * @var ProgressBar
      */
     private $bar;
 
     /**
-     * @param DefaultProgressBar $bar
+     * @param ProgressBar $bar
      * @param Dispatcher $events
      */
-    public function __construct(DefaultProgressBar $bar, Dispatcher $events)
+    public function __construct(ProgressBar $bar, Dispatcher $events)
     {
         $this->events = $events;
         $this->bar = $bar;
