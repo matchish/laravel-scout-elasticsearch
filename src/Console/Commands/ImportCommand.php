@@ -6,6 +6,7 @@ namespace Matchish\ScoutElasticSearch\Console\Commands;
 
 use Illuminate\Console\Command;
 use Matchish\ScoutElasticSearch\Jobs\Import;
+use Matchish\ScoutElasticSearch\Jobs\QueueableJob;
 use Matchish\ScoutElasticSearch\Searchable\SearchableListFactory;
 
 final class ImportCommand extends Command
@@ -24,22 +25,34 @@ final class ImportCommand extends Command
      */
     public function handle(): void
     {
-        $command = $this;
-        $searchableList = collect($command->argument('searchable'))->whenEmpty(function () {
-            $factory = new SearchableListFactory(app()->getNamespace(), app()->path());
+        $this->searchableList($this->argument('searchable'))
+        ->each(function ($searchable) {
+            $this->import($searchable);
+        });
+    }
 
+    private function searchableList($argument)
+    {
+        return collect($argument)->whenEmpty(function () {
+            $factory = new SearchableListFactory(app()->getNamespace(), app()->path());
             return $factory->make();
         });
-        $searchableList->each(function ($searchable) {
-            $job = new Import($searchable);
-            if (config('scout.queue')) {
-                dispatch($job)->allOnQueue((new $searchable)->syncWithSearchUsingQueue())
-                    ->allOnConnection(config((new $searchable)->syncWithSearchUsing()));
-                $this->output->success('All ['.$searchable.'] records have been dispatched to import job.');
-            } else {
-                dispatch_now($job);
-                $this->output->success('All ['.$searchable.'] records have been searchable.');
-            }
-        });
+
+    }
+
+    private function import($searchable)
+    {
+        $job = new Import($searchable);
+
+        if (config('scout.queue')) {
+            $job = new QueueableJob($job);
+        }
+
+        $bar = (new ProgressBarFactory($this->output))->create();
+        $job->withProgressReport($bar);
+
+        dispatch($job)->allOnQueue((new $searchable)->syncWithSearchUsingQueue())
+            ->allOnConnection(config((new $searchable)->syncWithSearchUsing()));
+
     }
 }
