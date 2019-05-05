@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Product;
+use stdClass;
 use Tests\IntegrationTestCase;
 use Illuminate\Support\Facades\Artisan;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 final class ImportCommandTest extends IntegrationTestCase
 {
@@ -28,7 +30,7 @@ final class ImportCommandTest extends IntegrationTestCase
             'index' => 'products',
             'body' => [
                 'query' => [
-                    'match_all' => new \stdClass(),
+                    'match_all' => new stdClass(),
                 ],
             ],
         ];
@@ -54,7 +56,7 @@ final class ImportCommandTest extends IntegrationTestCase
             'index' => 'products',
             'body' => [
                 'query' => [
-                    'match_all' => new \stdClass(),
+                    'match_all' => new stdClass(),
                 ],
             ],
         ];
@@ -78,7 +80,7 @@ final class ImportCommandTest extends IntegrationTestCase
             'index' => (new Product())->searchableAs(),
             'body' => [
                 'query' => [
-                    'match_all' => new \stdClass(),
+                    'match_all' => new stdClass(),
                 ],
             ],
         ];
@@ -91,7 +93,7 @@ final class ImportCommandTest extends IntegrationTestCase
         $params = [
             'index' => 'products_old',
             'body' => [
-                'aliases' => ['products' => new \stdClass()],
+                'aliases' => ['products' => new stdClass()],
                 'settings' => [
                     'number_of_shards' => 1,
                     'number_of_replicas' => 0,
