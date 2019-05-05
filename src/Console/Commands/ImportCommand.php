@@ -45,7 +45,7 @@ final class ImportCommand extends Command
         $job = new Import($searchable);
 
         if (config('scout.queue')) {
-            $job = new QueueableJob($job);
+            $job = (new QueueableJob())->chain([$job]);
         }
 
         $bar = (new ProgressBarFactory($this->output))->create();
