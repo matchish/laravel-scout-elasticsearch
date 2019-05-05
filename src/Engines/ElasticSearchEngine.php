@@ -115,15 +115,6 @@ final class ElasticSearchEngine extends Engine
     }
 
     /**
-     * @internal
-     */
-    public function sync($model)
-    {
-        $pipeline = new ImportPipeline($this->elasticsearch);
-        $pipeline->process([Index::fromSearchable($model), $model]);
-    }
-
-    /**
      * @param BaseBuilder $builder
      * @param array $options
      * @return SearchResults|mixed
