@@ -13,6 +13,7 @@ use Matchish\ScoutElasticSearch\ProgressReportable;
 final class Import
 {
     use Queueable;
+    use ProgressReportable;
 
     /**
      * @var string
