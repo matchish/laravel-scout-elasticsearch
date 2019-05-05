@@ -129,4 +129,48 @@ final class PullFromSourceTest extends IntegrationTestCase
         $response = $this->elasticsearch->search($params);
         $this->assertEquals(0, $response['hits']['hits'][0]['_source']['__soft_deleted']);
     }
+
+    public function test_pull_soft_deleted()
+    {
+        $this->app['config']['scout.soft_delete'] = true;
+
+        $dispatcher = Product::getEventDispatcher();
+        Product::unsetEventDispatcher();
+
+        $productsAmount = 3;
+
+        factory(Product::class, $productsAmount)->create();
+
+        Product::limit(1)->get()->first()->delete();
+
+        Product::setEventDispatcher($dispatcher);
+        $this->elasticsearch->indices()->create([
+            'index' => 'products_index',
+            'body' => ['aliases' => ['products' => new stdClass()]],
+        ]);
+        $stages = PullFromSource::chunked(new Product());
+        $stages->first()->handle();
+        $this->elasticsearch->indices()->refresh([
+            'index' => 'products',
+        ]);
+        $params = [
+            'index' => 'products',
+            'body' => [
+                'query' => [
+                    'match_all' => new stdClass(),
+                ],
+            ],
+        ];
+        $response = $this->elasticsearch->search($params);
+        $this->assertEquals(3, $response['hits']['total']);
+    }
+
+    public function test_no_searchables_no_chunks()
+    {
+
+        $stages = PullFromSource::chunked(new Product());
+
+        $this->assertEquals(0, $stages->count());
+    }
+
 }
