@@ -20,9 +20,9 @@ class ProgressBarFactory
         $this->output = $output;
     }
 
-    public function create()
+    public function create(int $max = 0)
     {
-        $bar = $this->output->createProgressBar();
+        $bar = $this->output->createProgressBar($max);
         $bar->setBarCharacter('<fg=green>⚬</>');
         $bar->setEmptyBarCharacter("<fg=red>⚬</>");
         $bar->setProgressCharacter("<fg=green>➤</>");
