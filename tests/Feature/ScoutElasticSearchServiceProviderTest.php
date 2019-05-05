@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class ScoutElasticSearchServiceProviderTest extends TestCase
 {
-    public function testConfigPublishing()
+    public function test_config_publishing()
     {
         \File::delete(config_path('elasticsearch.php'));
         $provider = new ElasticSearchServiceProvider($this->app);
