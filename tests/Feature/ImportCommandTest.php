@@ -114,4 +114,34 @@ final class ImportCommandTest extends IntegrationTestCase
 
         $this->assertFalse($this->elasticsearch->indices()->exists(['index' => 'products_old']), 'Old index must be deleted');
     }
+
+    public function test_progress_report()
+    {
+        $output = new BufferedOutput();
+        Artisan::call('scout:import', [], $output);
+
+        $output = explode("\n", $output->fetch());
+        $this->assertEquals(
+            '[OK] Starting import App\Product',
+            trim($output[1]));
+        $this->assertEquals(
+            '[OK] All App\Product searchable now',
+            trim($output[3]));
+    }
+
+    public function test_progress_report_in_queue()
+    {
+        $this->app['config']->set('scout.queue', ['connection' => 'sync', 'queue' => 'scout']);
+
+        $output = new BufferedOutput();
+        Artisan::call('scout:import', [], $output);
+
+        $output = explode("\n", $output->fetch());
+        $this->assertEquals(
+            '[OK] Dispatching import job to the queue',
+            trim($output[1]));
+        $this->assertEquals(
+            '[OK] All App\Product will be availiable for search soon',
+            trim($output[3]));
+    }
 }
