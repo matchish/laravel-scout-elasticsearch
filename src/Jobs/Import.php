@@ -2,14 +2,15 @@
 
 namespace Matchish\ScoutElasticSearch\Jobs;
 
+use Elasticsearch\Client;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
+use Illuminate\Support\Collection;
+use Matchish\ScoutElasticSearch\ProgressReportable;
 
 /**
  * @internal
  */
-final class Import implements ShouldQueue
+final class Import
 {
     use Queueable;
 
