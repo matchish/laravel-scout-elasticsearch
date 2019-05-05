@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tests\Integration\Pipelines\Stages;
+namespace Tests\Integration\Jobs\Stages;
 
 use App\Product;
+use stdClass;
 use Tests\IntegrationTestCase;
-use Matchish\ScoutElasticSearch\ElasticSearch\Index;
-use Matchish\ScoutElasticSearch\Pipelines\Stages\PullFromSource;
+use Matchish\ScoutElasticSearch\Jobs\Stages\PullFromSource;
 
 final class PullFromSourceTest extends IntegrationTestCase
 {
@@ -23,10 +23,10 @@ final class PullFromSourceTest extends IntegrationTestCase
         Product::setEventDispatcher($dispatcher);
         $this->elasticsearch->indices()->create([
             'index' => 'products_index',
-            'body' => ['aliases' => ['products' => new \stdClass()]],
+            'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = new PullFromSource($this->elasticsearch);
-        $stage([Index::fromSearchable(new Product()), new Product()]);
+        $stage = new PullFromSource(Product::query());
+        $stage->handle();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
         ]);
@@ -34,7 +34,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products',
             'body' => [
                 'query' => [
-                    'match_all' => new \stdClass(),
+                    'match_all' => new stdClass(),
                 ],
             ],
         ];
@@ -46,10 +46,10 @@ final class PullFromSourceTest extends IntegrationTestCase
     {
         $this->elasticsearch->indices()->create([
             'index' => 'products_index',
-            'body' => ['aliases' => ['products' => new \stdClass()]],
+            'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = new PullFromSource($this->elasticsearch);
-        $stage([Index::fromSearchable(new Product()), new Product()]);
+        $stage = new PullFromSource(Product::query());
+        $stage->handle();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
         ]);
@@ -57,7 +57,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products',
             'body' => [
                 'query' => [
-                    'match_all' => new \stdClass(),
+                    'match_all' => new stdClass(),
                 ],
             ],
         ];
@@ -78,10 +78,10 @@ final class PullFromSourceTest extends IntegrationTestCase
         Product::setEventDispatcher($dispatcher);
         $this->elasticsearch->indices()->create([
             'index' => 'products_index',
-            'body' => ['aliases' => ['products' => new \stdClass()]],
+            'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = new PullFromSource($this->elasticsearch);
-        $stage([Index::fromSearchable(new Product()), new Product()]);
+        $stage = new PullFromSource(Product::query());
+        $stage->handle();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
         ]);
@@ -89,7 +89,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products',
             'body' => [
                 'query' => [
-                    'match_all' => new \stdClass(),
+                    'match_all' => new stdClass(),
                 ],
             ],
         ];
@@ -97,7 +97,7 @@ final class PullFromSourceTest extends IntegrationTestCase
         $this->assertEquals($productsAmount, $response['hits']['total']);
     }
 
-    public function test_push_soft_delete_meta_data()
+    public function test_pull_soft_delete_meta_data()
     {
         $this->app['config']['scout.soft_delete'] = true;
 
@@ -111,10 +111,10 @@ final class PullFromSourceTest extends IntegrationTestCase
         Product::setEventDispatcher($dispatcher);
         $this->elasticsearch->indices()->create([
             'index' => 'products_index',
-            'body' => ['aliases' => ['products' => new \stdClass()]],
+            'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = new PullFromSource($this->elasticsearch);
-        $stage([Index::fromSearchable(new Product()), new Product()]);
+        $stage = new PullFromSource(Product::query());
+        $stage->handle();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
         ]);
@@ -122,7 +122,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products',
             'body' => [
                 'query' => [
-                    'match_all' => new \stdClass(),
+                    'match_all' => new stdClass(),
                 ],
             ],
         ];
