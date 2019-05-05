@@ -29,10 +29,22 @@ final class Import
     }
 
     /**
-     * @param ElasticSearchEngine $engine
+     * @param Client $elasticsearch
      */
-    public function handle(ElasticSearchEngine $engine): void
+    public function handle(Client $elasticsearch): void
     {
-        $engine->sync(new $this->searchable);
+        $stages = $this->stages();
+        $estimate = $stages->sum->estimate();
+        $this->progressBar()->setMaxSteps($estimate);
+        $stages->each(function ($stage) use ($elasticsearch){
+            $this->progressBar()->setMessage($stage->title());
+            $stage->handle($elasticsearch);
+            $this->progressBar()->advance($stage->estimate());
+        });
+    }
+
+    private function stages(): Collection
+    {
+        return ImportStages::fromSearchable(new $this->searchable);
     }
 }
