@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Book;
 use App\Product;
 use stdClass;
 use Tests\IntegrationTestCase;
@@ -122,11 +123,17 @@ final class ImportCommandTest extends IntegrationTestCase
 
         $output = explode("\n", $output->fetch());
         $this->assertEquals(
-            '[OK] Starting import App\Product',
-            trim($output[1]));
+            trans('scout::import.start', ['searchable' => Product::class]),
+            trim($output[0]));
         $this->assertEquals(
-            '[OK] All App\Product searchable now',
-            trim($output[3]));
+            '[OK] ' . trans('scout::import.done', ['searchable' => Product::class]),
+            trim($output[2]));
+        $this->assertEquals(
+            trans('scout::import.start', ['searchable' => Book::class]),
+            trim($output[4]));
+        $this->assertEquals(
+            '[OK] ' . trans('scout::import.done', ['searchable' => Book::class]),
+            trim($output[6]));
     }
 
     public function test_progress_report_in_queue()
@@ -138,10 +145,10 @@ final class ImportCommandTest extends IntegrationTestCase
 
         $output = explode("\n", $output->fetch());
         $this->assertEquals(
-            '[OK] Dispatching import job to the queue',
-            trim($output[1]));
+            trans('scout::import.start', ['searchable' => Product::class]),
+            trim($output[0]));
         $this->assertEquals(
-            '[OK] All App\Product will be availiable for search soon',
-            trim($output[3]));
+            '[OK] ' . trans('scout::import.done.queue', ['searchable' => Product::class]),
+            trim($output[2]));
     }
 }

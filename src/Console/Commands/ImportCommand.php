@@ -51,13 +51,15 @@ final class ImportCommand extends Command
         $bar = (new ProgressBarFactory($this->output))->create();
         $job->withProgressReport($bar);
 
-        $startMessage = config('scout.queue') ? "Dispatching import job to the queue" : "Starting import $searchable";
-        $this->output->success($startMessage);
+        $startMessage = trans('scout::import.start', ['searchable' => "<comment>$searchable</comment>"]);
+        $this->line($startMessage);
 
         dispatch($job)->allOnQueue((new $searchable)->syncWithSearchUsingQueue())
             ->allOnConnection(config((new $searchable)->syncWithSearchUsing()));
 
-        $doneMessage = config('scout.queue') ? "All $searchable will be availiable for search soon" : "All $searchable searchable now";
+        $doneMessage = trans(config('scout.queue') ? 'scout::import.done.queue' : 'scout::import.done', [
+            'searchable' => $searchable
+        ]);
         $this->output->success($doneMessage);
 
     }
