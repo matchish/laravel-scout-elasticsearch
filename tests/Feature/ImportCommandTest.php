@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Book;
+use stdClass;
 use App\Product;
 use Tests\IntegrationTestCase;
 use Illuminate\Support\Facades\Artisan;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 final class ImportCommandTest extends IntegrationTestCase
 {
@@ -28,7 +31,7 @@ final class ImportCommandTest extends IntegrationTestCase
             'index' => 'products',
             'body' => [
                 'query' => [
-                    'match_all' => new \stdClass(),
+                    'match_all' => new stdClass(),
                 ],
             ],
         ];
@@ -54,7 +57,7 @@ final class ImportCommandTest extends IntegrationTestCase
             'index' => 'products',
             'body' => [
                 'query' => [
-                    'match_all' => new \stdClass(),
+                    'match_all' => new stdClass(),
                 ],
             ],
         ];
@@ -78,7 +81,7 @@ final class ImportCommandTest extends IntegrationTestCase
             'index' => (new Product())->searchableAs(),
             'body' => [
                 'query' => [
-                    'match_all' => new \stdClass(),
+                    'match_all' => new stdClass(),
                 ],
             ],
         ];
@@ -91,7 +94,7 @@ final class ImportCommandTest extends IntegrationTestCase
         $params = [
             'index' => 'products_old',
             'body' => [
-                'aliases' => ['products' => new \stdClass()],
+                'aliases' => ['products' => new stdClass()],
                 'settings' => [
                     'number_of_shards' => 1,
                     'number_of_replicas' => 0,
@@ -111,5 +114,41 @@ final class ImportCommandTest extends IntegrationTestCase
         Artisan::call('scout:import');
 
         $this->assertFalse($this->elasticsearch->indices()->exists(['index' => 'products_old']), 'Old index must be deleted');
+    }
+
+    public function test_progress_report()
+    {
+        $output = new BufferedOutput();
+        Artisan::call('scout:import', [], $output);
+
+        $output = explode("\n", $output->fetch());
+        $this->assertEquals(
+            trans('scout::import.start', ['searchable' => Product::class]),
+            trim($output[0]));
+        $this->assertEquals(
+            '[OK] '.trans('scout::import.done', ['searchable' => Product::class]),
+            trim($output[2]));
+        $this->assertEquals(
+            trans('scout::import.start', ['searchable' => Book::class]),
+            trim($output[4]));
+        $this->assertEquals(
+            '[OK] '.trans('scout::import.done', ['searchable' => Book::class]),
+            trim($output[6]));
+    }
+
+    public function test_progress_report_in_queue()
+    {
+        $this->app['config']->set('scout.queue', ['connection' => 'sync', 'queue' => 'scout']);
+
+        $output = new BufferedOutput();
+        Artisan::call('scout:import', [], $output);
+
+        $output = explode("\n", $output->fetch());
+        $this->assertEquals(
+            trans('scout::import.start', ['searchable' => Product::class]),
+            trim($output[0]));
+        $this->assertEquals(
+            '[OK] '.trans('scout::import.done.queue', ['searchable' => Product::class]),
+            trim($output[2]));
     }
 }

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tests\Integration\Pipelines\Stages;
+namespace Tests\Integration\Jobs\Stages;
 
+use stdClass;
 use App\Product;
 use Tests\IntegrationTestCase;
-use Matchish\ScoutElasticSearch\ElasticSearch\Index;
-use Matchish\ScoutElasticSearch\Pipelines\Stages\PullFromSource;
+use Matchish\ScoutElasticSearch\Jobs\Stages\PullFromSource;
 
 final class PullFromSourceTest extends IntegrationTestCase
 {
@@ -23,10 +23,10 @@ final class PullFromSourceTest extends IntegrationTestCase
         Product::setEventDispatcher($dispatcher);
         $this->elasticsearch->indices()->create([
             'index' => 'products_index',
-            'body' => ['aliases' => ['products' => new \stdClass()]],
+            'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = new PullFromSource($this->elasticsearch);
-        $stage([Index::fromSearchable(new Product()), new Product()]);
+        $stage = new PullFromSource(Product::query());
+        $stage->handle();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
         ]);
@@ -34,7 +34,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products',
             'body' => [
                 'query' => [
-                    'match_all' => new \stdClass(),
+                    'match_all' => new stdClass(),
                 ],
             ],
         ];
@@ -46,10 +46,10 @@ final class PullFromSourceTest extends IntegrationTestCase
     {
         $this->elasticsearch->indices()->create([
             'index' => 'products_index',
-            'body' => ['aliases' => ['products' => new \stdClass()]],
+            'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = new PullFromSource($this->elasticsearch);
-        $stage([Index::fromSearchable(new Product()), new Product()]);
+        $stage = new PullFromSource(Product::query());
+        $stage->handle();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
         ]);
@@ -57,7 +57,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products',
             'body' => [
                 'query' => [
-                    'match_all' => new \stdClass(),
+                    'match_all' => new stdClass(),
                 ],
             ],
         ];
@@ -78,10 +78,10 @@ final class PullFromSourceTest extends IntegrationTestCase
         Product::setEventDispatcher($dispatcher);
         $this->elasticsearch->indices()->create([
             'index' => 'products_index',
-            'body' => ['aliases' => ['products' => new \stdClass()]],
+            'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = new PullFromSource($this->elasticsearch);
-        $stage([Index::fromSearchable(new Product()), new Product()]);
+        $stage = new PullFromSource(Product::query());
+        $stage->handle();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
         ]);
@@ -89,7 +89,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products',
             'body' => [
                 'query' => [
-                    'match_all' => new \stdClass(),
+                    'match_all' => new stdClass(),
                 ],
             ],
         ];
@@ -97,7 +97,7 @@ final class PullFromSourceTest extends IntegrationTestCase
         $this->assertEquals($productsAmount, $response['hits']['total']);
     }
 
-    public function test_push_soft_delete_meta_data()
+    public function test_pull_soft_delete_meta_data()
     {
         $this->app['config']['scout.soft_delete'] = true;
 
@@ -111,10 +111,10 @@ final class PullFromSourceTest extends IntegrationTestCase
         Product::setEventDispatcher($dispatcher);
         $this->elasticsearch->indices()->create([
             'index' => 'products_index',
-            'body' => ['aliases' => ['products' => new \stdClass()]],
+            'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = new PullFromSource($this->elasticsearch);
-        $stage([Index::fromSearchable(new Product()), new Product()]);
+        $stage = new PullFromSource(Product::query());
+        $stage->handle();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
         ]);
@@ -122,11 +122,82 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products',
             'body' => [
                 'query' => [
-                    'match_all' => new \stdClass(),
+                    'match_all' => new stdClass(),
                 ],
             ],
         ];
         $response = $this->elasticsearch->search($params);
         $this->assertEquals(0, $response['hits']['hits'][0]['_source']['__soft_deleted']);
+    }
+
+    public function test_pull_soft_deleted()
+    {
+        $this->app['config']['scout.soft_delete'] = true;
+
+        $dispatcher = Product::getEventDispatcher();
+        Product::unsetEventDispatcher();
+
+        $productsAmount = 3;
+
+        factory(Product::class, $productsAmount)->create();
+
+        Product::limit(1)->get()->first()->delete();
+
+        Product::setEventDispatcher($dispatcher);
+        $this->elasticsearch->indices()->create([
+            'index' => 'products_index',
+            'body' => ['aliases' => ['products' => new stdClass()]],
+        ]);
+        $stages = PullFromSource::chunked(new Product());
+        $stages->first()->handle();
+        $this->elasticsearch->indices()->refresh([
+            'index' => 'products',
+        ]);
+        $params = [
+            'index' => 'products',
+            'body' => [
+                'query' => [
+                    'match_all' => new stdClass(),
+                ],
+            ],
+        ];
+        $response = $this->elasticsearch->search($params);
+        $this->assertEquals(3, $response['hits']['total']);
+    }
+
+    public function test_no_searchables_no_chunks()
+    {
+        $stages = PullFromSource::chunked(new Product());
+
+        $this->assertEquals(0, $stages->count());
+    }
+
+    public function test_chunked_pull_only_one_page()
+    {
+        $dispatcher = Product::getEventDispatcher();
+        Product::unsetEventDispatcher();
+
+        $productsAmount = 5;
+
+        factory(Product::class, $productsAmount)->create();
+
+        Product::setEventDispatcher($dispatcher);
+
+        $chunks = PullFromSource::chunked(new Product());
+        $chunks->first()->handle();
+        $this->elasticsearch->indices()->refresh([
+            'index' => 'products',
+        ]);
+        $params = [
+            'index' => 'products',
+            'body' => [
+                'query' => [
+                    'match_all' => new stdClass(),
+                ],
+            ],
+        ];
+        $response = $this->elasticsearch->search($params);
+
+        $this->assertEquals(3, $response['hits']['total']);
     }
 }

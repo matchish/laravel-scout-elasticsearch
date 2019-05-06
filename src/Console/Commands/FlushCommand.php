@@ -32,7 +32,10 @@ final class FlushCommand extends Command
         });
         $searchableList->each(function ($searchable) {
             $searchable::removeAllFromSearch();
-            $this->output->success('All ['.$searchable.'] records have been flushed.');
+            $doneMessage = trans('scout::flush.done', [
+                'searchable' => $searchable,
+            ]);
+            $this->output->success($doneMessage);
         });
     }
 }

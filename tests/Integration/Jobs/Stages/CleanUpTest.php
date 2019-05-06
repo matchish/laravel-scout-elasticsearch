@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Integration\Pipelines\Stages;
+namespace Tests\Integration\Jobs\Stages;
 
+use stdClass;
 use App\Product;
 use Tests\IntegrationTestCase;
-use Matchish\ScoutElasticSearch\ElasticSearch\Index;
-use Matchish\ScoutElasticSearch\Pipelines\Stages\CleanUp;
+use Matchish\ScoutElasticSearch\Jobs\Stages\CleanUp;
 
 class CleanUpTest extends IntegrationTestCase
 {
@@ -13,7 +13,7 @@ class CleanUpTest extends IntegrationTestCase
     {
         $this->elasticsearch->indices()->create([
             'index' => 'products_old',
-            'body' => ['aliases' => ['products' => new \stdClass()]],
+            'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
         $this->elasticsearch->indices()->create([
             'index' => 'products_new',
@@ -24,22 +24,12 @@ class CleanUpTest extends IntegrationTestCase
             'body' => ['aliases' => ['products' => ['is_write_index' => false]]],
         ]);
 
-        $stage = new CleanUp($this->elasticsearch);
-        $stage([new Index(new Product(), []), new Product()]);
+        $stage = new CleanUp(new Product());
+        $stage->handle($this->elasticsearch);
         $writeIndexExist = $this->elasticsearch->indices()->exists(['index' => 'products_new']);
         $readIndexExist = $this->elasticsearch->indices()->exists(['index' => 'products_old']);
 
         $this->assertFalse($writeIndexExist);
         $this->assertTrue($readIndexExist);
-    }
-
-    public function test_return_same_payload()
-    {
-        $stage = new CleanUp($this->elasticsearch);
-        $payload = [new Index(new Product(), []), new Product()];
-        $nextPayload = $stage($payload);
-        $this->assertEquals(2, count($nextPayload));
-        $this->assertSame($payload[0], $nextPayload[0]);
-        $this->assertSame($payload[1], $nextPayload[1]);
     }
 }

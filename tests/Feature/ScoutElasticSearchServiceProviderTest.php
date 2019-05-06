@@ -3,10 +3,11 @@
 namespace Matchish\ScoutElasticSearch;
 
 use Tests\TestCase;
+use Elasticsearch\Client;
 
 class ScoutElasticSearchServiceProviderTest extends TestCase
 {
-    public function testConfigPublishing()
+    public function test_config_publishing()
     {
         \File::delete(config_path('elasticsearch.php'));
         $provider = new ElasticSearchServiceProvider($this->app);
@@ -17,5 +18,11 @@ class ScoutElasticSearchServiceProviderTest extends TestCase
         ]);
 
         $this->assertFileExists(config_path('elasticsearch.php'));
+    }
+
+    public function test_provides()
+    {
+        $provider = new ElasticSearchServiceProvider($this->app);
+        $this->assertEquals([Client::class], $provider->provides());
     }
 }

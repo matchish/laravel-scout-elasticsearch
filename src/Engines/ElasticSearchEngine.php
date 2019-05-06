@@ -8,7 +8,6 @@ use ONGR\ElasticsearchDSL\Search;
 use Laravel\Scout\Builder as BaseBuilder;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
-use Matchish\ScoutElasticSearch\Pipelines\ImportPipeline;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
 use Matchish\ScoutElasticSearch\ElasticSearch\SearchFactory;
 use Matchish\ScoutElasticSearch\ElasticSearch\SearchResults;
@@ -62,10 +61,13 @@ final class ElasticSearchEngine extends Engine
     public function flush($model)
     {
         $indexName = $model->searchableAs();
-        $body = (new Search())->addQuery(new MatchAllQuery())->toArray();
-        $params = new SearchParams($indexName, $body);
-        $this->elasticsearch->deleteByQuery($params->toArray());
-        $this->elasticsearch->indices()->refresh((new Refresh($indexName))->toArray());
+        $exist = $this->elasticsearch->indices()->exists(['index' => $indexName]);
+        if ($exist) {
+            $body = (new Search())->addQuery(new MatchAllQuery())->toArray();
+            $params = new SearchParams($indexName, $body);
+            $this->elasticsearch->deleteByQuery($params->toArray());
+            $this->elasticsearch->indices()->refresh((new Refresh($indexName))->toArray());
+        }
     }
 
     /**
@@ -112,15 +114,6 @@ final class ElasticSearchEngine extends Engine
     public function getTotalCount($results)
     {
         return $results['hits']['total'];
-    }
-
-    /**
-     * @internal
-     */
-    public function sync($model)
-    {
-        $pipeline = new ImportPipeline($this->elasticsearch);
-        $pipeline->process([Index::fromSearchable($model), $model]);
     }
 
     /**

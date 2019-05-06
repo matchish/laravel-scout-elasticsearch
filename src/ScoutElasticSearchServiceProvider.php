@@ -19,6 +19,8 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'scout');
+
         resolve(EngineManager::class)->extend(ElasticSearchEngine::class, function () {
             $elasticsearch = resolve(Client::class);
 

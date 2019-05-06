@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tests\Integration\Pipelines\Stages;
+namespace Tests\Integration\Jobs\Stages;
 
-use App\Product;
+use stdClass;
 use Tests\IntegrationTestCase;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
-use Matchish\ScoutElasticSearch\Pipelines\Stages\RefreshIndex;
+use Matchish\ScoutElasticSearch\Jobs\Stages\RefreshIndex;
 
 final class RefreshIndexTest extends IntegrationTestCase
 {
@@ -15,7 +15,7 @@ final class RefreshIndexTest extends IntegrationTestCase
     {
         $this->elasticsearch->indices()->create([
             'index' => 'products_index',
-            'body' => ['aliases' => ['products' => new \stdClass()]],
+            'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
         $this->elasticsearch->bulk(['body' => [
             ['index' => [
@@ -29,14 +29,14 @@ final class RefreshIndexTest extends IntegrationTestCase
             ], ],
         ]);
 
-        $stage = new RefreshIndex($this->elasticsearch);
-        $stage([new Index('products_index'), new Product()]);
+        $stage = new RefreshIndex(new Index('products_index'));
+        $stage->handle($this->elasticsearch);
 
         $params = [
             'index' => 'products',
             'body' => [
                 'query' => [
-                    'match_all' => new \stdClass(),
+                    'match_all' => new stdClass(),
                 ],
             ],
         ];
