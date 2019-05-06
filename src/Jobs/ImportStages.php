@@ -1,21 +1,18 @@
 <?php
 
-
 namespace Matchish\ScoutElasticSearch\Jobs;
 
-
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Jobs\Stages\CleanUp;
-use Matchish\ScoutElasticSearch\Jobs\Stages\CreateWriteIndex;
-use Matchish\ScoutElasticSearch\Jobs\Stages\PullFromSource;
 use Matchish\ScoutElasticSearch\Jobs\Stages\RefreshIndex;
+use Matchish\ScoutElasticSearch\Jobs\Stages\PullFromSource;
+use Matchish\ScoutElasticSearch\Jobs\Stages\CreateWriteIndex;
 use Matchish\ScoutElasticSearch\Jobs\Stages\SwitchToNewAndRemoveOldIndex;
 
 class ImportStages extends Collection
 {
-
     /**
      * @param Model $searchable
      * @return Collection

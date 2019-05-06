@@ -36,7 +36,7 @@ final class Import
         $stages = $this->stages();
         $estimate = $stages->sum->estimate();
         $this->progressBar()->setMaxSteps($estimate);
-        $stages->each(function ($stage) use ($elasticsearch){
+        $stages->each(function ($stage) use ($elasticsearch) {
             $this->progressBar()->setMessage($stage->title());
             $stage->handle($elasticsearch);
             $this->progressBar()->advance($stage->estimate());
