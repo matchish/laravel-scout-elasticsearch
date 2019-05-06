@@ -62,10 +62,13 @@ final class ElasticSearchEngine extends Engine
     public function flush($model)
     {
         $indexName = $model->searchableAs();
-        $body = (new Search())->addQuery(new MatchAllQuery())->toArray();
-        $params = new SearchParams($indexName, $body);
-        $this->elasticsearch->deleteByQuery($params->toArray());
-        $this->elasticsearch->indices()->refresh((new Refresh($indexName))->toArray());
+        $exist = $this->elasticsearch->indices()->exists(['index' => $indexName]);
+        if ($exist) {
+            $body = (new Search())->addQuery(new MatchAllQuery())->toArray();
+            $params = new SearchParams($indexName, $body);
+            $this->elasticsearch->deleteByQuery($params->toArray());
+            $this->elasticsearch->indices()->refresh((new Refresh($indexName))->toArray());
+        }
     }
 
     /**
