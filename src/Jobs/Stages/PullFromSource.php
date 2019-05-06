@@ -61,8 +61,8 @@ final class PullFromSource
             $chunkSize = (int) config('scout.chunk.searchable', self::DEFAULT_CHUNK_SIZE);
             $totalChunks = (int) ceil($totalSearchables / $chunkSize);
             return collect(range(1, $totalChunks))->map(function ($page) use ($query, $chunkSize) {
-                (clone $query)->forPage($page, $chunkSize);
-                return new static($query);
+                $clone = (clone $query)->forPage($page, $chunkSize);
+                return new static($clone);
             });
         } else {
             return collect();

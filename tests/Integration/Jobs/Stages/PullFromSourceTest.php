@@ -173,4 +173,33 @@ final class PullFromSourceTest extends IntegrationTestCase
         $this->assertEquals(0, $stages->count());
     }
 
+    public function test_chunked_pull_only_one_page()
+    {
+        $dispatcher = Product::getEventDispatcher();
+        Product::unsetEventDispatcher();
+
+        $productsAmount = 5;
+
+        factory(Product::class, $productsAmount)->create();
+
+        Product::setEventDispatcher($dispatcher);
+
+        $chunks = PullFromSource::chunked(new Product());
+        $chunks->first()->handle();
+        $this->elasticsearch->indices()->refresh([
+            'index' => 'products',
+        ]);
+        $params = [
+            'index' => 'products',
+            'body' => [
+                'query' => [
+                    'match_all' => new stdClass(),
+                ],
+            ],
+        ];
+        $response = $this->elasticsearch->search($params);
+
+        $this->assertEquals(3, $response['hits']['total']);
+    }
+
 }
