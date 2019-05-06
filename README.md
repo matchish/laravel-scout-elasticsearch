@@ -3,7 +3,7 @@
     <img alt="Scout ElasticSearch" src="https://raw.githubusercontent.com/matchish/laravel-scout-elasticsearch/master/docs/banner.svg?sanitize=true" >
   </a>
   
-  <img alt="Import progress report" src="https://raw.githubusercontent.com/matchish/laravel-scout-elasticsearch/master/docs/progress-report.svg?sanitize=true" >
+  <img alt="Import progress report" src="https://raw.githubusercontent.com/matchish/laravel-scout-elasticsearch/master/docs/progress-report.gif" >
 
   <p align="center">
     <a href="https://travis-ci.com/matchish/laravel-scout-elasticsearch"><img src="https://img.shields.io/travis/com/matchish/laravel-scout-elasticsearch.svg" alt="Build Status"></img></a>
