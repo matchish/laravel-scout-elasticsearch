@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\Jobs\Stages;
 
-use App\Product;
 use stdClass;
+use App\Product;
 use Tests\IntegrationTestCase;
 use Matchish\ScoutElasticSearch\Jobs\Stages\CleanUp;
 
@@ -32,5 +32,4 @@ class CleanUpTest extends IntegrationTestCase
         $this->assertFalse($writeIndexExist);
         $this->assertTrue($readIndexExist);
     }
-
 }

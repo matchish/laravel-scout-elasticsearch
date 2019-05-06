@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Jobs\Stages;
 
-use App\Product;
 use stdClass;
+use App\Product;
 use Tests\IntegrationTestCase;
 use Matchish\ScoutElasticSearch\Jobs\Stages\PullFromSource;
 
@@ -167,7 +167,6 @@ final class PullFromSourceTest extends IntegrationTestCase
 
     public function test_no_searchables_no_chunks()
     {
-
         $stages = PullFromSource::chunked(new Product());
 
         $this->assertEquals(0, $stages->count());
@@ -201,5 +200,4 @@ final class PullFromSourceTest extends IntegrationTestCase
 
         $this->assertEquals(3, $response['hits']['total']);
     }
-
 }

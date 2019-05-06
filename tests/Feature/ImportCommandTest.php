@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Book;
-use App\Product;
 use stdClass;
+use App\Product;
 use Tests\IntegrationTestCase;
 use Illuminate\Support\Facades\Artisan;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -126,13 +126,13 @@ final class ImportCommandTest extends IntegrationTestCase
             trans('scout::import.start', ['searchable' => Product::class]),
             trim($output[0]));
         $this->assertEquals(
-            '[OK] ' . trans('scout::import.done', ['searchable' => Product::class]),
+            '[OK] '.trans('scout::import.done', ['searchable' => Product::class]),
             trim($output[2]));
         $this->assertEquals(
             trans('scout::import.start', ['searchable' => Book::class]),
             trim($output[4]));
         $this->assertEquals(
-            '[OK] ' . trans('scout::import.done', ['searchable' => Book::class]),
+            '[OK] '.trans('scout::import.done', ['searchable' => Book::class]),
             trim($output[6]));
     }
 
@@ -148,7 +148,7 @@ final class ImportCommandTest extends IntegrationTestCase
             trans('scout::import.start', ['searchable' => Product::class]),
             trim($output[0]));
         $this->assertEquals(
-            '[OK] ' . trans('scout::import.done.queue', ['searchable' => Product::class]),
+            '[OK] '.trans('scout::import.done.queue', ['searchable' => Product::class]),
             trim($output[2]));
     }
 }

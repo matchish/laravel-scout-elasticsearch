@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Matchish\ScoutElasticSearch;
 
 use Symfony\Component\Console\Output\NullOutput;
@@ -19,5 +18,4 @@ trait ProgressReportable
     {
         return $this->progressBar ?: new ProgressBar(new NullOutput());
     }
-
 }
