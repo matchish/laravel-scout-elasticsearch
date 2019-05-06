@@ -3,8 +3,8 @@
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elasticsearch\Client;
-use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
+use Illuminate\Database\Eloquent\Model;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\WriteAlias;
 use Matchish\ScoutElasticSearch\ElasticSearch\DefaultAlias;
@@ -35,7 +35,6 @@ final class CreateWriteIndex
     }
 
     public function handle(Client $elasticsearch): void
-
     {
         /** @var Searchable $searchable */
         $searchable = $this->searchable;
@@ -58,5 +57,4 @@ final class CreateWriteIndex
     {
         return 1;
     }
-
 }

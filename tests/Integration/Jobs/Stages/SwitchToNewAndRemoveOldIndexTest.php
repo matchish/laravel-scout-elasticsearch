@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Jobs\Stages;
 
-use App\Product;
 use stdClass;
+use App\Product;
 use Tests\IntegrationTestCase;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Jobs\Stages\SwitchToNewAndRemoveOldIndex;

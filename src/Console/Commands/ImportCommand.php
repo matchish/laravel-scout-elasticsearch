@@ -35,9 +35,9 @@ final class ImportCommand extends Command
     {
         return collect($argument)->whenEmpty(function () {
             $factory = new SearchableListFactory(app()->getNamespace(), app()->path());
+
             return $factory->make();
         });
-
     }
 
     private function import($searchable)
@@ -58,9 +58,8 @@ final class ImportCommand extends Command
             ->allOnConnection(config((new $searchable)->syncWithSearchUsing()));
 
         $doneMessage = trans(config('scout.queue') ? 'scout::import.done.queue' : 'scout::import.done', [
-            'searchable' => $searchable
+            'searchable' => $searchable,
         ]);
         $this->output->success($doneMessage);
-
     }
 }

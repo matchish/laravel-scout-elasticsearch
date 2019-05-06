@@ -1,4 +1,5 @@
 <?php
+
 return [
     'start' => 'Importing [:searchable]',
     'done' => 'All [:searchable] records have been imported.',

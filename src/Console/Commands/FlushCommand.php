@@ -33,7 +33,7 @@ final class FlushCommand extends Command
         $searchableList->each(function ($searchable) {
             $searchable::removeAllFromSearch();
             $doneMessage = trans('scout::flush.done', [
-                'searchable' => $searchable
+                'searchable' => $searchable,
             ]);
             $this->output->success($doneMessage);
         });

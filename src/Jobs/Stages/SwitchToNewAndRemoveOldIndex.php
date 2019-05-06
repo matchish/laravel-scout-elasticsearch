@@ -3,8 +3,8 @@
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elasticsearch\Client;
-use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
+use Illuminate\Database\Eloquent\Model;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias\Get;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias\Update;
@@ -33,10 +33,10 @@ final class SwitchToNewAndRemoveOldIndex
     }
 
     public function handle(Client $elasticsearch): void
-   {
-       /** @var Searchable $searchable */
-       $searchable = $this->searchable;
-       $params = Get::anyIndex($searchable->searchableAs());
+    {
+        /** @var Searchable $searchable */
+        $searchable = $this->searchable;
+        $params = Get::anyIndex($searchable->searchableAs());
         $response = $elasticsearch->indices()->getAliases($params->toArray());
 
         $params = new Update();
@@ -47,7 +47,7 @@ final class SwitchToNewAndRemoveOldIndex
                 $params->add((string) $indexName, $searchable->searchableAs());
             }
         }
-       $elasticsearch->indices()->updateAliases($params->toArray());
+        $elasticsearch->indices()->updateAliases($params->toArray());
     }
 
     public function estimate(): int
