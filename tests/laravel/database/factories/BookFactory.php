@@ -14,20 +14,14 @@ $factory->define(Book::class, function (Faker $faker) {
     ];
 });
 
-$factory->define(Book::class, 'new-york', function (Faker $faker) {
+$factory->state(Book::class, 'new-york', function (Faker $faker) {
     return [
-        'custom_key' => $faker->uuid,
         'title' => "{$faker->sentence} New-York {$faker->sentence}",
-        'author' => $faker->name,
-        'year' => $faker->year,
     ];
 });
 
-$factory->define(Book::class, 'barselona', function (Faker $faker) {
+$factory->state(Book::class, 'barselona', function (Faker $faker) {
     return [
-        'custom_key' => $faker->uuid,
         'title' => "{$faker->sentence} Barselona {$faker->sentence}",
-        'author' => $faker->name,
-        'year' => $faker->year,
     ];
 });
