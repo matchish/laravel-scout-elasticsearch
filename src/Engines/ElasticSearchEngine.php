@@ -2,6 +2,7 @@
 
 namespace Matchish\ScoutElasticSearch\Engines;
 
+use Illuminate\Database\Eloquent\Collection;
 use Laravel\Scout\Searchable;
 use Laravel\Scout\Engines\Engine;
 use ONGR\ElasticsearchDSL\Search;
@@ -105,7 +106,7 @@ final class ElasticSearchEngine extends Engine
         $ids = $this->mapIds($results)->all();
         $hits = new EloquentHitsIteratorAggregate($ids, $model, $builder->queryCallback);
 
-        return new \Illuminate\Database\Eloquent\Collection($hits);
+        return new Collection($hits);
     }
 
     /**
