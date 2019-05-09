@@ -103,8 +103,7 @@ final class ElasticSearchEngine extends Engine
      */
     public function map(BaseBuilder $builder, $results, $model)
     {
-        $ids = $this->mapIds($results)->all();
-        $hits = new EloquentHitsIteratorAggregate($ids, $model, $builder->queryCallback);
+        $hits = new EloquentHitsIteratorAggregate($results, $builder->queryCallback);
 
         return new Collection($hits);
     }
