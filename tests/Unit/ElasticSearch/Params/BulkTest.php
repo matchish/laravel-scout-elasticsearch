@@ -46,7 +46,7 @@ class BulkTest extends TestCase
         $this->assertEquals([
             'body' => [
                 ['index' => ['_index' => 'products', '_type' => '_doc', '_id' => 2]],
-                ['title' => 'Scout', 'id' => 2],
+                ['title' => 'Scout', 'id' => 2, '__class_name' => 'App\Product'],
             ],
         ], $params);
     }
@@ -63,7 +63,7 @@ class BulkTest extends TestCase
         $this->assertEquals([
             'body' => [
                 ['index' => ['_index' => 'products', '_type' => '_doc', '_id' => 'Scout']],
-                ['title' => 'Scout', 'id' => 2],
+                ['title' => 'Scout', 'id' => 2, '__class_name' => 'App\Product'],
             ],
         ], $params);
     }
@@ -79,7 +79,7 @@ class BulkTest extends TestCase
         $this->assertEquals([
             'body' => [
                 ['index' => ['_index' => 'products', '_type' => '_doc', '_id' => 2]],
-                ['title' => 'Scout', '__soft_deleted' => 0, 'id' => 2],
+                ['title' => 'Scout', '__soft_deleted' => 0, 'id' => 2, '__class_name' => 'App\Product'],
             ],
         ], $params);
     }

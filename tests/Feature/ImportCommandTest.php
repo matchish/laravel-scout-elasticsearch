@@ -127,13 +127,13 @@ final class ImportCommandTest extends IntegrationTestCase
             trim($output[0]));
         $this->assertEquals(
             '[OK] '.trans('scout::import.done', ['searchable' => Product::class]),
-            trim($output[2]));
+            trim($output[14]));
         $this->assertEquals(
             trans('scout::import.start', ['searchable' => Book::class]),
-            trim($output[4]));
+            trim($output[16]));
         $this->assertEquals(
             '[OK] '.trans('scout::import.done', ['searchable' => Book::class]),
-            trim($output[6]));
+            trim($output[30]));
     }
 
     public function test_progress_report_in_queue()

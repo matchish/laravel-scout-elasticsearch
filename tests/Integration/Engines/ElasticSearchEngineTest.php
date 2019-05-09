@@ -4,6 +4,7 @@ namespace Tests\Integration\Engines;
 
 use App\Product;
 use Laravel\Scout\Builder;
+use stdClass;
 use Tests\IntegrationTestCase;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
 
@@ -43,7 +44,7 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
             'index' => 'products',
             'body' => [
                 'query' => [
-                    'match_all' => new \stdClass(),
+                    'match_all' => new stdClass(),
                 ],
             ],
         ];
@@ -66,7 +67,7 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
             'index' => 'products',
             'body' => [
                 'query' => [
-                    'match_all' => new \stdClass(),
+                    'match_all' => new stdClass(),
                 ],
             ],
         ];
@@ -88,7 +89,7 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
             'index' => 'products',
             'body' => [
                 'query' => [
-                    'match_all' => new \stdClass(),
+                    'match_all' => new stdClass(),
                 ],
             ],
         ];
@@ -101,9 +102,11 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
         $this->app['config']['scout.key'] = 'custom_key';
         $models = Product::all();
         $keys = $models->map(function ($product) {
-            return ['_id' => $product->getScoutKey()];
+            return ['_id' => $product->getScoutKey(), '_source' => [
+                '__class_name' => Product::class
+            ]];
         })->all();
-        $results = ['hits' => ['hits' => $keys]];
+        $results = ['hits' => ['hits' => $keys, 'total' => $models->count()]];
         $mappedModels = $this->engine->map(new Builder(new Product(), 'zonga'), $results, new Product());
         $this->assertEquals($models->map->id->all(), $mappedModels->map->id->all());
     }

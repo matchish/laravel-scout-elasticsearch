@@ -54,9 +54,20 @@ class ElasticSearchEngineTest extends TestCase
             return $query;
         });
         $engine = new ElasticSearchEngine(app(Client::class));
-        $engine->map($builder, ['hits' => ['hits' => ['_id' => 1],
-            ['_id' => 2],
-        ]], new Product());
+        $engine->map($builder, [
+            'hits' => [
+                'hits' => [
+                    [
+                        '_id' => 1, '_source' => [
+                        '__class_name' => Product::class
+                    ]],
+                    [
+                        '_id' => 2, '_source' => [
+                        '__class_name' => Product::class
+                    ]],
+                ],
+                'total' => 2
+            ]], new Product());
         $this->assertTrue($spy->executed);
     }
 }
