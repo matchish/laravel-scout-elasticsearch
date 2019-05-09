@@ -20,17 +20,12 @@ class ImportStages extends Collection
     public static function fromSearchable(Model $searchable)
     {
         $index = Index::fromSearchable($searchable);
-        $main = PullFromSource::chunked($searchable);
-        if ($main->count()) {
-            return (new static([
-                new CleanUp($searchable),
-                new CreateWriteIndex($searchable, $index),
-                PullFromSource::chunked($searchable),
-                new RefreshIndex($index),
-                new SwitchToNewAndRemoveOldIndex($searchable, $index),
-            ]))->flatten();
-        } else {
-            return new static;
-        }
+        return (new static([
+            new CleanUp($searchable),
+            new CreateWriteIndex($searchable, $index),
+            PullFromSource::chunked($searchable),
+            new RefreshIndex($index),
+            new SwitchToNewAndRemoveOldIndex($searchable, $index),
+        ]))->flatten()->filter();
     }
 }
