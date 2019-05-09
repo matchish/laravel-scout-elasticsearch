@@ -42,3 +42,6 @@ test: up ## Execute application tests
 test-coverage: up ## Execute application tests and generate report
 	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" ./vendor/bin/phpstan analyze
 	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" ./vendor/bin/phpunit  --coverage-html build/coverage-report
+
+test-filter:
+	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" ./vendor/bin/phpunit --filter=$(filter) --testdox
