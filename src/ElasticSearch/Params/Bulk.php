@@ -52,7 +52,10 @@ final class Bulk
 
                 $payload['body'][] = array_merge(
                     $model->toSearchableArray(),
-                    $model->scoutMetadata()
+                    $model->scoutMetadata(),
+                    [
+                        '__class_name' => get_class($model)
+                    ]
                 );
 
                 return $payload;
