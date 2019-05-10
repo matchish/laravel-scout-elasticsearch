@@ -27,6 +27,7 @@ If you need any help, [stack overflow](https://stackoverflow.com/questions/tagge
 
 ## :two_hearts: Features
 
+- Search amongst multiple models
 - [**Zero downtime** reimport](#zero-downtime-reimport) - it’s a breeze to import data in production.
 - Import all searchable models at once.
 - A fully configurable mapping for each model.
@@ -134,6 +135,17 @@ $results = Product::search('zonga', function($client, $body) {
 
 `$client` is `\ElasticSearch\Client` object from [elasticsearch/elasticsearch](https://packagist.org/packages/elasticsearch/elasticsearch) package  
  And `$body` is `ONGR\ElasticsearchDSL\Search` from [ongr/elasticsearch-dsl](https://packagist.org/packages/ongr/elasticsearch-dsl) package  
+
+### Search amongst multiple models
+You can do it with `Mixed` class
+```php
+Mixed::search('title:Barselona or to:Barselona')
+    within(implode(',', [
+        (new Ticket())->serchableAs(),
+        (new Book())->serchableAs(),
+    ]))
+    ->get();
+```
 
 >Don't forget to :star: the package if you like it. :pray:
 
