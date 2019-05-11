@@ -11,7 +11,6 @@ namespace Matchish\ScoutElasticSearch\ElasticSearch;
 use Traversable;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Searchable;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * @internal
@@ -56,16 +55,17 @@ final class EloquentHitsIteratorAggregate implements \IteratorAggregate
                     if (! empty($this->callback)) {
                         $builder->query($this->callback);
                     }
-                    /** @var Searchable $model */
+                    /* @var Searchable $model */
                     return $models = $model->getScoutModelsByIds(
                         $builder, $results->pluck('_id')->all()
                     );
                 })
                 ->flatten()->keyBy(function ($model) {
-                    return get_class($model) . '::' . $model->getScoutKey();
+                    return get_class($model).'::'.$model->getScoutKey();
                 });
             $hits = collect($hits)->map(function ($hit) use ($models) {
-                $key = $hit['_source']['__class_name'] . '::' . $hit['_id'];
+                $key = $hit['_source']['__class_name'].'::'.$hit['_id'];
+
                 return isset($models[$key]) ? $models[$key] : null;
             })->filter()->all();
         }

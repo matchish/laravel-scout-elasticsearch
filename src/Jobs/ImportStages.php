@@ -20,6 +20,7 @@ class ImportStages extends Collection
     public static function fromSearchable(Model $searchable)
     {
         $index = Index::fromSearchable($searchable);
+
         return (new static([
             new CleanUp($searchable),
             new CreateWriteIndex($searchable, $index),
