@@ -2,11 +2,11 @@
 
 namespace Matchish\ScoutElasticSearch\Engines;
 
-use Illuminate\Database\Eloquent\Collection;
 use Laravel\Scout\Searchable;
 use Laravel\Scout\Engines\Engine;
 use ONGR\ElasticsearchDSL\Search;
 use Laravel\Scout\Builder as BaseBuilder;
+use Illuminate\Database\Eloquent\Collection;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;

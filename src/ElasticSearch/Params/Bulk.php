@@ -54,7 +54,7 @@ final class Bulk
                     $model->toSearchableArray(),
                     $model->scoutMetadata(),
                     [
-                        '__class_name' => get_class($model)
+                        '__class_name' => get_class($model),
                     ]
                 );
 

@@ -2,9 +2,9 @@
 
 namespace Tests\Integration\Engines;
 
+use stdClass;
 use App\Product;
 use Laravel\Scout\Builder;
-use stdClass;
 use Tests\IntegrationTestCase;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
 
@@ -103,7 +103,7 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
         $models = Product::all();
         $keys = $models->map(function ($product) {
             return ['_id' => $product->getScoutKey(), '_source' => [
-                '__class_name' => Product::class
+                '__class_name' => Product::class,
             ]];
         })->all();
         $results = ['hits' => ['hits' => $keys, 'total' => $models->count()]];

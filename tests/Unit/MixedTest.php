@@ -2,15 +2,13 @@
 
 namespace Tests\Unit;
 
-
-use Laravel\Scout\Searchable;
-use Matchish\ScoutElasticSearch\Mixed;
-use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use Laravel\Scout\Searchable;
+use PHPUnit\Framework\TestCase;
+use Matchish\ScoutElasticSearch\Mixed;
 
 class MixedTest extends TestCase
 {
-
     public function test_search_signature()
     {
         $searchable = new ReflectionClass(Searchable::class);

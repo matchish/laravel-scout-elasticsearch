@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Book;
-use App\Product;
 use App\Ticket;
-use Matchish\ScoutElasticSearch\Mixed;
+use App\Product;
 use Tests\IntegrationTestCase;
 use Illuminate\Pagination\Paginator;
+use Matchish\ScoutElasticSearch\Mixed;
 use Illuminate\Support\Facades\Artisan;
 
 final class SearchTest extends IntegrationTestCase
@@ -133,5 +133,4 @@ final class SearchTest extends IntegrationTestCase
             ]))->get();
         $this->assertEquals(0, $mixed->count());
     }
-
 }
