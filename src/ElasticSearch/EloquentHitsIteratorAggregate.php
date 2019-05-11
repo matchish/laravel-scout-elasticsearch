@@ -11,7 +11,6 @@ namespace Matchish\ScoutElasticSearch\ElasticSearch;
 use Traversable;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Searchable;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * @internal
@@ -21,25 +20,19 @@ final class EloquentHitsIteratorAggregate implements \IteratorAggregate
     /**
      * @var array
      */
-    private $keys;
-    /**
-     * @var Model
-     */
-    private $model;
+    private $results;
     /**
      * @var callable|null
      */
     private $callback;
 
     /**
-     * @param array $keys
-     * @param Model $model
+     * @param array $results
      * @param callable|null $callback
      */
-    public function __construct(array $keys, Model $model, callable $callback = null)
+    public function __construct(array $results, callable $callback = null)
     {
-        $this->keys = $keys;
-        $this->model = $model;
+        $this->results = $results;
         $this->callback = $callback;
     }
 
@@ -52,20 +45,30 @@ final class EloquentHitsIteratorAggregate implements \IteratorAggregate
      */
     public function getIterator()
     {
-        /** @var Searchable $model */
-        $model = $this->model;
-        $builder = new Builder($this->model, '');
-        if (! empty($this->callback)) {
-            $builder->query($this->callback);
+        $hits = collect();
+        if ($this->results['hits']['total']) {
+            $hits = $this->results['hits']['hits'];
+            $models = collect($hits)->groupBy('_source.__class_name')
+                ->map(function ($results, $class) {
+                    $model = new $class;
+                    $builder = new Builder($model, '');
+                    if (! empty($this->callback)) {
+                        $builder->query($this->callback);
+                    }
+                    /* @var Searchable $model */
+                    return $models = $model->getScoutModelsByIds(
+                        $builder, $results->pluck('_id')->all()
+                    );
+                })
+                ->flatten()->keyBy(function ($model) {
+                    return get_class($model).'::'.$model->getScoutKey();
+                });
+            $hits = collect($hits)->map(function ($hit) use ($models) {
+                $key = $hit['_source']['__class_name'].'::'.$hit['_id'];
+
+                return isset($models[$key]) ? $models[$key] : null;
+            })->filter()->all();
         }
-        $models = $model->getScoutModelsByIds(
-            $builder, $this->keys
-        )->keyBy(function ($model) {
-            return $model->getScoutKey();
-        });
-        $hits = collect($this->keys)->map(function ($key) use ($models) {
-            return isset($models[$key]) ? $models[$key] : null;
-        })->filter()->all();
 
         return new \ArrayIterator($hits);
     }

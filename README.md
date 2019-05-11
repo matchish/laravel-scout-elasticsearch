@@ -27,7 +27,9 @@ If you need any help, [stack overflow](https://stackoverflow.com/questions/tagge
 
 ## :two_hearts: Features
 
+- [Search amongst multiple models](#search-amongst-multiple-models)
 - [**Zero downtime** reimport](#zero-downtime-reimport) - it’s a breeze to import data in production.
+- [Elasticsearch **7.0** ready](https://www.elastic.co/guide/en/elasticsearch/reference/current/removal-of-types.html) - We don't use mapping types.
 - Import all searchable models at once.
 - A fully configurable mapping for each model.
 - Full power of ElasticSearch in your queries
@@ -134,6 +136,19 @@ $results = Product::search('zonga', function($client, $body) {
 
 `$client` is `\ElasticSearch\Client` object from [elasticsearch/elasticsearch](https://packagist.org/packages/elasticsearch/elasticsearch) package  
  And `$body` is `ONGR\ElasticsearchDSL\Search` from [ongr/elasticsearch-dsl](https://packagist.org/packages/ongr/elasticsearch-dsl) package  
+
+### Search amongst multiple models
+You can do it with `Mixed` class, just pass indices names separated by commas to `within` method.
+```php
+Mixed::search('title:Barselona or to:Barselona')
+    within(implode(',', [
+        (new Ticket())->serchableAs(),
+        (new Book())->serchableAs(),
+    ]))
+->get();
+```
+In this example you will get collection of `Ticket` and `Book` models where tisket arrival city or
+book title is `Barselona`
 
 >Don't forget to :star: the package if you like it. :pray:
 

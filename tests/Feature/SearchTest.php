@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Book;
+use App\Ticket;
 use App\Product;
 use Tests\IntegrationTestCase;
 use Illuminate\Pagination\Paginator;
+use Matchish\ScoutElasticSearch\Mixed;
 use Illuminate\Support\Facades\Artisan;
 
 final class SearchTest extends IntegrationTestCase
@@ -87,5 +90,47 @@ final class SearchTest extends IntegrationTestCase
             ->within('new_products')
             ->get();
         $this->assertEquals($kindleAmount, $kindle->count());
+    }
+
+    public function test_mixed()
+    {
+        $newyorkAmount = rand(1, 5);
+        $barselonaAmount = rand(1, 5);
+
+        $dispatcher = Ticket::getEventDispatcher();
+        Ticket::unsetEventDispatcher();
+
+        factory(Ticket::class, $newyorkAmount)->state('new-york')->create();
+        factory(Ticket::class, $barselonaAmount)->state('barselona')->create();
+
+        Ticket::setEventDispatcher($dispatcher);
+
+        $dispatcher = Book::getEventDispatcher();
+        Book::unsetEventDispatcher();
+
+        factory(Book::class, $newyorkAmount)->state('new-york')->create();
+        factory(Book::class, $barselonaAmount)->state('barselona')->create();
+
+        Book::setEventDispatcher($dispatcher);
+
+        Artisan::call('scout:import');
+
+        $mixed = Mixed::search('new-york')->within(
+            implode(',', [(new Book)->searchableAs(),
+            (new Ticket())->searchableAs(),
+        ]))->get();
+        $this->assertEquals($newyorkAmount * 2, $mixed->count());
+        $this->assertEquals(['tickets' => $newyorkAmount, 'books' => $newyorkAmount], $mixed->map->getTable()->countBy()->all());
+    }
+
+    public function test_mixed_no_results()
+    {
+        Artisan::call('scout:import');
+
+        $mixed = Mixed::search('lisbon')->within(
+            implode(',', [(new Book)->searchableAs(),
+                (new Ticket())->searchableAs(),
+            ]))->get();
+        $this->assertEquals(0, $mixed->count());
     }
 }

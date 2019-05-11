@@ -13,10 +13,14 @@ use Matchish\ScoutElasticSearch\Jobs\Stages\SwitchToNewAndRemoveOldIndex;
 
 class ImportStagesTest extends TestCase
 {
-    public function test_no_stages_if_no_searchables()
+    public function test_no_pull_stages_if_no_searchables()
     {
         $stages = ImportStages::fromSearchable(new Product());
-        $this->assertEquals(0, $stages->count());
+        $this->assertEquals(4, $stages->count());
+        $this->assertInstanceOf(CleanUp::class, $stages->get(0));
+        $this->assertInstanceOf(CreateWriteIndex::class, $stages->get(1));
+        $this->assertInstanceOf(RefreshIndex::class, $stages->get(2));
+        $this->assertInstanceOf(SwitchToNewAndRemoveOldIndex::class, $stages->get(3));
     }
 
     public function test_stages()

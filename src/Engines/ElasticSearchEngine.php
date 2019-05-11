@@ -6,6 +6,7 @@ use Laravel\Scout\Searchable;
 use Laravel\Scout\Engines\Engine;
 use ONGR\ElasticsearchDSL\Search;
 use Laravel\Scout\Builder as BaseBuilder;
+use Illuminate\Database\Eloquent\Collection;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
@@ -102,10 +103,9 @@ final class ElasticSearchEngine extends Engine
      */
     public function map(BaseBuilder $builder, $results, $model)
     {
-        $ids = $this->mapIds($results)->all();
-        $hits = new EloquentHitsIteratorAggregate($ids, $model, $builder->queryCallback);
+        $hits = new EloquentHitsIteratorAggregate($results, $builder->queryCallback);
 
-        return new \Illuminate\Database\Eloquent\Collection($hits);
+        return new Collection($hits);
     }
 
     /**
