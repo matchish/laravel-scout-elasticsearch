@@ -29,6 +29,7 @@ If you need any help, [stack overflow](https://stackoverflow.com/questions/tagge
 
 - [Search amongst multiple models](#search-amongst-multiple-models)
 - [**Zero downtime** reimport](#zero-downtime-reimport) - it’s a breeze to import data in production.
+- [Elasticsearch **7.0** ready](https://www.elastic.co/guide/en/elasticsearch/reference/current/removal-of-types.html) - We don't use mapping types.
 - Import all searchable models at once.
 - A fully configurable mapping for each model.
 - Full power of ElasticSearch in your queries
