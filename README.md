@@ -137,15 +137,17 @@ $results = Product::search('zonga', function($client, $body) {
  And `$body` is `ONGR\ElasticsearchDSL\Search` from [ongr/elasticsearch-dsl](https://packagist.org/packages/ongr/elasticsearch-dsl) package  
 
 ### Search amongst multiple models
-You can do it with `Mixed` class
+You can do it with `Mixed` class, just pass indices names separated by commas to `within` method.
 ```php
 Mixed::search('title:Barselona or to:Barselona')
     within(implode(',', [
         (new Ticket())->serchableAs(),
         (new Book())->serchableAs(),
     ]))
-    ->get();
+->get();
 ```
+In this example you will get collection of `Ticket` and `Book` models where tisket arrival city or
+book title is `Barselona`
 
 >Don't forget to :star: the package if you like it. :pray:
 
