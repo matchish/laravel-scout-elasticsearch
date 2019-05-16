@@ -23,7 +23,7 @@ It’s built on top of the latest release of [Laravel Scout](https://laravel.com
 package. Using this package, you are free to take advantage of all of Laravel Scout’s
 great features, and at the same time leverage the complete set of ElasticSearch’s search experience.
 
-If you need any help, [stack overflow](https://stackoverflow.com/questions/tagged/laravel-scout%20laravel%20elasticsearch) is the preffered and recommended way to ask support questions.
+If you need any help, [stack overflow](https://stackoverflow.com/questions/tagged/laravel-scout%20laravel%20elasticsearch) is the preferred and recommended way to ask support questions.
 
 ## :two_hearts: Features
 
@@ -32,7 +32,7 @@ If you need any help, [stack overflow](https://stackoverflow.com/questions/tagge
 - [Elasticsearch **7.0** ready](https://www.elastic.co/guide/en/elasticsearch/reference/current/removal-of-types.html) - We don't use mapping types.
 - Import all searchable models at once.
 - A fully configurable mapping for each model.
-- Full power of ElasticSearch in your queries
+- Full power of ElasticSearch in your queries.
 
 ## :warning: Requirements
 
@@ -51,10 +51,10 @@ Set env variables
 SCOUT_DRIVER=Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine
 ```
 
-The package uses `\ElasticSearch\Client` from official package, but don't try to config it, 
-so you feel free do it in your app service provider. 
+The package uses `\ElasticSearch\Client` from official package, but does not try to configure it, 
+so feel free do it in your app service provider. 
 But if you don't want to do it right now, 
-you can use `Matchish\ElasticSearchServiceProvider` from package.  
+you can use `Matchish\ElasticSearchServiceProvider` from the package.  
 Register the provider, adding to `config/app.php`
 ```
 'providers' => [
@@ -79,7 +79,7 @@ It is very important to define the mapping when we create an index — an inappr
 
 To define mappings or settings for index, set config with right value. 
 
-For example if method `searchableAs` return 
+For example if method `searchableAs` returns 
 `products` string
 
 Config key for mappings should be  
@@ -104,16 +104,16 @@ The command create new temporary index, import all models to it, and then switch
 
 ### Search
 
-To be fully compatible with original scout package, this package don't add new methods.  
+To be fully compatible with original scout package, this package does not add new methods.  
 So how we can build complex queries?
 There is two ways.   
-By default when you pass query to `search` method the engine builds [query_string](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html) query, so you can build queries like this
+By default, when you pass a query to the `search` method, the engine builds a [query_string](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html) query, so you can build queries like this
 
 ```php
 Product::search('title:this OR description:this) AND (title:that OR description:that')`
 ```
 
-If it's not enough in your case you can pass callback to query builder
+If it's not enough in your case you can pass a callback to the query builder
 
 ```php
 $results = Product::search('zonga', function($client, $body) {
@@ -138,17 +138,17 @@ $results = Product::search('zonga', function($client, $body) {
  And `$body` is `ONGR\ElasticsearchDSL\Search` from [ongr/elasticsearch-dsl](https://packagist.org/packages/ongr/elasticsearch-dsl) package  
 
 ### Search amongst multiple models
-You can do it with `Mixed` class, just pass indices names separated by commas to `within` method.
+You can do it with `Mixed` class, just pass indices names separated by commas to the `within` method.
 ```php
-Mixed::search('title:Barselona or to:Barselona')
+Mixed::search('title:Barcelona or to:Barcelona')
     within(implode(',', [
-        (new Ticket())->serchableAs(),
-        (new Book())->serchableAs(),
+        (new Ticket())->searchableAs(),
+        (new Book())->searchableAs(),
     ]))
 ->get();
 ```
-In this example you will get collection of `Ticket` and `Book` models where tisket arrival city or
-book title is `Barselona`
+In this example you will get collection of `Ticket` and `Book` models where ticket's arrival city or
+book title is `Barcelona`
 
 >Don't forget to :star: the package if you like it. :pray:
 
