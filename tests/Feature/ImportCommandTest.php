@@ -119,7 +119,7 @@ final class ImportCommandTest extends IntegrationTestCase
     public function test_progress_report()
     {
         $output = new BufferedOutput();
-        Artisan::call('scout:import', [], $output);
+        Artisan::call('scout:import', ['searchable' => [Product::class, Book::class]], $output);
 
         $output = explode("\n", $output->fetch());
         $this->assertEquals(
