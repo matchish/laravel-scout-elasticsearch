@@ -115,12 +115,13 @@ final class SearchTest extends IntegrationTestCase
 
         Artisan::call('scout:import');
 
-        $mixed = Mixed::search('new-york')->within(
-            implode(',', [(new Book)->searchableAs(),
-            (new Ticket())->searchableAs(),
-        ]))->get();
-        $this->assertEquals($newyorkAmount * 2, $mixed->count());
-        $this->assertEquals(['tickets' => $newyorkAmount, 'books' => $newyorkAmount], $mixed->map->getTable()->countBy()->all());
+        $mixed = Mixed::search('Barcelona')->within(
+            implode(',', [
+                (new Book)->searchableAs(),
+                (new Ticket())->searchableAs(),
+            ]))->get();
+        $this->assertEquals($barcelonaAmount * 2, $mixed->count());
+        $this->assertEquals(['tickets' => $barcelonaAmount, 'books' => $barcelonaAmount], $mixed->map->getTable()->countBy()->all());
     }
 
     public function test_mixed_no_results()
