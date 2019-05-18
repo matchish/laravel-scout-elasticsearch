@@ -95,13 +95,13 @@ final class SearchTest extends IntegrationTestCase
     public function test_mixed()
     {
         $newyorkAmount = rand(1, 5);
-        $barselonaAmount = rand(1, 5);
+        $barcelonaAmount = rand(1, 5);
 
         $dispatcher = Ticket::getEventDispatcher();
         Ticket::unsetEventDispatcher();
 
         factory(Ticket::class, $newyorkAmount)->state('new-york')->create();
-        factory(Ticket::class, $barselonaAmount)->state('barselona')->create();
+        factory(Ticket::class, $barcelonaAmount)->state('barcelona')->create();
 
         Ticket::setEventDispatcher($dispatcher);
 
@@ -109,18 +109,19 @@ final class SearchTest extends IntegrationTestCase
         Book::unsetEventDispatcher();
 
         factory(Book::class, $newyorkAmount)->state('new-york')->create();
-        factory(Book::class, $barselonaAmount)->state('barselona')->create();
+        factory(Book::class, $barcelonaAmount)->state('barcelona')->create();
 
         Book::setEventDispatcher($dispatcher);
 
         Artisan::call('scout:import');
 
-        $mixed = Mixed::search('new-york')->within(
-            implode(',', [(new Book)->searchableAs(),
-            (new Ticket())->searchableAs(),
-        ]))->get();
-        $this->assertEquals($newyorkAmount * 2, $mixed->count());
-        $this->assertEquals(['tickets' => $newyorkAmount, 'books' => $newyorkAmount], $mixed->map->getTable()->countBy()->all());
+        $mixed = Mixed::search('Barcelona')->within(
+            implode(',', [
+                (new Book)->searchableAs(),
+                (new Ticket())->searchableAs(),
+            ]))->get();
+        $this->assertEquals($barcelonaAmount * 2, $mixed->count());
+        $this->assertEquals(['tickets' => $barcelonaAmount, 'books' => $barcelonaAmount], $mixed->map->getTable()->countBy()->all());
     }
 
     public function test_mixed_no_results()

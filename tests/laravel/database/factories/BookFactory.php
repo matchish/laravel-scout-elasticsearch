@@ -20,8 +20,8 @@ $factory->state(Book::class, 'new-york', function (Faker $faker) {
     ];
 });
 
-$factory->state(Book::class, 'barselona', function (Faker $faker) {
+$factory->state(Book::class, 'barcelona', function (Faker $faker) {
     return [
-        'title' => "{$faker->sentence} Barselona {$faker->sentence}",
+        'title' => "{$faker->sentence} Barcelona {$faker->sentence}",
     ];
 });
