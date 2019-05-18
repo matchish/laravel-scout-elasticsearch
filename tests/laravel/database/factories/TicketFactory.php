@@ -20,8 +20,8 @@ $factory->state(Ticket::class, 'new-york', function (Faker $faker) {
     ];
 });
 
-$factory->state(Ticket::class, 'barselona', function (Faker $faker) {
+$factory->state(Ticket::class, 'barcelona', function (Faker $faker) {
     return [
-        'to' => 'Barselona',
+        'to' => 'Barcelona',
     ];
 });
