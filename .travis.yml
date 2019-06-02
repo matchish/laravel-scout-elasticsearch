@@ -9,6 +9,9 @@ php:
   - 7.3
   - nightly
 
+env:
+  - ELASTICSEARCH_VERSION=6.6.2
+  - ELASTICSEARCH_VERSION=7.1.1
 cache:
   directories:
     - "$HOME/.composer/cache/files"
@@ -16,9 +19,10 @@ cache:
 matrix:
   allow_failures:
     - php: nightly
+    - env: ELASTICSEARCH_VERSION=7.1.1
 
 before_script:
-  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.6.2.deb && sudo dpkg -i --force-confnew elasticsearch-6.6.2.deb && sudo service elasticsearch restart
+  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ELASTICSEARCH_VERSION.deb && sudo dpkg -i --force-confnew elasticsearch-$ELASTICSEARCH_VERSION.deb && sudo service elasticsearch restart
   - sleep 20
   - curl -X GET "localhost:9200/_cluster/health?wait_for_status=yellow&timeout=50s"
   - travis_retry composer self-update
