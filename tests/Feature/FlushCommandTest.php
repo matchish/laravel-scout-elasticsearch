@@ -38,6 +38,6 @@ final class FlushCommandTest extends IntegrationTestCase
         ];
 
         $response = $this->elasticsearch->search($params);
-        $this->assertEquals(0, $response['hits']['total']);
+        $this->assertEquals(0, $response['hits']['total']['value']);
     }
 }

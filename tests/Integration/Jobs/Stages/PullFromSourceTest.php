@@ -39,7 +39,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             ],
         ];
         $response = $this->elasticsearch->search($params);
-        $this->assertEquals($productsAmount, $response['hits']['total']);
+        $this->assertEquals($productsAmount, $response['hits']['total']['value']);
     }
 
     public function test_dont_put_entities_if_no_entities_in_collection(): void
@@ -62,7 +62,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             ],
         ];
         $response = $this->elasticsearch->search($params);
-        $this->assertEquals(0, $response['hits']['total']);
+        $this->assertEquals(0, $response['hits']['total']['value']);
     }
 
     public function test_put_all_to_index_if_amount_of_entities_more_than_chunk_size(): void
@@ -94,7 +94,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             ],
         ];
         $response = $this->elasticsearch->search($params);
-        $this->assertEquals($productsAmount, $response['hits']['total']);
+        $this->assertEquals($productsAmount, $response['hits']['total']['value']);
     }
 
     public function test_pull_soft_delete_meta_data()
@@ -162,7 +162,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             ],
         ];
         $response = $this->elasticsearch->search($params);
-        $this->assertEquals(3, $response['hits']['total']);
+        $this->assertEquals(3, $response['hits']['total']['value']);
     }
 
     public function test_no_searchables_no_chunks()
@@ -198,6 +198,6 @@ final class PullFromSourceTest extends IntegrationTestCase
         ];
         $response = $this->elasticsearch->search($params);
 
-        $this->assertEquals(3, $response['hits']['total']);
+        $this->assertEquals(3, $response['hits']['total']['value']);
     }
 }
