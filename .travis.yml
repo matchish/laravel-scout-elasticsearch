@@ -1,15 +1,14 @@
 language: php
-  
+
 env:
-  - ELASTICSEARCH_BUILD=6.6.2.deb ELASTICSEARCH_HOST=localhost:9200
   - ELASTICSEARCH_BUILD=7.1.1-amd64.deb ELASTICSEARCH_HOST=localhost:9200
-  
+
 php:
   - 7.1
   - 7.2
   - 7.3
   - nightly
-  
+
 cache:
   directories:
     - "$HOME/.composer/cache/files"
@@ -20,7 +19,7 @@ matrix:
     - env: ELASTICSEARCH_BUILD=7.1.1
 
 before_script:
-  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ELASTICSEARCH_BUILD 
+  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ELASTICSEARCH_BUILD
   - sudo dpkg -i --force-confnew elasticsearch-$ELASTICSEARCH_BUILD
   - sudo sed -i.old 's/-Xms1g/-Xms128m/' /etc/elasticsearch/jvm.options
   - sudo sed -i.old 's/-Xmx1g/-Xmx128m/' /etc/elasticsearch/jvm.options
