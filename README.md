@@ -29,7 +29,7 @@ If you need any help, [stack overflow](https://stackoverflow.com/questions/tagge
 
 - [Search amongst multiple models](#search-amongst-multiple-models)
 - [**Zero downtime** reimport](#zero-downtime-reimport) - it’s a breeze to import data in production.
-- Elasticsearch **7.0** ready - Use [elasticsearch-7](https://github.com/matchish/laravel-scout-elasticsearch/tree/elasticsearch-7) branch instead. Please note there is no official elasticsearch package with support of 7 version. So this branch is not recommended for production
+- Elasticsearch **7.0** ready - Use [elasticsearch-7](https://github.com/matchish/laravel-scout-elasticsearch/tree/elasticsearch-7) branch instead.
 - Import all searchable models at once.
 - A fully configurable mapping for each model.
 - Full power of ElasticSearch in your queries.
