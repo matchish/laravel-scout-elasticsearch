@@ -58,12 +58,31 @@ final class PullFromSource
             ->orderBy($searchable->getKeyName());
         $totalSearchables = $query->count();
         if ($totalSearchables) {
-            $chunkSize = (int) config('scout.chunk.searchable', self::DEFAULT_CHUNK_SIZE);
-            $totalChunks = (int) ceil($totalSearchables / $chunkSize);
-
-            return collect(range(1, $totalChunks))->map(function ($page) use ($query, $chunkSize) {
-                $clone = (clone $query)->forPage($page, $chunkSize);
-
+            $chunkSize = (int)config('scout.chunk.searchable', self::DEFAULT_CHUNK_SIZE);
+            $cloneQuery = clone $query;
+            $cloneQuery->joinSub('SELECT @row :=0, 1 as temp', 'r', 'r.temp', 'r.temp')
+                ->selectRaw("@row := @row +1 AS rownum, {$searchable->getKeyName()}");
+            $ids = \DB::query()->fromSub($cloneQuery, 'ranked')->whereRaw("rownum %{$chunkSize} =1 and rownum != 1")->pluck('id');
+            $pairs = [];
+            $lastId = null;
+            foreach ($ids as $id) {
+                if ($lastId) {
+                    $pairs[] = [$lastId, $id];
+                } else {
+                    $pairs[] = [null, $id];
+                }
+                $lastId = $id;
+            }
+            $pairs[] = [$lastId, null];
+            return collect($pairs)->map(function ($pair) use ($query, $searchable) {
+                list($start, $end) = $pair;
+                $clone = (clone $query)
+                    ->when(!is_null($start), function ($query) use ($start, $searchable) {
+                        return $query->where($searchable->getKeyName(), '>', $start);
+                    })
+                    ->when(!is_null($end), function ($query) use ($end, $searchable) {
+                        return $query->where($searchable->getKeyName(), '<=', $end);
+                    });
                 return new static($clone);
             });
         } else {
