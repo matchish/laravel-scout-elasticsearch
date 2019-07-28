@@ -11,14 +11,13 @@ build:
   environment:
     php:
       version: '7.2'
+    variables:
+      ELASTICSEARCH_HOST: 'localhost:9200'
+      DB_HOST: '127.0.0.1'
+      DB_USERNAME: 'root'
+      DB_PASSWORD: ''
   nodes:
     analysis:
-      environment:
-        variables:
-          ELASTICSEARCH_HOST: 'localhost:9200'
-          DB_HOST: '127.0.0.1'
-          DB_USERNAME: 'root'
-          DB_PASSWORD: ''
       services:
         elasticsearch: 6.6.2
         mysql: 5.7
