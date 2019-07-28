@@ -17,17 +17,17 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        $this->app->setBasePath(__DIR__.'/laravel');
+        $this->app->setBasePath(__DIR__ . '/laravel');
 
         $this->withFactories(database_path('factories'));
 
-        Artisan::call('migrate:fresh', ['--database' => 'testbench']);
+        Artisan::call('migrate:fresh', ['--database' => 'mysql']);
     }
 
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application $app
+     * @param \Illuminate\Foundation\Application $app
      * @return void
      */
     protected function getEnvironmentSetUp($app)
@@ -36,13 +36,8 @@ abstract class TestCase extends BaseTestCase
         $app['config']->set('scout.chunk.searchable', 3);
         $app['config']->set('scout.queue', false);
         // Setup default database to use sqlite :memory:
-        $app['config']->set('database.default', 'testbench');
-        $app['config']->set('database.connections.testbench', [
-                'driver' => 'sqlite',
-                'database' => ':memory:',
-                'prefix' => '',
-            ]);
-        $app['config']->set('elasticsearch', require(__DIR__.'/../config/elasticsearch.php'));
+        $app['config']->set('database.default', 'mysql');
+        $app['config']->set('elasticsearch', require(__DIR__ . '/../config/elasticsearch.php'));
         $app['config']->set('elasticsearch.indices.mappings.products', [
                 '_doc' => [
                     'properties' => [
@@ -54,7 +49,7 @@ abstract class TestCase extends BaseTestCase
                         ],
                     ],
                 ],
-            ]);
+        ]);
     }
 
     protected function getPackageProviders($app)
