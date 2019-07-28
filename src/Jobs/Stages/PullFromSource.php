@@ -62,7 +62,7 @@ final class PullFromSource
             $cloneQuery = clone $query;
             $cloneQuery->joinSub('SELECT @row :=0, 1 as temp', 'r', 'r.temp', 'r.temp')
                 ->selectRaw("@row := @row +1 AS rownum, {$searchable->getKeyName()}");
-            $ids = \DB::query()->fromSub($cloneQuery, 'ranked')->whereRaw("rownum %{$chunkSize} =1 and rownum != 1")->pluck('id');
+            $ids = \DB::query()->fromSub($cloneQuery, 'ranked')->whereRaw("rownum %{$chunkSize} =0")->pluck('id');
             $pairs = [];
             $lastId = null;
             foreach ($ids as $id) {
