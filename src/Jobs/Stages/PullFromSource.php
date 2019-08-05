@@ -2,34 +2,30 @@
 
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
-use Laravel\Scout\Searchable;
 use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
+use Matchish\ScoutElasticSearch\Console\Commands\ImportSource;
 
 /**
  * @internal
  */
 final class PullFromSource
 {
-    const DEFAULT_CHUNK_SIZE = 500;
+    /**
+     * @var ImportSource
+     */
+    private $source;
 
     /**
-     * @var Builder
+     * @param ImportSource $source
      */
-    private $query;
-
-    /**
-     * @param Builder $query
-     */
-    public function __construct(Builder $query)
+    public function __construct(ImportSource $source)
     {
-        $this->query = $query;
+        $this->source = $source;
     }
 
     public function handle(): void
     {
-        $results = $this->query->get();
+        $results = $this->source->get();
         $results->filter->shouldBeSearchable()->searchable();
     }
 
@@ -44,49 +40,13 @@ final class PullFromSource
     }
 
     /**
-     * @param Model $searchable
+     * @param ImportSource $source
      * @return Collection
      */
-    public static function chunked(Model $searchable): Collection
+    public static function chunked(ImportSource $source): Collection
     {
-        /** @var Searchable $searchable */
-        $softDelete = config('scout.soft_delete', false);
-        $query = $searchable->newQuery()
-            ->when($softDelete, function ($query) {
-                return $query->withTrashed();
-            })
-            ->orderBy($searchable->getKeyName());
-        $totalSearchables = $query->count();
-        if ($totalSearchables) {
-            $chunkSize = (int)config('scout.chunk.searchable', self::DEFAULT_CHUNK_SIZE);
-            $cloneQuery = clone $query;
-            $cloneQuery->joinSub('SELECT @row :=0, 1 as temp', 'r', 'r.temp', 'r.temp')
-                ->selectRaw("@row := @row +1 AS rownum, {$searchable->getKeyName()}");
-            $ids = \DB::query()->fromSub($cloneQuery, 'ranked')->whereRaw("rownum %{$chunkSize} =0")->pluck('id');
-            $pairs = [];
-            $lastId = null;
-            foreach ($ids as $id) {
-                if ($lastId) {
-                    $pairs[] = [$lastId, $id];
-                } else {
-                    $pairs[] = [null, $id];
-                }
-                $lastId = $id;
-            }
-            $pairs[] = [$lastId, null];
-            return collect($pairs)->map(function ($pair) use ($query, $searchable) {
-                list($start, $end) = $pair;
-                $clone = (clone $query)
-                    ->when(!is_null($start), function ($query) use ($start, $searchable) {
-                        return $query->where($searchable->getKeyName(), '>', $start);
-                    })
-                    ->when(!is_null($end), function ($query) use ($end, $searchable) {
-                        return $query->where($searchable->getKeyName(), '<=', $end);
-                    });
-                return new static($clone);
-            });
-        } else {
-            return collect();
-        }
+        return $source->chunked()->map(function ($chunk) {
+            return new static($chunk);
+        });
     }
 }

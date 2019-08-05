@@ -3,6 +3,7 @@
 namespace Tests\Integration\Jobs;
 
 use App\Product;
+use Matchish\ScoutElasticSearch\Console\Commands\DefaultImportSourceFactory;
 use Tests\IntegrationTestCase;
 use Illuminate\Console\OutputStyle;
 use Matchish\ScoutElasticSearch\Jobs\Import;
@@ -19,7 +20,7 @@ class ImportTest extends IntegrationTestCase
         factory(Product::class, $productsAmount)->create();
         Product::setEventDispatcher($dispatcher);
 
-        $job = new Import(Product::class);
+        $job = new Import(DefaultImportSourceFactory::from(Product::class));
         $output = new DummyOutput();
         $outputStyle = new OutputStyle(new ArrayInput([]), $output);
         $progressBar = $outputStyle->createProgressBar();

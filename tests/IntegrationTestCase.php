@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: matchish
- * Date: 13.03.19
- * Time: 15:18.
- */
 
 namespace Tests;
 

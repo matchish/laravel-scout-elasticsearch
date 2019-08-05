@@ -8,6 +8,8 @@ use Elasticsearch\Client;
 use Laravel\Scout\EngineManager;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Scout\ScoutServiceProvider;
+use Matchish\ScoutElasticSearch\Console\Commands\DefaultImportSourceFactory;
+use Matchish\ScoutElasticSearch\Console\Commands\ImportSourceFactory;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
 use Matchish\ScoutElasticSearch\Console\Commands\FlushCommand;
 use Matchish\ScoutElasticSearch\Console\Commands\ImportCommand;
@@ -34,6 +36,7 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->register(ScoutServiceProvider::class);
+        $this->app->bind(ImportSourceFactory::class, DefaultImportSourceFactory::class);
 
         $this->registerCommands();
     }
