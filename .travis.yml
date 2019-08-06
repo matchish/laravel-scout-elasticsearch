@@ -3,7 +3,7 @@ language: php
 services:
   - mysql
   
-  env:
+env:
   - ELASTICSEARCH_HOST=localhost:9200 DB_DATABASE=scout_database DB_USERNAME=travis DB_PASSWORD=""
 
 php:
