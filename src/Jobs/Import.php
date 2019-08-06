@@ -5,8 +5,8 @@ namespace Matchish\ScoutElasticSearch\Jobs;
 use Elasticsearch\Client;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Collection;
-use Matchish\ScoutElasticSearch\Console\Commands\ImportSource;
 use Matchish\ScoutElasticSearch\ProgressReportable;
+use Matchish\ScoutElasticSearch\Console\Commands\ImportSource;
 
 /**
  * @internal

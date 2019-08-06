@@ -1,11 +1,10 @@
 <?php
 
-
 namespace Matchish\ScoutElasticSearch\Console\Commands;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 
 class ChunkScope implements Scope
 {
@@ -41,10 +40,10 @@ class ChunkScope implements Scope
         $start = $this->start;
         $end = $this->end;
         $builder
-            ->when(!is_null($start), function ($query) use ($start, $model) {
+            ->when(! is_null($start), function ($query) use ($start, $model) {
                 return $query->where($model->getKeyName(), '>', $start);
             })
-            ->when(!is_null($end), function ($query) use ($end, $model) {
+            ->when(! is_null($end), function ($query) use ($end, $model) {
                 return $query->where($model->getKeyName(), '<=', $end);
             });
     }
@@ -53,5 +52,4 @@ class ChunkScope implements Scope
     {
         return static::class;
     }
-
 }

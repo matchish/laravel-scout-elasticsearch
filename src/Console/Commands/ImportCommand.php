@@ -56,7 +56,7 @@ final class ImportCommand extends Command
         $startMessage = trans('scout::import.start', ['searchable' => "<comment>$searchable</comment>"]);
         $this->line($startMessage);
 
-        /** @var ImportSource $source */
+        /* @var ImportSource $source */
         dispatch($job)->allOnQueue($source->syncWithSearchUsingQueue())
             ->allOnConnection($source->syncWithSearchUsing());
 
