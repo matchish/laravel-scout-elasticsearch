@@ -6,10 +6,10 @@ namespace Tests\Integration\Jobs\Stages;
 
 use App\Product;
 use Elasticsearch\Client;
-use Matchish\ScoutElasticSearch\Console\Commands\DefaultImportSourceFactory;
 use Tests\IntegrationTestCase;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Jobs\Stages\CreateWriteIndex;
+use Matchish\ScoutElasticSearch\Console\Commands\DefaultImportSourceFactory;
 
 final class CreateWriteIndexTest extends IntegrationTestCase
 {

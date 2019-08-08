@@ -2,8 +2,8 @@
 
 namespace Matchish\ScoutElasticSearch\ElasticSearch;
 
-use IteratorAggregate;
 use Traversable;
+use IteratorAggregate;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Searchable;
 

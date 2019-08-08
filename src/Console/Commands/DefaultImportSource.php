@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Matchish\ScoutElasticSearch\Console\Commands;
-
 
 class DefaultImportSource implements ImportSource
 {
@@ -27,7 +25,6 @@ class DefaultImportSource implements ImportSource
         return $this->model()->syncWithSearchUsingQueue();
     }
 
-
     public function syncWithSearchUsing()
     {
         return $this->model()->syncWithSearchUsing();
@@ -44,7 +41,7 @@ class DefaultImportSource implements ImportSource
         $searchable = $this->model();
         $totalSearchables = $query->count();
         if ($totalSearchables) {
-            $chunkSize = (int)config('scout.chunk.searchable', self::DEFAULT_CHUNK_SIZE);
+            $chunkSize = (int) config('scout.chunk.searchable', self::DEFAULT_CHUNK_SIZE);
             $cloneQuery = clone $query;
             $cloneQuery->joinSub('SELECT @row :=0, 1 as temp', 'r', 'r.temp', 'r.temp')
                 ->selectRaw("@row := @row +1 AS rownum, {$searchable->getKeyName()}");
@@ -60,15 +57,16 @@ class DefaultImportSource implements ImportSource
                 $lastId = $id;
             }
             $pairs[] = [$lastId, null];
+
             return collect($pairs)->map(function ($pair) {
-                list($start, $end) = $pair;
+                [$start, $end] = $pair;
                 $chunkScope = new ChunkScope($start, $end);
+
                 return new static($this->className, [$chunkScope]);
             });
         } else {
             return collect();
         }
-
     }
 
     /**
@@ -89,8 +87,10 @@ class DefaultImportSource implements ImportSource
             })
             ->orderBy($this->model()->getKeyName());
         $scopes = $this->scopes;
+
         return collect($scopes)->reduce(function ($instance, $scope) {
             $instance->withGlobalScope($scope->key(), $scope);
+
             return $instance;
         }, $query);
     }

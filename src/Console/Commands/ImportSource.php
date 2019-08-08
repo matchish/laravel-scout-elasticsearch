@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Matchish\ScoutElasticSearch\Console\Commands;
-
 
 interface ImportSource
 {

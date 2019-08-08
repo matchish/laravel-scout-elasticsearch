@@ -17,7 +17,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        $this->app->setBasePath(__DIR__ . '/laravel');
+        $this->app->setBasePath(__DIR__.'/laravel');
 
         $this->withFactories(database_path('factories'));
 
@@ -37,7 +37,7 @@ abstract class TestCase extends BaseTestCase
         $app['config']->set('scout.queue', false);
         // Setup default database to use sqlite :memory:
         $app['config']->set('database.default', 'mysql');
-        $app['config']->set('elasticsearch', require(__DIR__ . '/../config/elasticsearch.php'));
+        $app['config']->set('elasticsearch', require(__DIR__.'/../config/elasticsearch.php'));
         $app['config']->set('elasticsearch.indices.mappings.products', [
                 '_doc' => [
                     'properties' => [
