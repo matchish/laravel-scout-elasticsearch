@@ -3,9 +3,9 @@
 namespace Tests\Unit\ElasticSearch;
 
 use App\Product;
-use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
 use Tests\TestCase;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
+use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
 
 class IndexTest extends TestCase
 {

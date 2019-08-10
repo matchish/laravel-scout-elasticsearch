@@ -3,12 +3,12 @@
 namespace Tests\Integration\Jobs;
 
 use App\Product;
-use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
 use Tests\IntegrationTestCase;
 use Illuminate\Console\OutputStyle;
 use Matchish\ScoutElasticSearch\Jobs\Import;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
+use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
 
 class ImportTest extends IntegrationTestCase
 {
