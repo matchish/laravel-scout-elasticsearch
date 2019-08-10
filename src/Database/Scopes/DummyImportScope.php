@@ -1,10 +1,9 @@
 <?php
 
-
 namespace Matchish\ScoutElasticSearch\Database\Scopes;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class DummyImportScope extends ImportScope
 {
@@ -18,5 +17,4 @@ class DummyImportScope extends ImportScope
     public function apply(Builder $builder, Model $model)
     {
     }
-
 }

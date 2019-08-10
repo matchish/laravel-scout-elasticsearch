@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Matchish\ScoutElasticSearch\Searchable;
-
 
 use Matchish\ScoutElasticSearch\Database\Scopes\ChunkScope;
 
@@ -65,6 +63,7 @@ class DefaultImportSource implements ImportSource
             return collect($pairs)->map(function ($pair) {
                 [$start, $end] = $pair;
                 $chunkScope = new ChunkScope($start, $end);
+
                 return new static($this->className, array_merge($this->scopes, [$chunkScope]));
             });
         } else {
