@@ -1,6 +1,7 @@
 <?php
 
-namespace Matchish\ScoutElasticSearch\Console\Commands;
+
+namespace Matchish\ScoutElasticSearch\Database\Scopes;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;

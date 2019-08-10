@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Jobs\Stages;
 
+use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
 use stdClass;
 use App\Product;
 use Tests\IntegrationTestCase;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Jobs\Stages\SwitchToNewAndRemoveOldIndex;
-use Matchish\ScoutElasticSearch\Console\Commands\DefaultImportSourceFactory;
 
 final class SwitchToNewAndRemoveOldIndexTest extends IntegrationTestCase
 {

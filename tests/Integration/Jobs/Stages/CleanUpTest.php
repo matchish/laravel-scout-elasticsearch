@@ -2,11 +2,11 @@
 
 namespace Tests\Integration\Jobs\Stages;
 
+use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
 use stdClass;
 use App\Product;
 use Tests\IntegrationTestCase;
 use Matchish\ScoutElasticSearch\Jobs\Stages\CleanUp;
-use Matchish\ScoutElasticSearch\Console\Commands\DefaultImportSourceFactory;
 
 class CleanUpTest extends IntegrationTestCase
 {

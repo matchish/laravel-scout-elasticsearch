@@ -1,6 +1,10 @@
 <?php
 
-namespace Matchish\ScoutElasticSearch\Console\Commands;
+
+namespace Matchish\ScoutElasticSearch\Searchable;
+
+
+use Matchish\ScoutElasticSearch\Database\Scopes\ChunkScope;
 
 class DefaultImportSource implements ImportSource
 {

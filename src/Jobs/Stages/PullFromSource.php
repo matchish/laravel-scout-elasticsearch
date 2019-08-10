@@ -3,7 +3,7 @@
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Illuminate\Support\Collection;
-use Matchish\ScoutElasticSearch\Console\Commands\ImportSource;
+use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
 /**
  * @internal

@@ -2,7 +2,7 @@
 
 namespace Matchish\ScoutElasticSearch\ElasticSearch;
 
-use Matchish\ScoutElasticSearch\Console\Commands\ImportSource;
+use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
 /**
  * @internal

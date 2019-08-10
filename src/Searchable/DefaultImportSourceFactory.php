@@ -1,6 +1,7 @@
 <?php
 
-namespace Matchish\ScoutElasticSearch\Console\Commands;
+
+namespace Matchish\ScoutElasticSearch\Searchable;
 
 class DefaultImportSourceFactory implements ImportSourceFactory
 {
