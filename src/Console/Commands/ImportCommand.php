@@ -46,8 +46,7 @@ final class ImportCommand extends Command
     private function import($searchable)
     {
         $sourceFactory = app(ImportSourceFactory::class);
-        $defaultScope = app(ImportScope::class);
-        $source = $sourceFactory::from($searchable, [$defaultScope]);
+        $source = $sourceFactory::from($searchable);
         $job = new Import($source);
 
         if (config('scout.queue')) {
