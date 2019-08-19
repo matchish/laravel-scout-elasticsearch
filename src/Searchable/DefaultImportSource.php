@@ -47,7 +47,7 @@ class DefaultImportSource implements ImportSource
             $cloneQuery = clone $query;
             $cloneQuery->joinSub('SELECT @row :=0, 1 as temp', 'r', 'r.temp', 'r.temp')
                 ->selectRaw("@row := @row +1 AS rownum, {$searchable->getKeyName()}");
-            $ids = \DB::query()->fromSub($cloneQuery, 'ranked')->whereRaw("rownum %{$chunkSize} =0")->pluck('id');
+            $ids = \DB::query()->fromSub($cloneQuery, 'ranked')->whereRaw("rownum %{$chunkSize} =0")->pluck($searchable->getKeyName());
             $pairs = [];
             $lastId = null;
             foreach ($ids as $id) {
@@ -91,7 +91,7 @@ class DefaultImportSource implements ImportSource
         $scopes = $this->scopes;
 
         return collect($scopes)->reduce(function ($instance, $scope) {
-            $instance->withGlobalScope($scope->key(), $scope);
+            $instance->withGlobalScope(get_class($scope), $scope);
 
             return $instance;
         }, $query);
