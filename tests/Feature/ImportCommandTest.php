@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Book;
+use App\BookWithCustomKey;
 use stdClass;
 use App\Product;
 use Tests\IntegrationTestCase;
@@ -87,6 +88,31 @@ final class ImportCommandTest extends IntegrationTestCase
         ];
         $response = $this->elasticsearch->search($params);
         $this->assertEquals($productsAmount, $response['hits']['total']);
+    }
+    public function test_import_with_custom_key_all_pages(): void
+    {
+        $this->app['config']['scout.key'] = 'title';
+
+        $dispatcher = Book::getEventDispatcher();
+        Book::unsetEventDispatcher();
+
+        $booksAmount = 10;
+
+        factory(Book::class, $booksAmount)->create();
+
+        Book::setEventDispatcher($dispatcher);
+
+        Artisan::call('scout:import');
+        $params = [
+            'index' => (new BookWithCustomKey())->searchableAs(),
+            'body' => [
+                'query' => [
+                    'match_all' => new stdClass(),
+                ],
+            ],
+        ];
+        $response = $this->elasticsearch->search($params);
+        $this->assertEquals($booksAmount, $response['hits']['total']);
     }
 
     public function test_remove_old_index_after_switching_to_new(): void
