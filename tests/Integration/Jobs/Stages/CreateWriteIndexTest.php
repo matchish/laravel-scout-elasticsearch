@@ -17,7 +17,7 @@ final class CreateWriteIndexTest extends IntegrationTestCase
         $elasticsearch = $this->app->make(Client::class);
         $stage = new CreateWriteIndex(new Product(), Index::fromSearchable(new Product()));
         $stage->handle($elasticsearch);
-        $response = $elasticsearch->indices()->getAliases(['index' => '*', 'name' => 'products']);
+        $response = $elasticsearch->indices()->getAlias(['index' => '*', 'name' => 'products']);
         $this->assertTrue($this->containsWriteIndex($response, 'products'));
     }
 
