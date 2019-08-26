@@ -34,7 +34,7 @@ final class CleanUp
         $params = GetAliasParams::anyIndex($searchable->searchableAs());
         try {
             /** @var array $response */
-            $response = $elasticsearch->indices()->getAliases($params->toArray());
+            $response = $elasticsearch->indices()->getAlias($params->toArray());
         } catch (Missing404Exception $e) {
             $response = [];
         }

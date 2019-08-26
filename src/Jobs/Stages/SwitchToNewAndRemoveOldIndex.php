@@ -38,7 +38,7 @@ final class SwitchToNewAndRemoveOldIndex
         $searchable = $this->searchable;
         $params = Get::anyIndex($searchable->searchableAs());
         /** @var array $response */
-        $response = $elasticsearch->indices()->getAliases($params->toArray());
+        $response = $elasticsearch->indices()->getAlias($params->toArray());
 
         $params = new Update();
         foreach ($response as $indexName => $alias) {

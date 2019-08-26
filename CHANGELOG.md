@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [2.0.3] - 2019-08-26
+### Fixed
+- Elasticsearch 7.2 compatibility
+
 ## [2.0.2] - 2019-05-10
 ### Added
 - Search amongst multiple models
