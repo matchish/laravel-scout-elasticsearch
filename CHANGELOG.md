@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [2.0.3] - 2019-09-09
+### Added
+- Added interface binding for HitsIteratorAggregate for custom implementation
+
 ## [2.0.2] - 2019-05-10
 ### Added
 - Search amongst multiple models
