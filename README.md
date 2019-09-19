@@ -90,10 +90,10 @@ Or you you can specify default mappings with config key
 Same way you can define settings
 
 For index `products` it will be  
-`elasticsearch.indices.settigs.products`  
+`elasticsearch.indices.settings.products`  
 
 And for default settings  
-`elasticsearch.indices.settigs.default`
+`elasticsearch.indices.settings.default`
 
 ### Zero downtime reimport
 While working in production, to keep your existing search experience available while reimporting your data, you also can use `scout:import` Artisan command:  
