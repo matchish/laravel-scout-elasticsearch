@@ -32,6 +32,29 @@ class ElasticSearchEngineTest extends TestCase
         $engine->search($builder);
     }
 
+    public function test_should_not_call_bulk_when_empty_models()
+    {
+        $client = m::mock(Client::class);
+        $client->shouldNotReceive('bulk');
+
+        $engine = new ElasticSearchEngine($client);
+
+        $engine->update([
+            new Product([])
+        ]);
+    }
+
+    public function test_should_call_bulk_when_not_empty_models()
+    {
+        $client = m::mock(Client::class);
+        $client->shouldReceive('bulk');
+        $engine = new ElasticSearchEngine($client);
+
+        $engine->update([
+            new Product(['title' => 'Scout'])
+        ]);
+    }
+
     public function test_pass_search_builder_to_callback()
     {
         $client = m::mock(Client::class);
