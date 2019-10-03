@@ -43,7 +43,11 @@ final class ElasticSearchEngine extends Engine
     {
         $params = new Bulk();
         $params->index($models);
-        $this->elasticsearch->bulk($params->toArray());
+        $paramsAsArray = $params->toArray();
+
+        if (!empty($paramsAsArray['body'])) {
+            $this->elasticsearch->bulk($paramsAsArray);
+        }
     }
 
     /**

@@ -51,6 +51,18 @@ class BulkTest extends TestCase
         ], $params);
     }
 
+    public function test_index_empty_model()
+    {
+        $bulk = new Bulk();
+        $product = new Product([]);
+        $bulk->index($product);
+        $params = $bulk->toArray();
+
+        $this->assertEquals([
+            'body' => [],
+        ], $params);
+    }
+
     public function test_index_with_custom_key_name()
     {
         $this->app['config']['scout.key'] = 'title';

@@ -39,24 +39,26 @@ final class Bulk
         $payload = ['body' => []];
         $payload = collect($this->indexDocs)->reduce(
             function ($payload, $model) {
-                if ($model::usesSoftDelete() && config('scout.soft_delete', false)) {
-                    $model->pushSoftDeleteMetadata();
-                }
-                $payload['body'][] = [
-                    'index' => [
-                        '_index' => $model->searchableAs(),
-                        '_id' => $model->getScoutKey(),
-                        '_type' => '_doc',
-                    ],
-                ];
+                if (!empty($model->toSearchableArray())) {
+                    if ($model::usesSoftDelete() && config('scout.soft_delete', false)) {
+                        $model->pushSoftDeleteMetadata();
+                    }
+                    $payload['body'][] = [
+                        'index' => [
+                            '_index' => $model->searchableAs(),
+                            '_id' => $model->getScoutKey(),
+                            '_type' => '_doc',
+                        ],
+                    ];
 
-                $payload['body'][] = array_merge(
-                    $model->toSearchableArray(),
-                    $model->scoutMetadata(),
-                    [
-                        '__class_name' => get_class($model),
-                    ]
-                );
+                    $payload['body'][] = array_merge(
+                        $model->toSearchableArray(),
+                        $model->scoutMetadata(),
+                        [
+                            '__class_name' => get_class($model),
+                        ]
+                    );
+                }
 
                 return $payload;
             }, $payload);
