@@ -40,7 +40,7 @@ class ElasticSearchEngineTest extends TestCase
         $engine = new ElasticSearchEngine($client);
 
         $engine->update([
-            new Product([])
+            new Product([]),
         ]);
     }
 
@@ -51,7 +51,7 @@ class ElasticSearchEngineTest extends TestCase
         $engine = new ElasticSearchEngine($client);
 
         $engine->update([
-            new Product(['title' => 'Scout'])
+            new Product(['title' => 'Scout']),
         ]);
     }
 

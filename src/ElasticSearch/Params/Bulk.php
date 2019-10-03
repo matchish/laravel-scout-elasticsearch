@@ -39,7 +39,7 @@ final class Bulk
         $payload = ['body' => []];
         $payload = collect($this->indexDocs)->reduce(
             function ($payload, $model) {
-                if (!empty($model->toSearchableArray())) {
+                if (! empty($model->toSearchableArray())) {
                     if ($model::usesSoftDelete() && config('scout.soft_delete', false)) {
                         $model->pushSoftDeleteMetadata();
                     }
