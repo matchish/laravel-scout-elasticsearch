@@ -22,6 +22,9 @@ final class ImportCommandTest extends IntegrationTestCase
 
         factory(Product::class, $productsAmount)->create();
 
+        $productsUnsearchableAmount = rand(1, 5);
+        factory(Product::class, $productsUnsearchableAmount)->states(['archive'])->create();
+
         Product::setEventDispatcher($dispatcher);
 
         Artisan::call('scout:import', [
@@ -47,7 +50,6 @@ final class ImportCommandTest extends IntegrationTestCase
         Product::unsetEventDispatcher();
 
         $productsAmount = rand(1, 5);
-
         factory(Product::class, $productsAmount)->create();
 
         Product::setEventDispatcher($dispatcher);

@@ -27,4 +27,9 @@ class Product extends Model
     {
         return $this->getAttribute($this->getScoutKeyName());
     }
+
+    public function shouldBeSearchable()
+    {
+        return $this->type != 'archive';
+    }
 }
