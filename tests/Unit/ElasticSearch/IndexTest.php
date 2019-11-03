@@ -9,8 +9,8 @@
 namespace Tests\Unit\ElasticSearch;
 
 use App\Product;
-use Tests\TestCase;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
+use Tests\TestCase;
 
 class IndexTest extends TestCase
 {

@@ -3,8 +3,8 @@
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elasticsearch\Client;
-use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias\Get;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias\Update;

@@ -8,9 +8,9 @@
 
 namespace Matchish\ScoutElasticSearch\ElasticSearch;
 
-use Traversable;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Searchable;
+use Traversable;
 
 /**
  * @internal

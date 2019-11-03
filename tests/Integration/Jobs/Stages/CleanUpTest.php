@@ -2,10 +2,10 @@
 
 namespace Tests\Integration\Jobs\Stages;
 
-use stdClass;
 use App\Product;
-use Tests\IntegrationTestCase;
 use Matchish\ScoutElasticSearch\Jobs\Stages\CleanUp;
+use stdClass;
+use Tests\IntegrationTestCase;
 
 class CleanUpTest extends IntegrationTestCase
 {

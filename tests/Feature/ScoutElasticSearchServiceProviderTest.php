@@ -2,8 +2,8 @@
 
 namespace Matchish\ScoutElasticSearch;
 
-use Tests\TestCase;
 use Elasticsearch\Client;
+use Tests\TestCase;
 
 class ScoutElasticSearchServiceProviderTest extends TestCase
 {

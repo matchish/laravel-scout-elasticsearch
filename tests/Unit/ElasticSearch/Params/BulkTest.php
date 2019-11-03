@@ -3,8 +3,8 @@
 namespace Tests\Unit\ElasticSearch\Params;
 
 use App\Product;
-use Tests\TestCase;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
+use Tests\TestCase;
 
 class BulkTest extends TestCase
 {

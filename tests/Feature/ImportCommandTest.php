@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Book;
-use stdClass;
 use App\Product;
-use Tests\IntegrationTestCase;
 use Illuminate\Support\Facades\Artisan;
+use stdClass;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Tests\IntegrationTestCase;
 
 final class ImportCommandTest extends IntegrationTestCase
 {
