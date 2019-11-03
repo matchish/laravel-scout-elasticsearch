@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Jobs\Stages;
 
-use stdClass;
 use App\Product;
-use Tests\IntegrationTestCase;
 use Matchish\ScoutElasticSearch\Jobs\Stages\PullFromSource;
+use stdClass;
+use Tests\IntegrationTestCase;
 
 final class PullFromSourceTest extends IntegrationTestCase
 {

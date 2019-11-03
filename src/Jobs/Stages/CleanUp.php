@@ -3,9 +3,9 @@
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elasticsearch\Client;
-use Laravel\Scout\Searchable;
-use Illuminate\Database\Eloquent\Model;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
+use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias\Get as GetAliasParams;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Delete as DeleteIndexParams;
 

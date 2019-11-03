@@ -3,11 +3,11 @@
 namespace Matchish\ScoutElasticSearch\ElasticSearch;
 
 use Laravel\Scout\Builder;
+use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
+use ONGR\ElasticsearchDSL\Query\FullText\QueryStringQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use ONGR\ElasticsearchDSL\Search;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
-use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
-use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
-use ONGR\ElasticsearchDSL\Query\FullText\QueryStringQuery;
 
 final class SearchFactory
 {
