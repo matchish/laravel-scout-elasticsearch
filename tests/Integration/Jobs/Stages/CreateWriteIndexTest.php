@@ -6,9 +6,9 @@ namespace Tests\Integration\Jobs\Stages;
 
 use App\Product;
 use Elasticsearch\Client;
-use Tests\IntegrationTestCase;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Jobs\Stages\CreateWriteIndex;
+use Tests\IntegrationTestCase;
 
 final class CreateWriteIndexTest extends IntegrationTestCase
 {

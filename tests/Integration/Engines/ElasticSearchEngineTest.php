@@ -2,13 +2,13 @@
 
 namespace Tests\Integration\Engines;
 
-use stdClass;
 use App\Product;
 use Laravel\Scout\Builder;
-use Tests\IntegrationTestCase;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
-use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Create;
+use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
+use stdClass;
+use Tests\IntegrationTestCase;
 
 final class ElasticSearchEngineTest extends IntegrationTestCase
 {
@@ -63,6 +63,7 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
         $models = Product::all();
         $models->map(function ($model) {
             $model->price = 'bad format';
+
             return $model;
         });
         $index = Index::fromSearchable($models->first());

@@ -2,18 +2,18 @@
 
 namespace Matchish\ScoutElasticSearch\Engines;
 
-use Laravel\Scout\Searchable;
-use Laravel\Scout\Engines\Engine;
-use ONGR\ElasticsearchDSL\Search;
-use Laravel\Scout\Builder as BaseBuilder;
 use Illuminate\Database\Eloquent\Collection;
-use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
+use Laravel\Scout\Builder as BaseBuilder;
+use Laravel\Scout\Engines\Engine;
+use Laravel\Scout\Searchable;
+use Matchish\ScoutElasticSearch\ElasticSearch\EloquentHitsIteratorAggregate;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
+use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Refresh;
+use Matchish\ScoutElasticSearch\ElasticSearch\Params\Search as SearchParams;
 use Matchish\ScoutElasticSearch\ElasticSearch\SearchFactory;
 use Matchish\ScoutElasticSearch\ElasticSearch\SearchResults;
-use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Refresh;
-use Matchish\ScoutElasticSearch\ElasticSearch\EloquentHitsIteratorAggregate;
-use Matchish\ScoutElasticSearch\ElasticSearch\Params\Search as SearchParams;
+use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
+use ONGR\ElasticsearchDSL\Search;
 
 final class ElasticSearchEngine extends Engine
 {
