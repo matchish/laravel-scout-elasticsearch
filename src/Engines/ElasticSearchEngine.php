@@ -8,7 +8,6 @@ use ONGR\ElasticsearchDSL\Search;
 use Laravel\Scout\Builder as BaseBuilder;
 use Illuminate\Database\Eloquent\Collection;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
-use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
 use Matchish\ScoutElasticSearch\ElasticSearch\SearchFactory;
 use Matchish\ScoutElasticSearch\ElasticSearch\SearchResults;
@@ -43,7 +42,10 @@ final class ElasticSearchEngine extends Engine
     {
         $params = new Bulk();
         $params->index($models);
-        $this->elasticsearch->bulk($params->toArray());
+        $response = $this->elasticsearch->bulk($params->toArray());
+        if (array_key_exists('errors', $response) && $response['errors']) {
+            throw new \Exception('Bulk update error');
+        }
     }
 
     /**

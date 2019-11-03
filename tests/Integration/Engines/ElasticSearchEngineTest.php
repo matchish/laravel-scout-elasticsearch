@@ -6,7 +6,10 @@ use stdClass;
 use App\Product;
 use Laravel\Scout\Builder;
 use Tests\IntegrationTestCase;
+use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
+use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Create;
+use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
 
 final class ElasticSearchEngineTest extends IntegrationTestCase
 {
@@ -53,6 +56,24 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
         foreach ($response['hits']['hits'] as $doc) {
             $this->assertEquals('Scout', $doc['_source']['title']);
         }
+    }
+
+    public function test_update_throw_exception_on_elasticsearch_error()
+    {
+        $this->expectException(\Exception::class);
+        $models = Product::all();
+        $models->map(function ($model) {
+            $model->price = 'bad format';
+            return $model;
+        });
+        $source = DefaultImportSourceFactory::from(Product::class);
+        $index = Index::fromSource($source);
+        $params = new Create(
+            'products',
+            $index->config()
+        );
+        $this->elasticsearch->indices()->create($params->toArray());
+        $this->engine->update($models);
     }
 
     public function test_delete()
