@@ -4,7 +4,7 @@ namespace Matchish\ScoutElasticSearch\Searchable;
 
 use Matchish\ScoutElasticSearch\Database\Scopes\ChunkScope;
 
-class DefaultImportSource implements ImportSource
+final class DefaultImportSource implements ImportSource
 {
     const DEFAULT_CHUNK_SIZE = 500;
 

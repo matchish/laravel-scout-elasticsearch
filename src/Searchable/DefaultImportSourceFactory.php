@@ -2,7 +2,7 @@
 
 namespace Matchish\ScoutElasticSearch\Searchable;
 
-class DefaultImportSourceFactory implements ImportSourceFactory
+final class DefaultImportSourceFactory implements ImportSourceFactory
 {
     public static function from(string $className): ImportSource
     {
