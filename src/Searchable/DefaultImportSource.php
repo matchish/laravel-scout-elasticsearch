@@ -2,7 +2,7 @@
 
 namespace Matchish\ScoutElasticSearch\Searchable;
 
-use Matchish\ScoutElasticSearch\Database\Scopes\ChunkScope;
+use Matchish\ScoutElasticSearch\Database\Scopes\PageScope;
 
 final class DefaultImportSource implements ImportSource
 {
@@ -40,30 +40,12 @@ final class DefaultImportSource implements ImportSource
     public function chunked()
     {
         $query = $this->newQuery();
-        $searchable = $this->model();
         $totalSearchables = $query->count();
         if ($totalSearchables) {
             $chunkSize = (int) config('scout.chunk.searchable', self::DEFAULT_CHUNK_SIZE);
-            $cloneQuery = clone $query;
-            $cloneQuery->joinSub('SELECT @row :=0, 1 as temp', 'r', 'r.temp', 'r.temp')
-                ->selectRaw("@row := @row +1 AS rownum, {$searchable->getKeyName()}");
-            $ids = \DB::query()->fromSub($cloneQuery, 'ranked')->whereRaw("rownum %{$chunkSize} =0")->pluck($searchable->getKeyName());
-            $pairs = [];
-            $lastId = null;
-            foreach ($ids as $id) {
-                if ($lastId) {
-                    $pairs[] = [$lastId, $id];
-                } else {
-                    $pairs[] = [null, $id];
-                }
-                $lastId = $id;
-            }
-            $pairs[] = [$lastId, null];
-
-            return collect($pairs)->map(function ($pair) {
-                [$start, $end] = $pair;
-                $chunkScope = new ChunkScope($start, $end);
-
+            $totalChunks = (int) ceil($totalSearchables / $chunkSize);
+            return collect(range(1, $totalChunks))->map(function ($page) use ($chunkSize) {
+                $chunkScope = new PageScope($page, $chunkSize);
                 return new static($this->className, array_merge($this->scopes, [$chunkScope]));
             });
         } else {
