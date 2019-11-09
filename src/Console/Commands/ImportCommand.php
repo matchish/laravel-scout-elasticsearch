@@ -8,7 +8,6 @@ use Illuminate\Console\Command;
 use Matchish\ScoutElasticSearch\Jobs\Import;
 use Matchish\ScoutElasticSearch\Jobs\QueueableJob;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
-use Matchish\ScoutElasticSearch\Database\Scopes\ImportScope;
 use Matchish\ScoutElasticSearch\Searchable\ImportSourceFactory;
 use Matchish\ScoutElasticSearch\Searchable\SearchableListFactory;
 
