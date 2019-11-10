@@ -9,4 +9,6 @@ parameters:
         -
             path: %currentWorkingDirectory%/src/Engines/ElasticSearchEngine.php
             message: '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::searchableAs\(\)\.#'
-
+        -
+            path: %currentWorkingDirectory%/src/Engines/ElasticSearchEngine.php
+            message: '#message.*ServerErrorResponseException constructor expects string, string|false given.#'

@@ -2,6 +2,7 @@
 
 namespace Matchish\ScoutElasticSearch\Engines;
 
+use Elasticsearch\Common\Exceptions\ServerErrorResponseException;
 use Illuminate\Database\Eloquent\Collection;
 use Laravel\Scout\Builder as BaseBuilder;
 use Laravel\Scout\Engines\Engine;
@@ -44,7 +45,8 @@ final class ElasticSearchEngine extends Engine
         $params->index($models);
         $response = $this->elasticsearch->bulk($params->toArray());
         if (array_key_exists('errors', $response) && $response['errors']) {
-            throw new \Exception('Bulk update error');
+            $error = new ServerErrorResponseException(json_encode($response, JSON_PRETTY_PRINT));
+            throw new \Exception('Bulk update error', $error->getCode(), $error);
         }
     }
 
