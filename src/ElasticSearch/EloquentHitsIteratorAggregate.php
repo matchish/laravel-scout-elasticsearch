@@ -2,10 +2,10 @@
 
 namespace Matchish\ScoutElasticSearch\ElasticSearch;
 
-use Traversable;
 use IteratorAggregate;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Searchable;
+use Traversable;
 
 /**
  * @internal
