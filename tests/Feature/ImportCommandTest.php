@@ -9,7 +9,6 @@ use App\BookWithCustomKey;
 use stdClass;
 use App\Product;
 use Illuminate\Support\Facades\Artisan;
-use stdClass;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Tests\IntegrationTestCase;
 
