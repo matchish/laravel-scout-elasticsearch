@@ -45,6 +45,12 @@ $factory->state(Product::class, 'like new', function (Faker $faker) {
     ];
 });
 
+$factory->state(Product::class, 'archive', function (Faker $faker) {
+    return [
+        'type' => 'archive',
+    ];
+});
+
 $factory->state(Product::class, 'new', function (Faker $faker) {
     return [
         'type' => 'new',

@@ -8,9 +8,10 @@ use App\Book;
 use App\BookWithCustomKey;
 use stdClass;
 use App\Product;
-use Tests\IntegrationTestCase;
 use Illuminate\Support\Facades\Artisan;
+use stdClass;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Tests\IntegrationTestCase;
 
 final class ImportCommandTest extends IntegrationTestCase
 {
@@ -22,6 +23,9 @@ final class ImportCommandTest extends IntegrationTestCase
         $productsAmount = rand(1, 5);
 
         factory(Product::class, $productsAmount)->create();
+
+        $productsUnsearchableAmount = rand(1, 5);
+        factory(Product::class, $productsUnsearchableAmount)->states(['archive'])->create();
 
         Product::setEventDispatcher($dispatcher);
 
@@ -48,7 +52,6 @@ final class ImportCommandTest extends IntegrationTestCase
         Product::unsetEventDispatcher();
 
         $productsAmount = rand(1, 5);
-
         factory(Product::class, $productsAmount)->create();
 
         Product::setEventDispatcher($dispatcher);

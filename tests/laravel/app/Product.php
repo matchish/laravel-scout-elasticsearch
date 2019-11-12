@@ -2,9 +2,9 @@
 
 namespace App;
 
-use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Scout\Searchable;
 
 class Product extends Model
 {
@@ -26,5 +26,10 @@ class Product extends Model
     public function getScoutKey()
     {
         return $this->getAttribute($this->getScoutKeyName());
+    }
+
+    public function shouldBeSearchable()
+    {
+        return $this->type != 'archive';
     }
 }

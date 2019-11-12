@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Book;
-use App\Ticket;
 use App\Product;
-use Tests\IntegrationTestCase;
+use App\Ticket;
 use Illuminate\Pagination\Paginator;
-use Matchish\ScoutElasticSearch\Mixed;
 use Illuminate\Support\Facades\Artisan;
+use Matchish\ScoutElasticSearch\Mixed;
+use Tests\IntegrationTestCase;
 
 final class SearchTest extends IntegrationTestCase
 {

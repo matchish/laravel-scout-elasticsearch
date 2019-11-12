@@ -2,10 +2,10 @@
 
 namespace Tests\Unit;
 
-use ReflectionClass;
 use Laravel\Scout\Searchable;
-use PHPUnit\Framework\TestCase;
 use Matchish\ScoutElasticSearch\Mixed;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class MixedTest extends TestCase
 {

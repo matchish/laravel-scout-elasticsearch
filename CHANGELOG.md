@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [2.0.4] - 2019-11-10
+### Fixed
+- Throw more descriptive exception if there are elasticsearch errors on update
+
+## [2.0.3] - 2019-11-04
+### Fixed
+- Throw exception if there are elasticsearch errors on update
+
 ## [2.0.2] - 2019-05-10
 ### Added
 - Search amongst multiple models
