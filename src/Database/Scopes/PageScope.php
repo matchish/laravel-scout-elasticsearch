@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Scope;
 
 class PageScope implements Scope
 {
-
     /**
      * @var int
      */

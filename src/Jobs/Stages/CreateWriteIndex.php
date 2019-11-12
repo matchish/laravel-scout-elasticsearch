@@ -3,11 +3,11 @@
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elasticsearch\Client;
-use Matchish\ScoutElasticSearch\ElasticSearch\Index;
-use Matchish\ScoutElasticSearch\Searchable\ImportSource;
-use Matchish\ScoutElasticSearch\ElasticSearch\WriteAlias;
 use Matchish\ScoutElasticSearch\ElasticSearch\DefaultAlias;
+use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Create;
+use Matchish\ScoutElasticSearch\ElasticSearch\WriteAlias;
+use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
 /**
  * @internal
