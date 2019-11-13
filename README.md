@@ -29,7 +29,7 @@ If you need any help, [stack overflow](https://stackoverflow.com/questions/tagge
 
 - [Search amongst multiple models](#search-amongst-multiple-models)
 - [**Zero downtime** reimport](#zero-downtime-reimport) - it’s a breeze to import data in production.
-- [Eager load for relations](#eager-load) - it’s a breeze to import data in production.
+- [Eager load relations](#eager-load) - speed up your import.
 - Elasticsearch **7.0** ready - Use [elasticsearch-7](https://github.com/matchish/laravel-scout-elasticsearch/tree/elasticsearch-7) branch instead.
 - Import all searchable models at once.
 - A fully configurable mapping for each model.
@@ -97,9 +97,9 @@ And for default settings
 `elasticsearch.indices.settings.default`
 
 ### Eager load
-To speed up import you can eager load relations on import only using global scopes.
+To speed up import you can eager load relations on import using global scopes.
 
-You should configure inject `ImportSourceFactory` in your service provider(`register` method)
+You should configure `ImportSourceFactory` in your service provider(`register` method)
 ```
 use Matchish\ScoutElasticSearch\Searchable\ImportSourceFactory;
 ...
@@ -107,7 +107,7 @@ public function register(): void
 {
 $this->app->bind(ImportSourceFactory::class, MyImportSourceFactory::class);
 ``` 
-Here an example of `MyImportSourceFactory`
+Here is an example of `MyImportSourceFactory`
 ```
 namespace Matchish\ScoutElasticSearch\Searchable;
 
@@ -115,6 +115,7 @@ final class MyImportSourceFactory implements ImportSourceFactory
 {
     public static function from(string $className): ImportSource
     {
+        //Add all required scopes
         return new DefaultImportSource($className, [new WithCommentsScope()]);
     }
 }
