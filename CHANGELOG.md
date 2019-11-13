@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [2.1.0] - 2019-11-13
+### Added
+- Import source factory
+- Using global scopes only for import
+
 ## [2.0.4] - 2019-11-10
 ### Fixed
 - Throw more descriptive exception if there are elasticsearch errors on update

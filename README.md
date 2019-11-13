@@ -29,6 +29,7 @@ If you need any help, [stack overflow](https://stackoverflow.com/questions/tagge
 
 - [Search amongst multiple models](#search-amongst-multiple-models)
 - [**Zero downtime** reimport](#zero-downtime-reimport) - it’s a breeze to import data in production.
+- [Eager load for relations](#eager-load) - it’s a breeze to import data in production.
 - Elasticsearch **7.0** ready - Use [elasticsearch-7](https://github.com/matchish/laravel-scout-elasticsearch/tree/elasticsearch-7) branch instead.
 - Import all searchable models at once.
 - A fully configurable mapping for each model.
@@ -95,6 +96,44 @@ For index `products` it will be
 And for default settings  
 `elasticsearch.indices.settings.default`
 
+### Eager load
+To speed up import you can eager load relations on import only using global scopes.
+
+You should configure inject `ImportSourceFactory` in your service provider(`register` method)
+```
+use Matchish\ScoutElasticSearch\Searchable\ImportSourceFactory;
+...
+public function register(): void
+{
+$this->app->bind(ImportSourceFactory::class, MyImportSourceFactory::class);
+``` 
+Here an example of `MyImportSourceFactory`
+```
+namespace Matchish\ScoutElasticSearch\Searchable;
+
+final class MyImportSourceFactory implements ImportSourceFactory
+{
+    public static function from(string $className): ImportSource
+    {
+        return new DefaultImportSource($className, [new WithCommentsScope()]);
+    }
+}
+
+class WithCommentsScope implements Scope {
+
+    /**
+     * Apply the scope to a given Eloquent query builder.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $builder
+     * @param \Illuminate\Database\Eloquent\Model $model
+     * @return void
+     */
+    public function apply(Builder $builder, Model $model)
+    {
+        $builder->with('comments');
+    }
+}
+```
 ### Zero downtime reimport
 While working in production, to keep your existing search experience available while reimporting your data, you also can use `scout:import` Artisan command:  
 
