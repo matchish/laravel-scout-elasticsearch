@@ -1,7 +1,10 @@
 language: php
 
+services:
+  - mysql
+
 env:
-  - ELASTICSEARCH_HOST=localhost:9200
+  - ELASTICSEARCH_HOST=localhost:9200 DB_DATABASE=scout_database DB_USERNAME=travis DB_PASSWORD=""
 
 php:
   - 7.1
@@ -18,6 +21,7 @@ matrix:
     - php: nightly
 
 before_script:
+  - mysql -e "create database $DB_DATABASE;"
   - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.6.2.deb && sudo dpkg -i --force-confnew elasticsearch-6.6.2.deb && sudo service elasticsearch restart
   - sleep 30
   - curl -X GET "localhost:9200/_cluster/health?wait_for_status=yellow&timeout=50s"

@@ -7,6 +7,7 @@ use Laravel\Scout\Builder;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Create;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
+use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
 use stdClass;
 use Tests\IntegrationTestCase;
 
@@ -66,7 +67,7 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
 
             return $model;
         });
-        $index = Index::fromSearchable($models->first());
+        $index = Index::fromSource(DefaultImportSourceFactory::from(Product::class));
         $params = new Create(
             'products',
             $index->config()

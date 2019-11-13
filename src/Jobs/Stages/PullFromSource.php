@@ -2,34 +2,30 @@
 
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Laravel\Scout\Searchable;
+use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
 /**
  * @internal
  */
 final class PullFromSource
 {
-    const DEFAULT_CHUNK_SIZE = 500;
+    /**
+     * @var ImportSource
+     */
+    private $source;
 
     /**
-     * @var Builder
+     * @param ImportSource $source
      */
-    private $query;
-
-    /**
-     * @param Builder $query
-     */
-    public function __construct(Builder $query)
+    public function __construct(ImportSource $source)
     {
-        $this->query = $query;
+        $this->source = $source;
     }
 
     public function handle(): void
     {
-        $results = $this->query->get();
+        $results = $this->source->get();
         $results->filter->shouldBeSearchable()->searchable();
     }
 
@@ -44,30 +40,13 @@ final class PullFromSource
     }
 
     /**
-     * @param Model $searchable
+     * @param ImportSource $source
      * @return Collection
      */
-    public static function chunked(Model $searchable): Collection
+    public static function chunked(ImportSource $source): Collection
     {
-        /** @var Searchable $searchable */
-        $softDelete = config('scout.soft_delete', false);
-        $query = $searchable->newQuery()
-            ->when($softDelete, function ($query) {
-                return $query->withTrashed();
-            })
-            ->orderBy($searchable->getKeyName());
-        $totalSearchables = $query->count();
-        if ($totalSearchables) {
-            $chunkSize = (int) config('scout.chunk.searchable', self::DEFAULT_CHUNK_SIZE);
-            $totalChunks = (int) ceil($totalSearchables / $chunkSize);
-
-            return collect(range(1, $totalChunks))->map(function ($page) use ($query, $chunkSize) {
-                $clone = (clone $query)->forPage($page, $chunkSize);
-
-                return new static($clone);
-            });
-        } else {
-            return collect();
-        }
+        return $source->chunked()->map(function ($chunk) {
+            return new static($chunk);
+        });
     }
 }

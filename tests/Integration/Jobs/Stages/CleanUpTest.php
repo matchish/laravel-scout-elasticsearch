@@ -4,6 +4,7 @@ namespace Tests\Integration\Jobs\Stages;
 
 use App\Product;
 use Matchish\ScoutElasticSearch\Jobs\Stages\CleanUp;
+use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
 use stdClass;
 use Tests\IntegrationTestCase;
 
@@ -24,7 +25,7 @@ class CleanUpTest extends IntegrationTestCase
             'body' => ['aliases' => ['products' => ['is_write_index' => false]]],
         ]);
 
-        $stage = new CleanUp(new Product());
+        $stage = new CleanUp(DefaultImportSourceFactory::from(Product::class));
         $stage->handle($this->elasticsearch);
         $writeIndexExist = $this->elasticsearch->indices()->exists(['index' => 'products_new']);
         $readIndexExist = $this->elasticsearch->indices()->exists(['index' => 'products_old']);

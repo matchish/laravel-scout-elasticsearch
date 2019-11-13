@@ -3,11 +3,10 @@
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elasticsearch\Client;
-use Illuminate\Database\Eloquent\Model;
-use Laravel\Scout\Searchable;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias\Get;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias\Update;
+use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
 /**
  * @internal
@@ -15,28 +14,28 @@ use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias\Update;
 final class SwitchToNewAndRemoveOldIndex
 {
     /**
-     * @var Model
+     * @var ImportSource
      */
-    private $searchable;
+    private $source;
     /**
      * @var Index
      */
     private $index;
 
     /**
-     * @param Model $searchable
+     * @param ImportSource $source
+     * @param Index $index
      */
-    public function __construct(Model $searchable, Index $index)
+    public function __construct(ImportSource $source, Index $index)
     {
-        $this->searchable = $searchable;
+        $this->source = $source;
         $this->index = $index;
     }
 
     public function handle(Client $elasticsearch): void
     {
-        /** @var Searchable $searchable */
-        $searchable = $this->searchable;
-        $params = Get::anyIndex($searchable->searchableAs());
+        $source = $this->source;
+        $params = Get::anyIndex($source->searchableAs());
         $response = $elasticsearch->indices()->getAliases($params->toArray());
 
         $params = new Update();
@@ -44,7 +43,7 @@ final class SwitchToNewAndRemoveOldIndex
             if ($indexName != $this->index->name()) {
                 $params->removeIndex($indexName);
             } else {
-                $params->add((string) $indexName, $searchable->searchableAs());
+                $params->add((string) $indexName, $source->searchableAs());
             }
         }
         $elasticsearch->indices()->updateAliases($params->toArray());

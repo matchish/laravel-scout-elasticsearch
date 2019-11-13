@@ -6,6 +6,7 @@ namespace Tests\Integration\Jobs\Stages;
 
 use App\Product;
 use Matchish\ScoutElasticSearch\Jobs\Stages\PullFromSource;
+use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
 use stdClass;
 use Tests\IntegrationTestCase;
 
@@ -25,7 +26,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products_index',
             'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = new PullFromSource(Product::query());
+        $stage = new PullFromSource(DefaultImportSourceFactory::from(Product::class));
         $stage->handle();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
@@ -48,7 +49,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products_index',
             'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = new PullFromSource(Product::query());
+        $stage = new PullFromSource(DefaultImportSourceFactory::from(Product::class));
         $stage->handle();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
@@ -80,7 +81,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products_index',
             'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = new PullFromSource(Product::query());
+        $stage = new PullFromSource(DefaultImportSourceFactory::from(Product::class));
         $stage->handle();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
@@ -113,7 +114,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products_index',
             'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = new PullFromSource(Product::query());
+        $stage = new PullFromSource(DefaultImportSourceFactory::from(Product::class));
         $stage->handle();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
@@ -148,7 +149,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products_index',
             'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stages = PullFromSource::chunked(new Product());
+        $stages = PullFromSource::chunked(DefaultImportSourceFactory::from(Product::class));
         $stages->first()->handle();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
@@ -167,7 +168,7 @@ final class PullFromSourceTest extends IntegrationTestCase
 
     public function test_no_searchables_no_chunks()
     {
-        $stages = PullFromSource::chunked(new Product());
+        $stages = PullFromSource::chunked(DefaultImportSourceFactory::from(Product::class));
 
         $this->assertEquals(0, $stages->count());
     }
@@ -183,7 +184,7 @@ final class PullFromSourceTest extends IntegrationTestCase
 
         Product::setEventDispatcher($dispatcher);
 
-        $chunks = PullFromSource::chunked(new Product());
+        $chunks = PullFromSource::chunked(DefaultImportSourceFactory::from(Product::class));
         $chunks->first()->handle();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',

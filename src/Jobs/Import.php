@@ -6,6 +6,7 @@ use Elasticsearch\Client;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Collection;
 use Matchish\ScoutElasticSearch\ProgressReportable;
+use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
 /**
  * @internal
@@ -16,16 +17,16 @@ final class Import
     use ProgressReportable;
 
     /**
-     * @var string
+     * @var ImportSource
      */
-    private $searchable;
+    private $source;
 
     /**
-     * @param string $searchable
+     * @param ImportSource $source
      */
-    public function __construct(string $searchable)
+    public function __construct(ImportSource $source)
     {
-        $this->searchable = $searchable;
+        $this->source = $source;
     }
 
     /**
@@ -45,6 +46,6 @@ final class Import
 
     private function stages(): Collection
     {
-        return ImportStages::fromSearchable(new $this->searchable);
+        return ImportStages::fromSource($this->source);
     }
 }

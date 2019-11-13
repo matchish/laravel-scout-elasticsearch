@@ -11,6 +11,8 @@ use Laravel\Scout\ScoutServiceProvider;
 use Matchish\ScoutElasticSearch\Console\Commands\FlushCommand;
 use Matchish\ScoutElasticSearch\Console\Commands\ImportCommand;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
+use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
+use Matchish\ScoutElasticSearch\Searchable\ImportSourceFactory;
 
 final class ScoutElasticSearchServiceProvider extends ServiceProvider
 {
@@ -34,6 +36,7 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->register(ScoutServiceProvider::class);
+        $this->app->bind(ImportSourceFactory::class, DefaultImportSourceFactory::class);
 
         $this->registerCommands();
     }
