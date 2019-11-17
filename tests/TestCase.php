@@ -47,7 +47,7 @@ abstract class TestCase extends BaseTestCase
                     'type' => 'integer',
                 ],
             ],
-            ]);
+        ]);
     }
 
     protected function getPackageProviders($app)

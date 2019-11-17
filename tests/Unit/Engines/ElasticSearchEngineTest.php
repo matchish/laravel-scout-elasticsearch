@@ -7,7 +7,6 @@ use Elasticsearch\Client;
 use Laravel\Scout\Builder;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
 use Mockery as m;
-use ONGR\ElasticsearchDSL\Search;
 use Tests\TestCase;
 
 class ElasticSearchEngineTest extends TestCase
