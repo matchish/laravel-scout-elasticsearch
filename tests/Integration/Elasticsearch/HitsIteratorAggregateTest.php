@@ -2,10 +2,10 @@
 
 namespace Matchish\ScoutElasticSearch;
 
-use Tests\TestCase;
 use App\Library\CustomHitsIteratorAggregate;
-use Matchish\ScoutElasticSearch\ElasticSearch\HitsIteratorAggregate;
 use Matchish\ScoutElasticSearch\ElasticSearch\EloquentHitsIteratorAggregate;
+use Matchish\ScoutElasticSearch\ElasticSearch\HitsIteratorAggregate;
+use Tests\TestCase;
 
 class HitsIteratorAggregateTest extends TestCase
 {
