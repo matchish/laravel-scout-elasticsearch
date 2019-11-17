@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Jobs\Stages;
 
-use stdClass;
 use App\Product;
-use Tests\IntegrationTestCase;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Jobs\Stages\SwitchToNewAndRemoveOldIndex;
+use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
+use stdClass;
+use Tests\IntegrationTestCase;
 
 final class SwitchToNewAndRemoveOldIndexTest extends IntegrationTestCase
 {
@@ -23,7 +24,7 @@ final class SwitchToNewAndRemoveOldIndexTest extends IntegrationTestCase
             'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
 
-        $stage = new SwitchToNewAndRemoveOldIndex(new Product(), new Index('products_new'));
+        $stage = new SwitchToNewAndRemoveOldIndex(DefaultImportSourceFactory::from(Product::class), new Index('products_new'));
         $stage->handle($this->elasticsearch);
 
         $newIndexExist = $this->elasticsearch->indices()->exists(['index' => 'products_new']);

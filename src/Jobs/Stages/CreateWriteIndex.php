@@ -3,12 +3,11 @@
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elasticsearch\Client;
-use Laravel\Scout\Searchable;
-use Illuminate\Database\Eloquent\Model;
-use Matchish\ScoutElasticSearch\ElasticSearch\Index;
-use Matchish\ScoutElasticSearch\ElasticSearch\WriteAlias;
 use Matchish\ScoutElasticSearch\ElasticSearch\DefaultAlias;
+use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Create;
+use Matchish\ScoutElasticSearch\ElasticSearch\WriteAlias;
+use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
 /**
  * @internal
@@ -16,29 +15,28 @@ use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Create;
 final class CreateWriteIndex
 {
     /**
-     * @var Model
+     * @var ImportSource
      */
-    private $searchable;
+    private $source;
     /**
      * @var Index
      */
     private $index;
 
     /**
-     * @param Model $searchable
+     * @param ImportSource $source
      * @param Index $index
      */
-    public function __construct(Model $searchable, Index $index)
+    public function __construct(ImportSource $source, Index $index)
     {
-        $this->searchable = $searchable;
+        $this->source = $source;
         $this->index = $index;
     }
 
     public function handle(Client $elasticsearch): void
     {
-        /** @var Searchable $searchable */
-        $searchable = $this->searchable;
-        $this->index->addAlias(new WriteAlias(new DefaultAlias($searchable->searchableAs())));
+        $source = $this->source;
+        $this->index->addAlias(new WriteAlias(new DefaultAlias($source->searchableAs())));
 
         $params = new Create(
             $this->index->name(),

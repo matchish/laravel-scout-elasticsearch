@@ -6,16 +6,17 @@ namespace Tests\Integration\Jobs\Stages;
 
 use App\Product;
 use Elasticsearch\Client;
-use Tests\IntegrationTestCase;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Jobs\Stages\CreateWriteIndex;
+use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
+use Tests\IntegrationTestCase;
 
 final class CreateWriteIndexTest extends IntegrationTestCase
 {
     public function test_create_write_index(): void
     {
         $elasticsearch = $this->app->make(Client::class);
-        $stage = new CreateWriteIndex(new Product(), Index::fromSearchable(new Product()));
+        $stage = new CreateWriteIndex(DefaultImportSourceFactory::from(Product::class), Index::fromSource(DefaultImportSourceFactory::from(Product::class)));
         $stage->handle($elasticsearch);
         $response = $elasticsearch->indices()->getAlias(['index' => '*', 'name' => 'products']);
         $this->assertTrue($this->containsWriteIndex($response, 'products'));

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Product;
-use Tests\IntegrationTestCase;
 use Illuminate\Support\Facades\Artisan;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Refresh;
+use Tests\IntegrationTestCase;
 
 final class FlushCommandTest extends IntegrationTestCase
 {

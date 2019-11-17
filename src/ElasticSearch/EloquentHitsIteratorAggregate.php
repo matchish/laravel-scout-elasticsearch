@@ -1,21 +1,16 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: matchish
- * Date: 20.03.19
- * Time: 12:39.
- */
 
 namespace Matchish\ScoutElasticSearch\ElasticSearch;
 
-use Traversable;
+use IteratorAggregate;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Searchable;
+use Traversable;
 
 /**
  * @internal
  */
-final class EloquentHitsIteratorAggregate implements \IteratorAggregate
+final class EloquentHitsIteratorAggregate implements IteratorAggregate
 {
     /**
      * @var array

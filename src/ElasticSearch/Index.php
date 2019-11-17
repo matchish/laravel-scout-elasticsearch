@@ -2,6 +2,8 @@
 
 namespace Matchish\ScoutElasticSearch\ElasticSearch;
 
+use Matchish\ScoutElasticSearch\Searchable\ImportSource;
+
 /**
  * @internal
  */
@@ -81,11 +83,11 @@ final class Index
         return $config;
     }
 
-    public static function fromSearchable($searchable): Index
+    public static function fromSource(ImportSource $source): Index
     {
-        $name = $searchable->searchableAs().'_'.time();
-        $settingsConfigKey = "elasticsearch.indices.settings.{$searchable->searchableAs()}";
-        $mappingsConfigKey = "elasticsearch.indices.mappings.{$searchable->searchableAs()}";
+        $name = $source->searchableAs().'_'.time();
+        $settingsConfigKey = "elasticsearch.indices.settings.{$source->searchableAs()}";
+        $mappingsConfigKey = "elasticsearch.indices.mappings.{$source->searchableAs()}";
         $defaultSettings = [
             'number_of_shards' => 1,
             'number_of_replicas' => 0,

@@ -7,6 +7,8 @@ namespace Matchish\ScoutElasticSearch\Console\Commands;
 use Illuminate\Console\Command;
 use Matchish\ScoutElasticSearch\Jobs\Import;
 use Matchish\ScoutElasticSearch\Jobs\QueueableJob;
+use Matchish\ScoutElasticSearch\Searchable\ImportSource;
+use Matchish\ScoutElasticSearch\Searchable\ImportSourceFactory;
 use Matchish\ScoutElasticSearch\Searchable\SearchableListFactory;
 
 final class ImportCommand extends Command
@@ -42,7 +44,9 @@ final class ImportCommand extends Command
 
     private function import($searchable)
     {
-        $job = new Import($searchable);
+        $sourceFactory = app(ImportSourceFactory::class);
+        $source = $sourceFactory::from($searchable);
+        $job = new Import($source);
 
         if (config('scout.queue')) {
             $job = (new QueueableJob())->chain([$job]);
@@ -54,8 +58,9 @@ final class ImportCommand extends Command
         $startMessage = trans('scout::import.start', ['searchable' => "<comment>$searchable</comment>"]);
         $this->line($startMessage);
 
-        dispatch($job)->allOnQueue((new $searchable)->syncWithSearchUsingQueue())
-            ->allOnConnection(config((new $searchable)->syncWithSearchUsing()));
+        /* @var ImportSource $source */
+        dispatch($job)->allOnQueue($source->syncWithSearchUsingQueue())
+            ->allOnConnection($source->syncWithSearchUsing());
 
         $doneMessage = trans(config('scout.queue') ? 'scout::import.done.queue' : 'scout::import.done', [
             'searchable' => $searchable,

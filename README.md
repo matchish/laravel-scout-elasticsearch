@@ -6,7 +6,7 @@
   <img alt="Import progress report" src="https://raw.githubusercontent.com/matchish/laravel-scout-elasticsearch/master/docs/demo.gif" >
 
   <p align="center">
-    <a href="https://travis-ci.com/matchish/laravel-scout-elasticsearch"><img src="https://img.shields.io/travis/com/matchish/laravel-scout-elasticsearch.svg" alt="Build Status"></img></a>
+    <a href="https://travis-ci.com/matchish/laravel-scout-elasticsearch"><img src="https://img.shields.io/travis/com/matchish/laravel-scout-elasticsearch/master.svg" alt="Build Status"></img></a>
     <a href="https://scrutinizer-ci.com/g/matchish/laravel-scout-elasticsearch"><img alt="Code quality" src="https://img.shields.io/scrutinizer/g/matchish/laravel-scout-elasticsearch.svg?label=quality"></img></a>
     <a href="https://scrutinizer-ci.com/g/matchish/laravel-scout-elasticsearch"><img src="https://img.shields.io/scrutinizer/coverage/g/matchish/laravel-scout-elasticsearch.svg" alt="Coverage"></img></a>
     <a href="https://packagist.org/packages/matchish/laravel-scout-elasticsearch"><img src="https://poser.pugx.org/matchish/laravel-scout-elasticsearch/d/total.svg" alt="Total Downloads"></a>
@@ -29,6 +29,8 @@ If you need any help, [stack overflow](https://stackoverflow.com/questions/tagge
 
 - [Search amongst multiple models](#search-amongst-multiple-models)
 - [**Zero downtime** reimport](#zero-downtime-reimport) - it’s a breeze to import data in production.
+- [Eager load relations](#eager-load) - speed up your import.
+- Elasticsearch **7.0** ready - Use [elasticsearch-7](https://github.com/matchish/laravel-scout-elasticsearch/tree/elasticsearch-7) branch instead.
 - Import all searchable models at once.
 - A fully configurable mapping for each model.
 - Full power of ElasticSearch in your queries.
@@ -89,11 +91,50 @@ Or you you can specify default mappings with config key
 Same way you can define settings
 
 For index `products` it will be  
-`elasticsearch.indices.settigs.products`  
+`elasticsearch.indices.settings.products`  
 
 And for default settings  
-`elasticsearch.indices.settigs.default`
+`elasticsearch.indices.settings.default`
 
+### Eager load
+To speed up import you can eager load relations on import using global scopes.
+
+You should configure `ImportSourceFactory` in your service provider(`register` method)
+```
+use Matchish\ScoutElasticSearch\Searchable\ImportSourceFactory;
+...
+public function register(): void
+{
+$this->app->bind(ImportSourceFactory::class, MyImportSourceFactory::class);
+``` 
+Here is an example of `MyImportSourceFactory`
+```
+namespace Matchish\ScoutElasticSearch\Searchable;
+
+final class MyImportSourceFactory implements ImportSourceFactory
+{
+    public static function from(string $className): ImportSource
+    {
+        //Add all required scopes
+        return new DefaultImportSource($className, [new WithCommentsScope()]);
+    }
+}
+
+class WithCommentsScope implements Scope {
+
+    /**
+     * Apply the scope to a given Eloquent query builder.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $builder
+     * @param \Illuminate\Database\Eloquent\Model $model
+     * @return void
+     */
+    public function apply(Builder $builder, Model $model)
+    {
+        $builder->with('comments');
+    }
+}
+```
 ### Zero downtime reimport
 While working in production, to keep your existing search experience available while reimporting your data, you also can use `scout:import` Artisan command:  
 

@@ -20,6 +20,19 @@ services:
       XDEBUG_CONFIG: ${XDEBUG_CONFIG}
       PHP_IDE_CONFIG: ${PHP_IDE_CONFIG}
       ELASTICSEARCH_HOST: ${ELASTICSEARCH_HOST}
+      DB_HOST: ${DB_HOST}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - default
+  db:
+    image: mysql:5.7.22
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     networks:
       - default
   elasticsearch:

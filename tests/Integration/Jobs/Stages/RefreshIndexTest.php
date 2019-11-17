@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Jobs\Stages;
 
-use stdClass;
-use Tests\IntegrationTestCase;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Jobs\Stages\RefreshIndex;
+use stdClass;
+use Tests\IntegrationTestCase;
 
 final class RefreshIndexTest extends IntegrationTestCase
 {
