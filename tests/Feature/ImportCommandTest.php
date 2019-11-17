@@ -115,7 +115,7 @@ final class ImportCommandTest extends IntegrationTestCase
             ],
         ];
         $response = $this->elasticsearch->search($params);
-        $this->assertEquals($booksAmount, $response['hits']['total']);
+        $this->assertEquals($booksAmount, $response['hits']['total']['value']);
     }
 
     public function test_remove_old_index_after_switching_to_new(): void
