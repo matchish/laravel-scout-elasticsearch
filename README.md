@@ -198,7 +198,8 @@ book title is `Barcelona`
 ### Working with results
 Often your response isn't collection of models but aggregations or models with higlights an so on.
 In this case you need to implement your own implementation of `HitsIteratorAggregate` and bind it in your service provider
-[case](https://github.com/matchish/laravel-scout-elasticsearch/issues/28)
+
+[Here is a case](https://github.com/matchish/laravel-scout-elasticsearch/issues/28)
 
 ## :free: License
 Scout ElasticSearch is an open-sourced software licensed under the [MIT license](LICENSE.md).
