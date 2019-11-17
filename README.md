@@ -195,7 +195,7 @@ Mixed::search('title:Barcelona or to:Barcelona')
 In this example you will get collection of `Ticket` and `Book` models where ticket's arrival city or
 book title is `Barcelona`
 
-###Working with results
+### Working with results
 Often your response isn't collection of models but aggregations or models with higlights an so on.
 In this case you need to implement your own implementation of `HitsIteratorAggregate` and bind it in your service provider
 (case)[https://github.com/matchish/laravel-scout-elasticsearch/issues/28]
