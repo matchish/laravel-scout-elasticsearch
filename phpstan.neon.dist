@@ -15,3 +15,7 @@ parameters:
         -
             path: %currentWorkingDirectory%/src/Engines/ElasticSearchEngine.php
             message: '#Parameter \#2 \$search of function array_key_exists expects array, array\|\(callable\) given\.#'
+        -
+            path: %currentWorkingDirectory%/src/Engines/ElasticSearchEngine.php
+            message: 'Argument of an invalid type array\|\(callable\) supplied for foreach, only
+                               iterables are supported\.'
