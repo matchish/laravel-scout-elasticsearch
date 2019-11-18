@@ -41,6 +41,6 @@ final class RefreshIndexTest extends IntegrationTestCase
             ],
         ];
         $response = $this->elasticsearch->search($params);
-        $this->assertEquals(1, $response['hits']['total']);
+        $this->assertEquals(1, $response['hits']['total']['value']);
     }
 }

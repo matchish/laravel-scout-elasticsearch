@@ -39,16 +39,14 @@ abstract class TestCase extends BaseTestCase
         $app['config']->set('database.default', 'mysql');
         $app['config']->set('elasticsearch', require(__DIR__.'/../config/elasticsearch.php'));
         $app['config']->set('elasticsearch.indices.mappings.products', [
-                '_doc' => [
-                    'properties' => [
-                        'type' => [
-                            'type' => 'keyword',
-                        ],
-                        'price' => [
-                            'type' => 'integer',
-                        ],
-                    ],
+            'properties' => [
+                'type' => [
+                    'type' => 'keyword',
                 ],
+                'price' => [
+                    'type' => 'integer',
+                ],
+            ],
         ]);
     }
 

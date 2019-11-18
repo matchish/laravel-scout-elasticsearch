@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [3.0.0] - 2019-11-17
+### Added
+- Elasticsearch 7 support
+- Added interface binding for HitsIteratorAggregate for custom implementation
+
 ## [2.1.0] - 2019-11-13
 ### Added
 - Import source factory

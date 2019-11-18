@@ -40,7 +40,7 @@ final class ImportCommandTest extends IntegrationTestCase
             ],
         ];
         $response = $this->elasticsearch->search($params);
-        $this->assertEquals($productsAmount, $response['hits']['total']);
+        $this->assertEquals($productsAmount, $response['hits']['total']['value']);
     }
 
     public function test_import_entites_in_queue(): void
@@ -65,7 +65,7 @@ final class ImportCommandTest extends IntegrationTestCase
             ],
         ];
         $response = $this->elasticsearch->search($params);
-        $this->assertEquals($productsAmount, $response['hits']['total']);
+        $this->assertEquals($productsAmount, $response['hits']['total']['value']);
     }
 
     public function test_import_all_pages(): void
@@ -89,7 +89,7 @@ final class ImportCommandTest extends IntegrationTestCase
             ],
         ];
         $response = $this->elasticsearch->search($params);
-        $this->assertEquals($productsAmount, $response['hits']['total']);
+        $this->assertEquals($productsAmount, $response['hits']['total']['value']);
     }
 
     public function test_import_with_custom_key_all_pages(): void
@@ -115,7 +115,7 @@ final class ImportCommandTest extends IntegrationTestCase
             ],
         ];
         $response = $this->elasticsearch->search($params);
-        $this->assertEquals($booksAmount, $response['hits']['total']);
+        $this->assertEquals($booksAmount, $response['hits']['total']['value']);
     }
 
     public function test_remove_old_index_after_switching_to_new(): void

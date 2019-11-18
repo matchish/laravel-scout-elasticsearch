@@ -52,7 +52,7 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
             ],
         ];
         $response = $this->elasticsearch->search($params);
-        $this->assertEquals($models->count(), $response['hits']['total']);
+        $this->assertEquals($models->count(), $response['hits']['total']['value']);
         foreach ($response['hits']['hits'] as $doc) {
             $this->assertEquals('Scout', $doc['_source']['title']);
         }
@@ -93,7 +93,7 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
             ],
         ];
         $response = $this->elasticsearch->search($params);
-        $this->assertEquals(1, $response['hits']['total']);
+        $this->assertEquals(1, $response['hits']['total']['value']);
         foreach ($response['hits']['hits'] as $doc) {
             $this->assertEquals($shouldBeNotDeleted->getScoutKey(), $doc['_id']);
         }
@@ -115,7 +115,7 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
             ],
         ];
         $response = $this->elasticsearch->search($params);
-        $this->assertEquals(0, $response['hits']['total']);
+        $this->assertEquals(0, $response['hits']['total']['value']);
     }
 
     public function test_map_with_custom_key_name()

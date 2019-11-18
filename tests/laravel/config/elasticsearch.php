@@ -4,17 +4,15 @@ return [
     'indices' => [
         'mappings' => [
             'default' => [
-                '_doc' => [
-                    'properties' => [
-                        'created_at' => [
-                            'type' => 'date',
-                        ],
-                        'updated_at' => [
-                            'type' => 'date',
-                        ],
-                        'deleted_at' => [
-                            'type' => 'date',
-                        ],
+                'properties' => [
+                    'created_at' => [
+                        'type' => 'date',
+                    ],
+                    'updated_at' => [
+                        'type' => 'date',
+                    ],
+                    'deleted_at' => [
+                        'type' => 'date',
                     ],
                 ],
             ],

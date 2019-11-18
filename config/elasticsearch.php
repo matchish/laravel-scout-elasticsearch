@@ -5,11 +5,9 @@ return [
     'indices' => [
         'mappings' => [
             'default' => [
-                '_doc' => [
-                    'properties' => [
-                        'id' => [
-                            'type' => 'keyword',
-                        ],
+                'properties' => [
+                    'id' => [
+                        'type' => 'keyword',
                     ],
                 ],
             ],

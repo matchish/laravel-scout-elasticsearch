@@ -36,16 +36,13 @@ services:
     networks:
       - default
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.6.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.1.1
     user: "1000:1000"
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
     environment:
-      - cluster.name=docker-cluster
-      - cluster.routing.allocation.disk.threshold_enabled=true
-      - cluster.routing.allocation.disk.watermark.flood_stage=200mb
-      - cluster.routing.allocation.disk.watermark.low=500mb
-      - cluster.routing.allocation.disk.watermark.high=300mb
+      - discovery.type=single-node
+      - cluster.routing.allocation.disk.threshold_enabled=false
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
@@ -60,7 +57,8 @@ services:
     image: lmenezes/cerebro
     ports:
      - "9002:9000"
-
+    networks:
+      - default
 networks:
   default:
     driver: bridge

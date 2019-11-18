@@ -4,7 +4,7 @@ services:
   - mysql
 
 env:
-  - ELASTICSEARCH_HOST=localhost:9200 DB_DATABASE=scout_database DB_USERNAME=travis DB_PASSWORD=""
+  - ELASTICSEARCH_BUILD=7.1.1-amd64.deb ELASTICSEARCH_HOST=localhost:9200 DB_DATABASE=scout_database DB_USERNAME=travis DB_PASSWORD=""
 
 php:
   - 7.1
@@ -19,10 +19,17 @@ cache:
 matrix:
   allow_failures:
     - php: nightly
+    - env: ELASTICSEARCH_BUILD=7.1.1
 
 before_script:
   - mysql -e "create database $DB_DATABASE;"
-  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.6.2.deb && sudo dpkg -i --force-confnew elasticsearch-6.6.2.deb && sudo service elasticsearch restart
+  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ELASTICSEARCH_BUILD
+  - sudo dpkg -i --force-confnew elasticsearch-$ELASTICSEARCH_BUILD
+  - sudo sed -i.old 's/-Xms1g/-Xms128m/' /etc/elasticsearch/jvm.options
+  - sudo sed -i.old 's/-Xmx1g/-Xmx128m/' /etc/elasticsearch/jvm.options
+  - echo -e '-XX:+DisableExplicitGC\n-Djdk.io.permissionsUseCanonicalPath=true\n-Dlog4j.skipJansi=true\n-server\n' | sudo tee -a /etc/elasticsearch/jvm.options
+  - sudo chown -R elasticsearch:elasticsearch /etc/default/elasticsearch
+  - sudo service elasticsearch restart
   - sleep 30
   - curl -X GET "localhost:9200/_cluster/health?wait_for_status=yellow&timeout=50s"
   - travis_retry composer self-update

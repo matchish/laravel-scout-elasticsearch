@@ -25,12 +25,13 @@ great features, and at the same time leverage the complete set of ElasticSearchâ
 
 If you need any help, [stack overflow](https://stackoverflow.com/questions/tagged/laravel-scout%20laravel%20elasticsearch) is the preferred and recommended way to ask support questions.
 
-## :two_hearts: Features
+## :two_hearts: Features  
+Don't forget to :star: the package if you like it. :pray:
 
 - [Search amongst multiple models](#search-amongst-multiple-models)
 - [**Zero downtime** reimport](#zero-downtime-reimport) - itâ€™s a breeze to import data in production.
 - [Eager load relations](#eager-load) - speed up your import.
-- Elasticsearch **7.0** ready - Use [elasticsearch-7](https://github.com/matchish/laravel-scout-elasticsearch/tree/elasticsearch-7) branch instead.
+- Elasticsearch **7.0** ready
 - Import all searchable models at once.
 - A fully configurable mapping for each model.
 - Full power of ElasticSearch in your queries.
@@ -39,7 +40,11 @@ If you need any help, [stack overflow](https://stackoverflow.com/questions/tagge
 
 - PHP version >= 7.1.3
 - Laravel Framework version >= 5.6
-- Elasticsearch version >= 6
+
+| Elasticsearch version | ElasticsearchDSL version    |
+| --------------------- | --------------------------- |
+| >= 7.0                | >= 3.0.0                    |
+| >= 6.0, < 7.0         | < 3.0.0                     |
 
 ## :rocket: Installation
 
@@ -190,7 +195,11 @@ Mixed::search('title:Barcelona or to:Barcelona')
 In this example you will get collection of `Ticket` and `Book` models where ticket's arrival city or
 book title is `Barcelona`
 
->Don't forget to :star: the package if you like it. :pray:
+### Working with results
+Often your response isn't collection of models but aggregations or models with higlights an so on.
+In this case you need to implement your own implementation of `HitsIteratorAggregate` and bind it in your service provider
+
+[Here is a case](https://github.com/matchish/laravel-scout-elasticsearch/issues/28)
 
 ## :free: License
 Scout ElasticSearch is an open-sourced software licensed under the [MIT license](LICENSE.md).
