@@ -23,7 +23,7 @@ build:
   nodes:
     analysis:
       services:
-        elasticsearch: 6.6.2
+        elasticsearch: 7.4.2
         mysql: 5.7
       tests:
         override:
