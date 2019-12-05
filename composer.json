@@ -1,6 +1,6 @@
 {
     "name": "matchish/laravel-scout-elasticsearch",
-    "description": "This package extends Laravel Scout adding full power of ElasticSearch",
+    "description": "Search among multiple models with ElasticSearch and Laravel Scout",
     "version": "3.0.0",
     "keywords": [
         "laravel",
