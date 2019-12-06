@@ -31,7 +31,7 @@ Don't forget to :star: the package if you like it. :pray:
 - [Search amongst multiple models](#search-amongst-multiple-models)
 - [**Zero downtime** reimport](#zero-downtime-reimport) - it’s a breeze to import data in production.
 - [Eager load relations](#eager-load) - speed up your import.
-- Elasticsearch **7.0** ready
+- Elasticsearch **7.4** support
 - Import all searchable models at once.
 - A fully configurable mapping for each model.
 - Full power of ElasticSearch in your queries.
