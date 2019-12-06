@@ -25,6 +25,9 @@ class ProgressBarFactory
         $bar->setBarCharacter('<fg=green>⚬</>');
         $bar->setEmptyBarCharacter('<fg=red>⚬</>');
         $bar->setProgressCharacter('<fg=green>➤</>');
+        $bar->setRedrawFrequency(1);
+        $bar->maxSecondsBetweenRedraws(0);
+        $bar->minSecondsBetweenRedraws(0);
         $bar->setFormat(
             "%message%\n%current%/%max% [%bar%] %percent:3s%%\n"
         );
