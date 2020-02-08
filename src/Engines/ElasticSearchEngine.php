@@ -25,6 +25,9 @@ final class ElasticSearchEngine extends Engine
      */
     protected $elasticsearch;
 
+    /** @var string */
+    private $hitsIterator = null;
+
     /**
      * Create a new engine instance.
      *
@@ -107,10 +110,17 @@ final class ElasticSearchEngine extends Engine
      */
     public function map(BaseBuilder $builder, $results, $model)
     {
-        $hits = app()->makeWith(HitsIteratorAggregate::class,
-                    ['results' => $results,
+        if(is_null($this->hitsIterator)){
+            $hits = app()->makeWith(HitsIteratorAggregate::class,
+                ['results' => $results,
                     'callback' => $builder->queryCallback,
-                    ]);
+                ]);
+        } else {
+            $hits = app()->makeWith($this->hitsIterator,
+                ['results' => $results,
+                    'callback' => $builder->queryCallback,
+                ]);
+        }
 
         return new Collection($hits);
     }
@@ -138,7 +148,8 @@ final class ElasticSearchEngine extends Engine
             return call_user_func(
                 $callback,
                 $this->elasticsearch,
-                $searchBody
+                $searchBody,
+                $this
             );
         }
         /** @var Searchable $model */
@@ -147,5 +158,13 @@ final class ElasticSearchEngine extends Engine
         $params = new SearchParams($indexName, $searchBody->toArray());
 
         return $this->elasticsearch->search($params->toArray());
+    }
+
+    /**
+     * @param $value
+     */
+    public function useHitsIterator($value)
+    {
+        $this->hitsIterator = $value;
     }
 }
