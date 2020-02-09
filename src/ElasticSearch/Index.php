@@ -86,16 +86,32 @@ final class Index
     public static function fromSource(ImportSource $source): Index
     {
         $name = $source->searchableAs().'_'.time();
-        $settingsConfigKey = "elasticsearch.indices.settings.{$source->searchableAs()}";
-        $mappingsConfigKey = "elasticsearch.indices.mappings.{$source->searchableAs()}";
+
         $defaultSettings = [
             'number_of_shards' => 1,
             'number_of_replicas' => 0,
-
         ];
-        $settings = config($settingsConfigKey, config('elasticsearch.indices.settings.default', $defaultSettings));
-        $mappings = config($mappingsConfigKey, config('elasticsearch.indices.mappings.default'));
+
+        $settings = self::getConfig($source, 'elasticsearch.indices.settings', $defaultSettings);
+        $mappings = self::getConfig($source, 'elasticsearch.indices.mappings', config('elasticsearch.indices.mappings.default'));
 
         return new static($name, $settings, $mappings);
+    }
+
+    private static function getConfig(ImportSource $source, $baseKey, $default = null): ?array
+    {
+        if($config = config($baseKey.$source->searchableAs(), null)){
+            return $config;
+        }
+
+        foreach(config($baseKey) as $key => $mapping){
+            $keyPattern = str_replace('*', '(\w{1,})', $key);
+            preg_match("/{$keyPattern}/", $source->searchableAs(), $matches);
+            if($matches){
+                return $mapping;
+            }
+        }
+
+        return $default ?? null;
     }
 }
