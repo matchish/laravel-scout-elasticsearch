@@ -20,6 +20,9 @@ final class SearchFactory
     {
         $search = new Search();
         $query = new QueryStringQuery($builder->query);
+        if(isset($options['fields'])){
+            $query->addParameter('fields', $options['fields']);
+        }
         if (! empty($builder->wheres)) {
             $boolQuery = new BoolQuery();
             foreach ($builder->wheres as $field => $value) {
