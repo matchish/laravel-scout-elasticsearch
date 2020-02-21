@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [3.0.1] - 2020-03-02
+### Fixed
+-  Respect the model uses soft delete
+
 ## [3.0.0] - 2019-11-17
 ### Added
 - Elasticsearch 7 support

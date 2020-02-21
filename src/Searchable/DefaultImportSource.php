@@ -66,7 +66,7 @@ final class DefaultImportSource implements ImportSource
     private function newQuery()
     {
         $query = $this->model()->newQuery();
-        $softDelete = config('scout.soft_delete', false);
+        $softDelete = $this->className::usesSoftDelete() && config('scout.soft_delete', false);
         $query
             ->when($softDelete, function ($query) {
                 return $query->withTrashed();
