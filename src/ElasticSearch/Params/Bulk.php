@@ -32,6 +32,8 @@ final class Bulk
     }
 
     /**
+     * TODO: Add ability to extend payload without modifying the class
+     *
      * @return array
      */
     public function toArray(): array
@@ -47,6 +49,7 @@ final class Bulk
                         '_index' => $model->searchableAs(),
                         '_id' => $model->getScoutKey(),
                         '_type' => '_doc',
+                        'routing' => false === empty($model->routing) ? $model->routing : $model->getScoutKey(),
                     ],
                 ];
 
@@ -67,6 +70,7 @@ final class Bulk
                         '_index' => $model->searchableAs(),
                         '_id' => $model->getScoutKey(),
                         '_type' => '_doc',
+                        'routing' => false === empty($model->routing) ? $model->routing : $model->getScoutKey(),
                     ],
                 ];
 
