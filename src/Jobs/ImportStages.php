@@ -21,7 +21,7 @@ class ImportStages extends Collection
     {
         $index = Index::fromSource($source);
 
-        return (new static([
+        return (new self([
             new CleanUp($source),
             new CreateWriteIndex($source, $index),
             PullFromSource::chunked($source),

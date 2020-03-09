@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Matchish\ScoutElasticSearch\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 use Matchish\ScoutElasticSearch\Jobs\Import;
 use Matchish\ScoutElasticSearch\Jobs\QueueableJob;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
@@ -27,13 +28,13 @@ final class ImportCommand extends Command
      */
     public function handle(): void
     {
-        $this->searchableList($this->argument('searchable'))
+        $this->searchableList((array) $this->argument('searchable'))
         ->each(function ($searchable) {
             $this->import($searchable);
         });
     }
 
-    private function searchableList($argument)
+    private function searchableList(array $argument): Collection
     {
         return collect($argument)->whenEmpty(function () {
             $factory = new SearchableListFactory(app()->getNamespace(), app()->path());
@@ -42,7 +43,7 @@ final class ImportCommand extends Command
         });
     }
 
-    private function import($searchable)
+    private function import(string $searchable): void
     {
         $sourceFactory = app(ImportSourceFactory::class);
         $source = $sourceFactory::from($searchable);

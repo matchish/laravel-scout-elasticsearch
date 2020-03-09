@@ -65,6 +65,6 @@ final class EloquentHitsIteratorAggregate implements IteratorAggregate
             })->filter()->all();
         }
 
-        return new \ArrayIterator($hits);
+        return new \ArrayIterator((array) $hits);
     }
 }

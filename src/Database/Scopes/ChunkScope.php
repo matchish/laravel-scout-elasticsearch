@@ -48,7 +48,7 @@ class ChunkScope implements Scope
             });
     }
 
-    public function key()
+    public function key(): string
     {
         return static::class;
     }

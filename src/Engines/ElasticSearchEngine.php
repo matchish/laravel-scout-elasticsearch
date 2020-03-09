@@ -141,7 +141,7 @@ final class ElasticSearchEngine extends Engine
                 $searchBody
             );
         }
-        /** @var Searchable $model */
+
         $model = $builder->model;
         $indexName = $builder->index ?: $model->searchableAs();
         $params = new SearchParams($indexName, $searchBody->toArray());

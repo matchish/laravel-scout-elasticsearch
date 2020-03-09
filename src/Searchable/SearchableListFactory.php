@@ -12,6 +12,9 @@ use Symfony\Component\Finder\Finder;
 
 final class SearchableListFactory
 {
+    /**
+     * @var array
+     */
     private static $declaredClasses;
     /**
      * @var string

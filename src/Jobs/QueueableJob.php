@@ -11,7 +11,7 @@ class QueueableJob implements ShouldQueue
     use Queueable;
     use ProgressReportable;
 
-    public function handle()
+    public function handle(): void
     {
     }
 }

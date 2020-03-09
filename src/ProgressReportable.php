@@ -7,9 +7,12 @@ use Symfony\Component\Console\Output\NullOutput;
 
 trait ProgressReportable
 {
+    /**
+     * @var ProgressBar
+     */
     private $progressBar;
 
-    public function withProgressReport(ProgressBar $progressBar)
+    public function withProgressReport(ProgressBar $progressBar): void
     {
         $this->progressBar = $progressBar;
     }

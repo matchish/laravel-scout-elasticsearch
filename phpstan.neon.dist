@@ -5,6 +5,7 @@ parameters:
     paths:
         - src
     reportUnmatchedIgnoredErrors: false
+    checkMissingIterableValueType: false
     ignoreErrors:
         -
             path: %currentWorkingDirectory%/src/Engines/ElasticSearchEngine.php

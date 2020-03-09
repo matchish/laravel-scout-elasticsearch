@@ -2,13 +2,22 @@
 
 namespace Matchish\ScoutElasticSearch\Searchable;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Matchish\ScoutElasticSearch\Database\Scopes\PageScope;
+use Illuminate\Support\Collection;
 
 final class DefaultImportSource implements ImportSource
 {
     const DEFAULT_CHUNK_SIZE = 500;
 
+    /**
+     * @var string
+     */
     private $className;
+    /**
+     * @var array
+     */
     private $scopes;
 
     /**
@@ -22,12 +31,12 @@ final class DefaultImportSource implements ImportSource
         $this->scopes = $scopes;
     }
 
-    public function syncWithSearchUsingQueue()
+    public function syncWithSearchUsingQueue(): ?string
     {
         return $this->model()->syncWithSearchUsingQueue();
     }
 
-    public function syncWithSearchUsing()
+    public function syncWithSearchUsing(): ?string
     {
         return $this->model()->syncWithSearchUsing();
     }
@@ -37,7 +46,7 @@ final class DefaultImportSource implements ImportSource
         return $this->model()->searchableAs();
     }
 
-    public function chunked()
+    public function chunked(): Collection
     {
         $query = $this->newQuery();
         $totalSearchables = $query->count();
@@ -63,7 +72,7 @@ final class DefaultImportSource implements ImportSource
         return new $this->className;
     }
 
-    private function newQuery()
+    private function newQuery(): Builder
     {
         $query = $this->model()->newQuery();
         $softDelete = $this->className::usesSoftDelete() && config('scout.soft_delete', false);
@@ -81,6 +90,9 @@ final class DefaultImportSource implements ImportSource
         }, $query);
     }
 
+    /**
+     * @return Builder[]|EloquentCollection
+     */
     public function get()
     {
         return $this->newQuery()->get();

@@ -32,7 +32,7 @@ final class Update
         ];
     }
 
-    public function add(string $index, string $alias)
+    public function add(string $index, string $alias): void
     {
         $this->actions[] = ['add' => [
             'index' => $index,
@@ -40,7 +40,7 @@ final class Update
         ]];
     }
 
-    public function removeIndex($index)
+    public function removeIndex(string $index): void
     {
         $this->actions[] = ['remove_index' => ['index' => $index]];
     }
