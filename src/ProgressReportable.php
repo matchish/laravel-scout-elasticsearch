@@ -3,7 +3,6 @@
 namespace Matchish\ScoutElasticSearch;
 
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Output\NullOutput;
 
 trait ProgressReportable
 {

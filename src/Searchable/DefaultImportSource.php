@@ -3,9 +3,8 @@
 namespace Matchish\ScoutElasticSearch\Searchable;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Matchish\ScoutElasticSearch\Database\Scopes\PageScope;
 use Illuminate\Support\Collection;
+use Matchish\ScoutElasticSearch\Database\Scopes\PageScope;
 
 final class DefaultImportSource implements ImportSource
 {
