@@ -90,9 +90,6 @@ final class DefaultImportSource implements ImportSource
         }, $query);
     }
 
-    /**
-     * @return Builder[]|EloquentCollection
-     */
     public function get()
     {
         return $this->newQuery()->get();

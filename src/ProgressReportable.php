@@ -19,6 +19,6 @@ trait ProgressReportable
 
     private function progressBar(): ProgressBar
     {
-        return $this->progressBar ?: new ProgressBar(new NullOutput());
+        return $this->progressBar;
     }
 }
