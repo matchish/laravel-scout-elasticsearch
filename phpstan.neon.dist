@@ -12,7 +12,7 @@ parameters:
             message: '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::searchableAs\(\)\.#'
         -
             path: %currentWorkingDirectory%/src/Engines/ElasticSearchEngine.php
-            message: '#message.*ServerErrorResponseException constructor expects string, string|false given.#'
+            message: '#message.*ServerErrorResponseException constructor expects string, string\|false given.#'
         -
             path: %currentWorkingDirectory%/src/Engines/ElasticSearchEngine.php
             message: '#Parameter \#2 \$search of function array_key_exists expects array, array\|\(callable\) given\.#'

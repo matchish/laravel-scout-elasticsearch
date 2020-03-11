@@ -3,6 +3,7 @@
 namespace Matchish\ScoutElasticSearch\Searchable;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Matchish\ScoutElasticSearch\Database\Scopes\PageScope;
 
@@ -89,8 +90,11 @@ final class DefaultImportSource implements ImportSource
         }, $query);
     }
 
-    public function get()
+    public function get(): EloquentCollection
     {
-        return $this->newQuery()->get();
+        /** @var EloquentCollection $models */
+        $models = $this->newQuery()->get();
+
+        return $models;
     }
 }
