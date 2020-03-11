@@ -24,11 +24,11 @@
     },
     "require-dev": {
         "fzaninotto/faker": "^1.8",
-        "phpstan/phpstan": "^0.11",
-        "orchestra/testbench": "^3.0",
-        "phpunit/phpunit": "^7.4",
-        "illuminate/support": "5.6.*|5.7.*|5.8.*",
-        "nunomaduro/larastan": "~0.3",
+        "phpstan/phpstan": "0.11.6",
+        "orchestra/testbench": "3.8.5",
+        "phpunit/phpunit": "7.5.18",
+        "laravel/framework": "5.8.35",
+        "nunomaduro/larastan": "0.3.16",
         "nette/bootstrap": "^2.4.6"
     },
     "autoload-dev": {
