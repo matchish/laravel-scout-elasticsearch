@@ -13,9 +13,19 @@ class ScoutElasticSearchServiceProviderTest extends TestCase
         $provider = new ElasticSearchServiceProvider($this->app);
         $provider->boot();
 
+        // assert config is loaded from vendor before publishing
+        $distConfig = config('elasticsearch', false);
+        $this->assertNotFalse($distConfig);
+        $this->assertArrayHasKey('indices', $distConfig);
+
         \Artisan::call('vendor:publish', [
             '--tag' => 'config',
         ]);
+
+        // assert config is the same as before publishing
+        $publishedConfig = config('elasticsearch', false);
+
+        $this->assertEquals($distConfig, $publishedConfig);
 
         $this->assertFileExists(config_path('elasticsearch.php'));
     }
