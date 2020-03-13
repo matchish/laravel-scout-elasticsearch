@@ -32,7 +32,7 @@ final class Bulk
     }
 
     /**
-     * TODO: Add ability to extend payload without modifying the class
+     * TODO: Add ability to extend payload without modifying the class.
      *
      * @return array
      */
