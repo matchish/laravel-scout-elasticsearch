@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [3.0.2] - 2020-03-13
+### Fixed
+-  Merge the config from the package
+
 ## [3.0.1] - 2020-03-02
 ### Fixed
 -  Respect the model uses soft delete

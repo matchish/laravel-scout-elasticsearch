@@ -7,17 +7,13 @@ use Tests\TestCase;
 
 class ScoutElasticSearchServiceProviderTest extends TestCase
 {
-    public function test_config_publishing()
+    public function test_config_is_merged_from_the_package()
     {
-        \File::delete(config_path('elasticsearch.php'));
         $provider = new ElasticSearchServiceProvider($this->app);
+        $provider->register();
         $provider->boot();
 
-        \Artisan::call('vendor:publish', [
-            '--tag' => 'config',
-        ]);
-
-        $this->assertFileExists(config_path('elasticsearch.php'));
+        $this->assertNotFalse(config('elasticsearch', false));
     }
 
     public function test_provides()
