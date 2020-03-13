@@ -18,7 +18,7 @@ class IndexTest extends TestCase
 
 namespace Matchish\ScoutElasticSearch\ElasticSearch;
 
-function time():int
+function time(): int
 {
     return 1525376494;
 }
