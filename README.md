@@ -113,7 +113,7 @@ public function register(): void
 $this->app->bind(ImportSourceFactory::class, MyImportSourceFactory::class);
 ``` 
 Here is an example of `MyImportSourceFactory`
-```
+```php
 namespace Matchish\ScoutElasticSearch\Searchable;
 
 final class MyImportSourceFactory implements ImportSourceFactory
