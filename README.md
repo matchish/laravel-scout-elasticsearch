@@ -62,7 +62,7 @@ so feel free do it in your app service provider.
 But if you don't want to do it right now, 
 you can use `Matchish\ElasticSearchServiceProvider` from the package.  
 Register the provider, adding to `config/app.php`
-```
+```php
 'providers' => [
     // Other Service Providers
 
@@ -105,7 +105,7 @@ And for default settings
 To speed up import you can eager load relations on import using global scopes.
 
 You should configure `ImportSourceFactory` in your service provider(`register` method)
-```
+```php
 use Matchish\ScoutElasticSearch\Searchable\ImportSourceFactory;
 ...
 public function register(): void
@@ -113,7 +113,7 @@ public function register(): void
 $this->app->bind(ImportSourceFactory::class, MyImportSourceFactory::class);
 ``` 
 Here is an example of `MyImportSourceFactory`
-```
+```php
 namespace Matchish\ScoutElasticSearch\Searchable;
 
 final class MyImportSourceFactory implements ImportSourceFactory
