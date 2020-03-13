@@ -58,12 +58,12 @@ class ElasticSearchEngineTest extends TestCase
                 'hits' => [
                     [
                         '_id' => 1, '_source' => [
-                        '__class_name' => Product::class,
-                    ], ],
+                            '__class_name' => Product::class,
+                        ], ],
                     [
                         '_id' => 2, '_source' => [
-                        '__class_name' => Product::class,
-                    ], ],
+                            '__class_name' => Product::class,
+                        ], ],
                 ],
                 'total' => 2,
             ], ], new Product());
