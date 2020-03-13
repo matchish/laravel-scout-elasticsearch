@@ -33,6 +33,6 @@ build:
             coverage:
               file: 'coverage.clover'
               format: 'clover'
-    dependencies:
-      override:
-        - composer update --no-interaction --no-suggest --prefer-source
+  dependencies:
+    override:
+      - composer update --no-interaction --no-suggest --prefer-source
