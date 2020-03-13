@@ -12,9 +12,9 @@ class HitsIteratorAggregateTest extends TestCase
     public function test_hits_iterator_aggregate_binds_to_eloquent_implementation()
     {
         $iteratorAggregate = $this->app->makeWith(HitsIteratorAggregate::class, [
-                                                'results' => [],
-                                                'callback' => null,
-                                            ]);
+            'results' => [],
+            'callback' => null,
+        ]);
 
         $this->assertEquals(EloquentHitsIteratorAggregate::class, get_class($iteratorAggregate));
     }
@@ -24,9 +24,9 @@ class HitsIteratorAggregateTest extends TestCase
         $this->app->bind(HitsIteratorAggregate::class, CustomHitsIteratorAggregate::class);
 
         $iteratorAggregate = $this->app->makeWith(HitsIteratorAggregate::class, [
-                                                'results' => [],
-                                                'callback' => null,
-                                            ]);
+            'results' => [],
+            'callback' => null,
+        ]);
 
         $this->assertEquals(CustomHitsIteratorAggregate::class, get_class($iteratorAggregate));
     }
