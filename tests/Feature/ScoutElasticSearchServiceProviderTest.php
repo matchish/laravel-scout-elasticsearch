@@ -9,7 +9,7 @@ class ScoutElasticSearchServiceProviderTest extends TestCase
 {
     public function test_config_is_merged_from_the_package()
     {
-        $distConfig = require(__DIR__.'/../../config/elasticsearch.php');
+        $distConfig = require __DIR__.'/../../config/elasticsearch.php';
 
         $this->assertSame($distConfig, config('elasticsearch'));
     }
