@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+
 ## [3.0.3] - 2020-03-14
 ### Added
 -  Load config from package [#84](https://github.com/matchish/laravel-scout-elasticsearch/issues/84)
