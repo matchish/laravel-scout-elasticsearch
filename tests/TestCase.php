@@ -37,17 +37,6 @@ abstract class TestCase extends BaseTestCase
         $app['config']->set('scout.queue', false);
         // Setup default database to use sqlite :memory:
         $app['config']->set('database.default', 'mysql');
-        $app['config']->set('elasticsearch', require(__DIR__.'/../config/elasticsearch.php'));
-        $app['config']->set('elasticsearch.indices.mappings.products', [
-            'properties' => [
-                'type' => [
-                    'type' => 'keyword',
-                ],
-                'price' => [
-                    'type' => 'integer',
-                ],
-            ],
-        ]);
     }
 
     protected function getPackageProviders($app)
