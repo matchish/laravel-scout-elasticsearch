@@ -26,7 +26,7 @@ RUN ln -snf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && echo ${TIMEZONE} >
 RUN printf '[PHP]\ndate.timezone = "%s"\n', ${TIMEZONE} > /usr/local/etc/php/conf.d/tzone.ini
 RUN "date"
 
-RUN apt-get update && apt-get install -y libmcrypt-dev mysql-client \
+RUN apt-get update && apt-get install -y libmcrypt-dev mariadb-client \
     && docker-php-ext-install pdo_mysql
 
 FROM php as php-development
