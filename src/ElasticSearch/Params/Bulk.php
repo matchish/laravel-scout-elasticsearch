@@ -32,6 +32,8 @@ final class Bulk
     }
 
     /**
+     * TODO: Add ability to extend payload without modifying the class.
+     *
      * @return array
      */
     public function toArray(): array
@@ -42,11 +44,14 @@ final class Bulk
                 if ($model::usesSoftDelete() && config('scout.soft_delete', false)) {
                     $model->pushSoftDeleteMetadata();
                 }
+                $routing = $model->routing;
+                $scoutKey = $model->getScoutKey();
                 $payload['body'][] = [
                     'index' => [
                         '_index' => $model->searchableAs(),
-                        '_id' => $model->getScoutKey(),
+                        '_id' => $scoutKey,
                         '_type' => '_doc',
+                        'routing' => false === empty($routing) ? $routing : $scoutKey,
                     ],
                 ];
 
@@ -62,11 +67,14 @@ final class Bulk
             }, $payload);
         $payload = collect($this->deleteDocs)->reduce(
             function ($payload, $model) {
+                $routing = $model->routing;
+                $scoutKey = $model->getScoutKey();
                 $payload['body'][] = [
                     'delete' => [
                         '_index' => $model->searchableAs(),
-                        '_id' => $model->getScoutKey(),
+                        '_id' => $scoutKey,
                         '_type' => '_doc',
+                        'routing' => false === empty($routing) ? $routing : $scoutKey,
                     ],
                 ];
 
