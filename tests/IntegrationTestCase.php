@@ -42,6 +42,4 @@ class IntegrationTestCase extends TestCase
             ],
         ]);
     }
-
-
 }
