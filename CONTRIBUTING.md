@@ -15,3 +15,8 @@ Contributions are welcome, and are accepted via pull requests. Please review the
 * Please remember that we follow [SemVer](http://semver.org/).
 
 We have [StyleCI](https://styleci.io/) setup to automatically fix any code style issues.
+
+# Running tests
+
+Run `make install` to prepare docker containers for  tests  
+Run tests `make test`
