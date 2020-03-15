@@ -15,6 +15,7 @@
   </p>
 </p>
 
+#### For Laravel Framefork < 6.0.0 use [3.x](https://github.com/matchish/laravel-scout-elasticsearch/tree/3.x) branch
 The package provides the perfect starting point to integrate
 ElasticSearch into your Laravel application. It is carefully crafted to simplify the usage
 of ElasticSearch within the [Laravel Framework](https://laravel.com).
