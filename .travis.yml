@@ -7,7 +7,6 @@ env:
   - ELASTICSEARCH_BUILD=7.1.1-amd64.deb ELASTICSEARCH_HOST=localhost:9200 DB_DATABASE=scout_database DB_USERNAME=travis DB_PASSWORD=""
 
 php:
-  - 7.1
   - 7.2
   - 7.3
   - nightly

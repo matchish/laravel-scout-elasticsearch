@@ -38,7 +38,7 @@ final class Get
         ];
     }
 
-    public static function anyIndex($alias)
+    public static function anyIndex(string $alias): Get
     {
         return new static($alias, '*');
     }

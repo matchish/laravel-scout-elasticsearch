@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [4.0.0] - 2020-03-12
+### Added
+-  Scout 8 Support
 
 ## [3.0.3] - 2020-03-14
 ### Added

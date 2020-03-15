@@ -41,7 +41,7 @@ final class SwitchToNewAndRemoveOldIndex
         $params = new Update();
         foreach ($response as $indexName => $alias) {
             if ($indexName != $this->index->name()) {
-                $params->removeIndex($indexName);
+                $params->removeIndex((string) $indexName);
             } else {
                 $params->add((string) $indexName, $source->searchableAs());
             }

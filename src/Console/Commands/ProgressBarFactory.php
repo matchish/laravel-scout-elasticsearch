@@ -2,6 +2,7 @@
 
 namespace Matchish\ScoutElasticSearch\Console\Commands;
 
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Style\OutputStyle;
 
 class ProgressBarFactory
@@ -19,7 +20,7 @@ class ProgressBarFactory
         $this->output = $output;
     }
 
-    public function create(int $max = 0)
+    public function create(int $max = 0): ProgressBar
     {
         $bar = $this->output->createProgressBar($max);
         $bar->setBarCharacter('<fg=green>⚬</>');

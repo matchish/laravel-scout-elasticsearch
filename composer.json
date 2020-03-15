@@ -1,7 +1,7 @@
 {
     "name": "matchish/laravel-scout-elasticsearch",
     "description": "Search among multiple models with ElasticSearch and Laravel Scout",
-    "version": "3.0.3",
+    "version": "4.0.0",
     "keywords": [
         "laravel",
         "scout",
@@ -17,19 +17,17 @@
         }
     ],
     "require": {
-        "php": "^7.1.3",
+        "php": "^7.2",
         "elasticsearch/elasticsearch": ">=7.2",
-        "laravel/scout": "^6.1.1|^7.0",
+        "laravel/scout": "^8.0",
         "ongr/elasticsearch-dsl": "^7.0"
     },
     "require-dev": {
         "fzaninotto/faker": "^1.8",
-        "phpstan/phpstan": "0.11.6",
-        "orchestra/testbench": "3.8.5",
-        "phpunit/phpunit": "7.5.18",
-        "laravel/framework": "5.8.35",
-        "nunomaduro/larastan": "0.3.16",
-        "nette/bootstrap": "^2.4.6"
+        "orchestra/testbench": "^4.0|^5.0",
+        "phpunit/phpunit": "^8.0|^9.0",
+        "illuminate/support": "^6.0|^7.0",
+        "nunomaduro/larastan": "~0.5"
     },
     "autoload-dev": {
         "psr-4": {
