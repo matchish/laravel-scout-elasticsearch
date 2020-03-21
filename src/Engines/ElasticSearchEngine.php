@@ -2,6 +2,7 @@
 
 namespace Matchish\ScoutElasticSearch\Engines;
 
+use App\Search\HitsIterators\OrderHitsIterator;
 use Elasticsearch\Common\Exceptions\ServerErrorResponseException;
 use Illuminate\Database\Eloquent\Collection;
 use Laravel\Scout\Builder as BaseBuilder;
@@ -106,13 +107,18 @@ final class ElasticSearchEngine extends Engine
      */
     public function map(BaseBuilder $builder, $results, $model)
     {
-        $hits = app()->makeWith(
-            HitsIteratorAggregate::class,
-            [
-                'results'  => $results,
-                'callback' => $builder->queryCallback,
-            ]
-        );
+        if ($builder->queryCallback instanceof \IteratorAggregate) {
+            $hits = call_user_func($builder->queryCallback, $results);
+
+        } else {
+            $hits = app()->makeWith(
+                HitsIteratorAggregate::class,
+                [
+                    'results' => $results,
+                    'callback' => $builder->queryCallback,
+                ]
+            );
+        }
 
         return new Collection($hits);
     }
