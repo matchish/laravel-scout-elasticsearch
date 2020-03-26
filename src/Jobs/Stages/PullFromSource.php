@@ -25,8 +25,10 @@ final class PullFromSource
 
     public function handle(): void
     {
-        $results = $this->source->get();
-        $results->filter->shouldBeSearchable()->searchable();
+        $results = $this->source->get()->filter->shouldBeSearchable();
+        if (! $results->isEmpty()) {
+            $results->first()->searchableUsing()->update($results);
+        }
     }
 
     public function estimate(): int
