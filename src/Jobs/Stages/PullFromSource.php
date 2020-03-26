@@ -26,7 +26,7 @@ final class PullFromSource
     public function handle(): void
     {
         $results = $this->source->get()->filter->shouldBeSearchable();
-        if (!$results->isEmpty()) {
+        if (! $results->isEmpty()) {
             $results->first()->searchableUsing()->update($results);
         }
     }
