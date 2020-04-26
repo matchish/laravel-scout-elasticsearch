@@ -28,7 +28,7 @@ services:
     networks:
       - default
   db:
-    image: mysql:5.7.22
+    image: mariadb:10.3
     environment:
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_USER: ${DB_USERNAME}
