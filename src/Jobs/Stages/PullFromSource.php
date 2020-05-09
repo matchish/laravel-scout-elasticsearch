@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\LazyCollection;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
 /**
@@ -43,12 +45,18 @@ final class PullFromSource
 
     /**
      * @param ImportSource $source
-     * @return Collection
+     * @return LazyCollection
      */
-    public static function chunked(ImportSource $source): Collection
+    public static function chunked(ImportSource $source): LazyCollection
     {
-        return $source->chunked()->map(function ($chunk) {
-            return new static($chunk);
+        /** @var Collection $chunked */
+        $chunked = $source->chunked();
+        return LazyCollection::make(function () use ($chunked){
+            foreach ($chunked as $chunks) {
+                yield $chunks->map(function ($chunk) {
+                    return new static($chunk);
+                });
+            }
         });
     }
 }

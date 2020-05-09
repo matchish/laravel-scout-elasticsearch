@@ -96,16 +96,18 @@ final class ImportCommandTest extends IntegrationTestCase
     {
         $this->app['config']['scout.key'] = 'title';
 
-        $dispatcher = Book::getEventDispatcher();
-        Book::unsetEventDispatcher();
+        $dispatcher = BookWithCustomKey::getEventDispatcher();
+        BookWithCustomKey::unsetEventDispatcher();
 
         $booksAmount = 10;
 
-        factory(Book::class, $booksAmount)->create();
+        factory(BookWithCustomKey::class, $booksAmount)->create();
 
-        Book::setEventDispatcher($dispatcher);
+        BookWithCustomKey::setEventDispatcher($dispatcher);
 
-        Artisan::call('scout:import');
+        Artisan::call('scout:import', [
+            'searchable' => BookWithCustomKey::class
+        ]);
         $params = [
             'index' => (new BookWithCustomKey())->searchableAs(),
             'body' => [
