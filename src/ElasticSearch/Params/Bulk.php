@@ -22,12 +22,12 @@ final class Bulk
      */
     public function delete($docs): void
     {
-        if (is_iterable($docs)) {
-            foreach ($docs as $doc) {
-                $this->delete($doc);
-            }
-        } else {
-            $this->deleteDocs[$docs->getScoutKey()] = $docs;
+        if (! is_iterable($docs)) {
+            $docs = [$docs];
+        }
+
+        foreach ($docs as $doc) {
+            $this->deleteDocs[$doc->getScoutKey()] = $doc;
         }
     }
 
@@ -89,12 +89,12 @@ final class Bulk
      */
     public function index($docs): void
     {
-        if (is_iterable($docs)) {
-            foreach ($docs as $doc) {
-                $this->index($doc);
-            }
-        } else {
-            $this->indexDocs[$docs->getScoutKey()] = $docs;
+        if (! is_iterable($docs)) {
+            $docs = [$docs];
+        }
+
+        foreach ($docs as $doc) {
+            $this->indexDocs[$doc->getScoutKey()] = $doc;
         }
     }
 }

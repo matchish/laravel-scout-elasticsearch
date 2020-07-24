@@ -94,14 +94,12 @@ final class ImportCommandTest extends IntegrationTestCase
 
     public function test_import_with_custom_key_all_pages(): void
     {
-        $this->app['config']['scout.key'] = 'title';
-
         $dispatcher = Book::getEventDispatcher();
         Book::unsetEventDispatcher();
 
         $booksAmount = 10;
 
-        factory(Book::class, $booksAmount)->create();
+        $books = factory(Book::class, $booksAmount)->create();
 
         Book::setEventDispatcher($dispatcher);
 
@@ -116,6 +114,7 @@ final class ImportCommandTest extends IntegrationTestCase
         ];
         $response = $this->elasticsearch->search($params);
         $this->assertEquals($booksAmount, $response['hits']['total']['value']);
+        $this->assertEquals($books[0]->custom_key, $response['hits']['hits'][0]['_id']);
     }
 
     public function test_remove_old_index_after_switching_to_new(): void
