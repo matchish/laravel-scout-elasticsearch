@@ -4,7 +4,6 @@ namespace Tests\Integration\Engines;
 
 use App\Product;
 use Laravel\Scout\Builder;
-use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Create;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
 use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
@@ -67,7 +66,7 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
 
             return $model;
         });
-        $index = Index::fromSource(DefaultImportSourceFactory::from(Product::class));
+        $index = DefaultImportSourceFactory::from(Product::class)->defineIndex();
         $params = new Create(
             'products',
             $index->config()

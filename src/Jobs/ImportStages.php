@@ -3,7 +3,6 @@
 namespace Matchish\ScoutElasticSearch\Jobs;
 
 use Illuminate\Support\Collection;
-use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Jobs\Stages\CleanUp;
 use Matchish\ScoutElasticSearch\Jobs\Stages\CreateWriteIndex;
 use Matchish\ScoutElasticSearch\Jobs\Stages\PullFromSource;
@@ -19,7 +18,7 @@ class ImportStages extends Collection
      */
     public static function fromSource(ImportSource $source)
     {
-        $index = Index::fromSource($source);
+        $index = $source->defineIndex();
 
         return (new self([
             new CleanUp($source),
