@@ -20,15 +20,15 @@
         "php": "^7.2|^7.3",
         "elasticsearch/elasticsearch": ">=7.2",
         "laravel/scout": "^8.0",
-        "ongr/elasticsearch-dsl": "^7.0",
-        "laravel/legacy-factories": "^1.0"
+        "ongr/elasticsearch-dsl": "^7.0"
     },
     "require-dev": {
         "fzaninotto/faker": "^1.8",
         "orchestra/testbench": "^4.0|^5.0",
         "phpunit/phpunit": "^8.0|^9.0",
         "illuminate/support": "^6.0|^7.0|^8.0",
-        "nunomaduro/larastan": "~0.5"
+        "nunomaduro/larastan": "~0.5",
+        "laravel/legacy-factories": "^1.0"
     },
     "autoload-dev": {
         "psr-4": {
