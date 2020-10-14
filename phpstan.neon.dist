@@ -7,6 +7,7 @@ parameters:
     reportUnmatchedIgnoredErrors: false
     checkMissingIterableValueType: false
     ignoreErrors:
+        - '#Call to an undefined method Illuminate\\Support\\HigherOrder#'
         -
             path: %currentWorkingDirectory%/src/Engines/ElasticSearchEngine.php
             message: '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::searchableAs\(\)\.#'
