@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [4.0.2] - 2020-10-18
+### Added
+-  Laravel 8 Support
+
 ## [4.0.1] - 2020-03-26
 ### Fixed
 -  Prevent unnessasary send `\Laravel\Scout\Jobs\MakeSearchable` to a queue
