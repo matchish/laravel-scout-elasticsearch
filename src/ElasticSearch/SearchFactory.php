@@ -36,6 +36,9 @@ final class SearchFactory
         if (array_key_exists('size', $options)) {
             $search->setSize($options['size']);
         }
+        if (array_key_exists('scroll', $options)) {
+            $search->setScroll($options['scroll']);
+        }
         if (! empty($builder->orders)) {
             foreach ($builder->orders as $order) {
                 $search->addSort(new FieldSort($order['column'], $order['direction']));

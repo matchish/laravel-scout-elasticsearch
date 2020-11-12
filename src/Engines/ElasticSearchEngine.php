@@ -85,11 +85,12 @@ final class ElasticSearchEngine extends Engine
     /**
      * {@inheritdoc}
      */
-    public function paginate(BaseBuilder $builder, $perPage, $page)
+    public function paginate(BaseBuilder $builder, $perPage, $page, $scroll = '5m')
     {
         return $this->performSearch($builder, [
             'from' => ($page - 1) * $perPage,
             'size' => $perPage,
+            'scroll' => $scroll,
         ]);
     }
 
