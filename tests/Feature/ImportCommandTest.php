@@ -172,12 +172,9 @@ final class ImportCommandTest extends IntegrationTestCase
         $output = new BufferedOutput();
         Artisan::call('scout:import', [], $output);
 
-        $output = explode("\n", $output->fetch());
-        $this->assertEquals(
-            trans('scout::import.start', ['searchable' => Product::class]),
-            trim($output[0]));
-        $this->assertEquals(
-            '[OK] '.trans('scout::import.done.queue', ['searchable' => Product::class]),
-            trim($output[2]));
+        $output = array_map('trim', explode("\n", $output->fetch()));
+
+        $this->assertContains(trans('scout::import.start', ['searchable' => Product::class]), $output);
+        $this->assertContains('[OK] '.trans('scout::import.done.queue', ['searchable' => Product::class]), $output);
     }
 }
