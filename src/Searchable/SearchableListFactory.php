@@ -64,14 +64,71 @@ final class SearchableListFactory
     private function getProjectClasses(): array
     {
         if (self::$declaredClasses === null) {
+
+            self::$declaredClasses = [];
+
             $configFiles = Finder::create()->files()->name('*.php')->in($this->appPath);
+
             foreach ($configFiles->files() as $file) {
-                require_once $file;
+                if ($className = $this->classNameFromFileContents($file->getPathname())) {
+                    self::$declaredClasses[] = $className;
+                }
             }
-            self::$declaredClasses = get_declared_classes();
         }
 
         return self::$declaredClasses;
+    }
+
+    /**
+     * https://stackoverflow.com/a/7153391/1359273
+     *
+     * @param string $path
+     * @return string|null
+     */
+    private function classNameFromFileContents($path)
+    {
+        $fp = fopen($path, 'r');
+
+        if (false === $fp) {
+            return null;
+        }
+
+        $class = $namespace = $buffer = '';
+        $i = 0;
+        while (!$class) {
+            if (feof($fp)) break;
+
+            $buffer .= fread($fp, 512);
+            $tokens = token_get_all($buffer);
+
+            if (strpos($buffer, '{') === false) continue;
+
+            for (;$i<count($tokens);$i++) {
+                if ($tokens[$i][0] === T_NAMESPACE) {
+                    for ($j=$i+1;$j<count($tokens); $j++) {
+                        if ($tokens[$j][0] === T_STRING) {
+                            $namespace .= $tokens[$j][1];
+                        } else if ($tokens[$j] === '{' || $tokens[$j] === ';') {
+                            break;
+                        }
+                    }
+                }
+
+                if ($tokens[$i][0] === T_CLASS) {
+                    for ($j=$i+1;$j<count($tokens);$j++) {
+                        if ($tokens[$j] === '{') {
+                            $class = $tokens[$i+2][1];
+                        }
+                    }
+                }
+            }
+        }
+
+        if (! $class) {
+            return null;
+        }
+
+        return $namespace ? "{$namespace}\\{$class}" : $class;
     }
 
     /**
