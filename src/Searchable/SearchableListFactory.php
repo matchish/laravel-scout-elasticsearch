@@ -103,7 +103,6 @@ final class SearchableListFactory
             }
 
             for ($i = 0, $iMax = count($tokens); $i < $iMax; $i++) {
-
                 if ($tokens[$i][0] === T_NAMESPACE) {
                     for ($j = $i + 1, $jMax = count($tokens); $j < $jMax; $j++) {
                         if ($tokens[$j][0] === T_STRING) {
