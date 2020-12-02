@@ -77,10 +77,9 @@ final class SearchableListFactory
     }
 
     /**
-     * https://stackoverflow.com/a/7153391/1359273
-     *
      * @param string $path
      * @return string|null
+     * @link https://stackoverflow.com/a/7153391/1359273
      */
     private function classNameFromFileContents($path)
     {
@@ -91,18 +90,23 @@ final class SearchableListFactory
         }
 
         $class = $namespace = $buffer = '';
-        $i = 0;
+
         while (!$class) {
-            if (feof($fp)) break;
+            if (feof($fp)) {
+                break;
+            }
 
             $buffer .= fread($fp, 512);
             $tokens = token_get_all($buffer);
 
-            if (strpos($buffer, '{') === false) continue;
+            if (strpos($buffer, '{') === false) {
+                continue;
+            }
 
-            for (;$i<count($tokens);$i++) {
+            for ($i = 0, $iMax = count($tokens); $i < $iMax; $i++) {
+
                 if ($tokens[$i][0] === T_NAMESPACE) {
-                    for ($j=$i+1;$j<count($tokens); $j++) {
+                    for ($j = $i+1, $jMax = count($tokens); $j < $jMax; $j++) {
                         if ($tokens[$j][0] === T_STRING) {
                             $namespace .= $tokens[$j][1];
                         } else if ($tokens[$j] === '{' || $tokens[$j] === ';') {
@@ -112,7 +116,7 @@ final class SearchableListFactory
                 }
 
                 if ($tokens[$i][0] === T_CLASS) {
-                    for ($j=$i+1;$j<count($tokens);$j++) {
+                    for ($j = $i+1, $jMax = count($tokens); $j < $jMax; $j++) {
                         if ($tokens[$j] === '{') {
                             $class = $tokens[$i+2][1];
                         }
