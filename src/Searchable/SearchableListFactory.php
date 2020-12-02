@@ -64,7 +64,6 @@ final class SearchableListFactory
     private function getProjectClasses(): array
     {
         if (self::$declaredClasses === null) {
-
             self::$declaredClasses = [];
 
             $configFiles = Finder::create()->files()->name('*.php')->in($this->appPath);
@@ -94,7 +93,7 @@ final class SearchableListFactory
 
         $class = $namespace = $buffer = '';
 
-        while (!$class) {
+        while (! $class) {
             if (feof($fp)) {
                 break;
             }
@@ -109,19 +108,19 @@ final class SearchableListFactory
             for ($i = 0, $iMax = count($tokens); $i < $iMax; $i++) {
 
                 if ($tokens[$i][0] === T_NAMESPACE) {
-                    for ($j = $i+1, $jMax = count($tokens); $j < $jMax; $j++) {
+                    for ($j = $i + 1, $jMax = count($tokens); $j < $jMax; $j++) {
                         if ($tokens[$j][0] === T_STRING) {
                             $namespace .= $tokens[$j][1];
-                        } else if ($tokens[$j] === '{' || $tokens[$j] === ';') {
+                        } elseif ($tokens[$j] === '{' || $tokens[$j] === ';') {
                             break;
                         }
                     }
                 }
 
                 if ($tokens[$i][0] === T_CLASS) {
-                    for ($j = $i+1, $jMax = count($tokens); $j < $jMax; $j++) {
+                    for ($j = $i + 1, $jMax = count($tokens); $j < $jMax; $j++) {
                         if ($tokens[$j] === '{') {
-                            $class = $tokens[$i+2][1];
+                            $class = $tokens[$i + 2][1];
                         }
                     }
                 }

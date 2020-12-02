@@ -9,7 +9,7 @@ class SearchableListFactoryTest extends TestCase
 {
     public function test_only_load_seachable_classes()
     {
-        $this->assertFileExists(app()->path() . '/Providers/TelescopeServiceProvider.php');
+        $this->assertFileExists(app()->path().'/Providers/TelescopeServiceProvider.php');
 
         // This should NOT throw "Error: Class 'Laravel\Telescope\TelescopeApplicationServiceProvider' not found"
         $factory = new SearchableListFactory(app()->getNamespace(), app()->path());
