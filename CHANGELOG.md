@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [3.0.4] - 2020-12-03
+### Fixed
+-  Compatible with Laravel Telescope as dev requirement [#135](https://github.com/matchish/laravel-scout-elasticsearch/issues/135)
 
 ## [3.0.3] - 2020-03-14
 ### Added
