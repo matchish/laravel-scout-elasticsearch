@@ -6,13 +6,25 @@ namespace Matchish\ScoutElasticSearch\Searchable;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use function in_array;
 use Laravel\Scout\Searchable;
+use PhpParser\Error;
+use PhpParser\Node;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\NodeFinder;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\NameResolver;
+use PhpParser\ParserFactory;
+use Roave\BetterReflection\BetterReflection;
+use Roave\BetterReflection\Reflector\ClassReflector;
+use Roave\BetterReflection\Reflector\Exception\IdentifierNotFound;
 use Symfony\Component\Finder\Finder;
 
 final class SearchableListFactory
 {
-    private static $declaredClasses;
+    /**
+     * @var array
+     */
+    private static $searchableClasses;
     /**
      * @var string
      */
@@ -21,6 +33,14 @@ final class SearchableListFactory
      * @var string
      */
     private $appPath;
+    /**
+     * @var array
+     */
+    private $errors = [];
+    /**
+     * @var ClassReflector
+     */
+    private $classReflector;
 
     /**
      * @param string $namespace
@@ -32,102 +52,11 @@ final class SearchableListFactory
     }
 
     /**
-     * Get a list of searchable models.
-     *
-     * @return string[]
-     */
-    private function find(): array
-    {
-        $appNamespace = $this->namespace;
-
-        return array_values(array_filter($this->getProjectClasses(), function (string $class) use ($appNamespace) {
-            return Str::startsWith($class, $appNamespace) && $this->isSearchableModel($class);
-        }));
-    }
-
-    /**
-     * @param  string $class
-     *
-     * @return bool
-     */
-    private function isSearchableModel($class): bool
-    {
-        return in_array(Searchable::class, class_uses_recursive($class), true);
-    }
-
-    /**
      * @return array
      */
-    private function getProjectClasses(): array
+    public function getErrors(): array
     {
-        if (self::$declaredClasses === null) {
-            self::$declaredClasses = [];
-
-            $configFiles = Finder::create()->files()->name('*.php')->in($this->appPath);
-
-            foreach ($configFiles->files() as $file) {
-                if ($className = $this->classNameFromFileContents($file->getPathname())) {
-                    self::$declaredClasses[] = $className;
-                }
-            }
-        }
-
-        return self::$declaredClasses;
-    }
-
-    /**
-     * @param string $path
-     * @return string|null
-     * @link https://stackoverflow.com/a/7153391/1359273
-     */
-    private function classNameFromFileContents($path)
-    {
-        $fp = fopen($path, 'r');
-
-        if (false === $fp) {
-            return null;
-        }
-
-        $class = $namespace = $buffer = '';
-
-        while (! $class) {
-            if (feof($fp)) {
-                break;
-            }
-
-            $buffer .= fread($fp, 512);
-            $tokens = token_get_all($buffer);
-
-            if (strpos($buffer, '{') === false) {
-                continue;
-            }
-
-            for ($i = 0, $iMax = count($tokens); $i < $iMax; $i++) {
-                if ($tokens[$i][0] === T_NAMESPACE) {
-                    for ($j = $i + 1, $jMax = count($tokens); $j < $jMax; $j++) {
-                        if ($tokens[$j][0] === T_STRING) {
-                            $namespace .= $tokens[$j][1];
-                        } elseif ($tokens[$j] === '{' || $tokens[$j] === ';') {
-                            break;
-                        }
-                    }
-                }
-
-                if ($tokens[$i][0] === T_CLASS) {
-                    for ($j = $i + 1, $jMax = count($tokens); $j < $jMax; $j++) {
-                        if ($tokens[$j] === '{') {
-                            $class = $tokens[$i + 2][1];
-                        }
-                    }
-                }
-            }
-        }
-
-        if (! $class) {
-            return null;
-        }
-
-        return $namespace ? "{$namespace}\\{$class}" : $class;
+        return $this->errors;
     }
 
     /**
@@ -136,5 +65,105 @@ final class SearchableListFactory
     public function make(): Collection
     {
         return new Collection($this->find());
+    }
+
+    /**
+     * Get a list of searchable models.
+     *
+     * @return string[]
+     */
+    private function find(): array
+    {
+        $appNamespace = $this->namespace;
+
+        return array_values(array_filter($this->getSearchableClasses(), function (string $class) use ($appNamespace) {
+            return Str::startsWith($class, $appNamespace);
+        }));
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getSearchableClasses(): array
+    {
+        if (self::$searchableClasses === null) {
+
+            $projectClasses = $this->getProjectClasses();
+
+            self::$searchableClasses = $projectClasses->filter(function ($class) {
+                return $this->findSearchableTraitRecursively($class);
+            })->toArray();
+        }
+
+        return self::$searchableClasses;
+    }
+
+    private function getProjectClasses()
+    {
+        $nodeFinder = new NodeFinder();
+        /** @var Class_[] $nodes */
+        $nodes = $nodeFinder->find($this->getStmts(), function (Node $node) {
+            return $node instanceof Class_;
+        });
+
+        return Collection::make($nodes)->map(function ($node) {
+            return $node->namespacedName->toCodeString();
+        });
+    }
+
+    private function getStmts()
+    {
+        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+        $nameResolverVisitor = new NameResolver();
+        $nodeTraverser = new NodeTraverser();
+        $nodeTraverser->addVisitor($nameResolverVisitor);
+        $stmts = [];
+        $finder = Finder::create()->files()->name('*.php')->in($this->appPath);
+
+        foreach ($finder as $file) {
+            try {
+                $stmts[] = $parser->parse($file->getContents());
+
+            } catch (Error $e) {
+                $this->errors[] = $e->getMessage();
+                continue;
+            }
+        }
+
+        $stmts = Collection::make($stmts)->flatten(1)->toArray();
+        $stmts = $nodeTraverser->traverse($stmts);
+
+        return $stmts;
+    }
+
+    private function findSearchableTraitRecursively(string $class): bool
+    {
+        try {
+            $reflection = $this->classReflector()->reflect($class);
+
+            if (in_array(Searchable::class, $reflection->getTraitNames())) {
+                return true;
+            }
+
+            if ($parent = $reflection->getParentClass()) {
+                return $this->findSearchableTraitRecursively($parent->getName());
+            }
+
+            return false;
+
+        } catch (IdentifierNotFound $e) {
+            $this->errors[] = $e->getMessage();
+
+            return false;
+        }
+    }
+
+    private function classReflector()
+    {
+        if (null === $this->classReflector) {
+            $this->classReflector = (new BetterReflection())->classReflector();
+        }
+
+        return $this->classReflector;
     }
 }
