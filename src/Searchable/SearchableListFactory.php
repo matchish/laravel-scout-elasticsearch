@@ -122,7 +122,6 @@ final class SearchableListFactory
         foreach ($finder as $file) {
             try {
                 $stmts[] = $parser->parse($file->getContents());
-
             } catch (Error $e) {
                 $this->errors[] = $e->getMessage();
                 continue;
@@ -149,7 +148,6 @@ final class SearchableListFactory
             }
 
             return false;
-
         } catch (IdentifierNotFound $e) {
             $this->errors[] = $e->getMessage();
 
