@@ -87,7 +87,6 @@ final class SearchableListFactory
     private function getSearchableClasses(): array
     {
         if (self::$searchableClasses === null) {
-
             $projectClasses = $this->getProjectClasses();
 
             self::$searchableClasses = $projectClasses->filter(function ($class) {
