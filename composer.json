@@ -21,7 +21,7 @@
         "elasticsearch/elasticsearch": ">=7.2",
         "laravel/scout": "^6.1.1|^7.0",
         "ongr/elasticsearch-dsl": "^7.0",
-        "roave/better-reflection": "^4.3"
+        "roave/better-reflection": "^3.3|^4.3"
     },
     "require-dev": {
         "fzaninotto/faker": "^1.8",
