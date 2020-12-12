@@ -8,7 +8,7 @@ env:
 
 php:
   - 7.3
-  - nightly
+  - 8.0.0
 
 cache:
   directories:
