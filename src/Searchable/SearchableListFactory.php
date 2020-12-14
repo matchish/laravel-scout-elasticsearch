@@ -97,7 +97,10 @@ final class SearchableListFactory
         return self::$searchableClasses;
     }
 
-    private function getProjectClasses()
+    /**
+     * @return Collection
+     */
+    private function getProjectClasses(): Collection
     {
         $nodeFinder = new NodeFinder();
         /** @var Class_[] $nodes */
@@ -110,7 +113,10 @@ final class SearchableListFactory
         });
     }
 
-    private function getStmts()
+    /**
+     * @return array
+     */
+    private function getStmts(): array
     {
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
         $nameResolverVisitor = new NameResolver();
@@ -134,6 +140,10 @@ final class SearchableListFactory
         return $stmts;
     }
 
+    /**
+     * @param string $class
+     * @return bool
+     */
     private function findSearchableTraitRecursively(string $class): bool
     {
         try {
@@ -155,7 +165,10 @@ final class SearchableListFactory
         }
     }
 
-    private function classReflector()
+    /**
+     * @return ClassReflector
+     */
+    private function classReflector(): ClassReflector
     {
         if (null === $this->classReflector) {
             $this->classReflector = (new BetterReflection())->classReflector();
