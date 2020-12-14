@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [4.0.4] - 2020-12-14
+### Fixed
+-  Parse PHP to find searchable classes without loading them
+
 ## [4.0.3] - 2020-12-02
 ### Fixed
 -  Compatible with Laravel Telescope as dev requirement [#135](https://github.com/matchish/laravel-scout-elasticsearch/issues/135)
