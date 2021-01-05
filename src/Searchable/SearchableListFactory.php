@@ -139,12 +139,20 @@ final class SearchableListFactory
         try {
             $reflection = $this->classReflector()->reflect($class);
 
-            if (in_array(Searchable::class, $reflection->getTraitNames())) {
+            if (in_array(Searchable::class, $traits = $reflection->getTraitNames())) {
                 return true;
             }
 
+            foreach ($traits as $trait) {
+                if ($this->findSearchableTraitRecursively($trait)) {
+                    return true;
+                }
+            }
+
             if ($parent = $reflection->getParentClass()) {
-                return $this->findSearchableTraitRecursively($parent->getName());
+                if ($this->findSearchableTraitRecursively($parent->getName())) {
+                    return true;
+                }
             }
 
             return false;

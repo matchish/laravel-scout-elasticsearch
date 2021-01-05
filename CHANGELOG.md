@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [3.0.6] - 2021-01-05
+### Fixed
+-  Find searchable classes when inherited through traits
+
 ## [3.0.5] - 2020-12-10
 ### Fixed
 -  Parse PHP to find searchable classes without loading them
