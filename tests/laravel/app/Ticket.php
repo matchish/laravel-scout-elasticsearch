@@ -2,9 +2,9 @@
 
 namespace App;
 
+use App\Traits\Searchable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Laravel\Scout\Searchable;
 
 class Ticket extends Model
 {

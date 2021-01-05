@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Searchable;
 
+use App\Ticket;
+use App\Traits\Searchable;
 use Matchish\ScoutElasticSearch\Searchable\SearchableListFactory;
 use Tests\TestCase;
 
@@ -18,5 +20,18 @@ class SearchableListFactoryTest extends TestCase
 
         // There are 4 searchable models: Book, BookWithCustomKey, Product and Ticket
         $this->assertCount(4, $searchable);
+    }
+
+    public function test_find_searchable_trait_within_trait()
+    {
+        $this->assertContains(Searchable::class, class_uses(Ticket::class, true));
+
+        // This should NOT throw "Error: Class 'Laravel\Telescope\TelescopeApplicationServiceProvider' not found"
+        $factory = new SearchableListFactory(app()->getNamespace(), app()->path());
+
+        $searchable = $factory->make();
+
+        // Model Ticket has trait that implements the Searchable trait.
+        $this->assertContains(Ticket::class, $searchable);
     }
 }

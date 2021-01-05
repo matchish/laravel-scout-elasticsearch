@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [4.0.4] - 2021-01-05
+### Fixed
+-  Find searchable classes when inherited through traits
+
 ## [4.0.4] - 2020-12-14
 ### Fixed
 -  Parse PHP to find searchable classes without loading them
@@ -25,6 +29,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ## [4.0.0] - 2020-03-12
 ### Added
 -  Scout 8 Support
+
+## [3.0.6] - 2021-01-05
+### Fixed
+-  Find searchable classes when inherited through traits
+
+## [3.0.5] - 2020-12-10
+### Fixed
+-  Parse PHP to find searchable classes without loading them
+
+## [3.0.4] - 2020-12-03
+### Fixed
+-  Compatible with Laravel Telescope as dev requirement [#135](https://github.com/matchish/laravel-scout-elasticsearch/issues/135)
 
 ## [3.0.3] - 2020-03-14
 ### Added
