@@ -4,6 +4,7 @@ namespace Matchish\ScoutElasticSearch\Jobs;
 
 use Illuminate\Support\Collection;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
+use Matchish\ScoutElasticSearch\Jobs\Stages\CleanLastId;
 use Matchish\ScoutElasticSearch\Jobs\Stages\CleanUp;
 use Matchish\ScoutElasticSearch\Jobs\Stages\CreateWriteIndex;
 use Matchish\ScoutElasticSearch\Jobs\Stages\PullFromSource;
@@ -24,6 +25,7 @@ class ImportStages extends Collection
         return (new self([
             new CleanUp($source),
             new CreateWriteIndex($source, $index),
+            new CleanLastId(),//Cleans the last ID of the cache left over from the last time
             PullFromSource::chunked($source),
             new RefreshIndex($index),
             new SwitchToNewAndRemoveOldIndex($source, $index),
