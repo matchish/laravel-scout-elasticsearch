@@ -25,7 +25,7 @@ class ImportStages extends Collection
         return (new self([
             new CleanUp($source),
             new CreateWriteIndex($source, $index),
-            new CleanLastId(),// Cleans the last ID of the cache left over from the last time
+            new CleanLastId(), // Cleans the last ID of the cache left over from the last time
             PullFromSource::chunked($source),
             new RefreshIndex($index),
             new SwitchToNewAndRemoveOldIndex($source, $index),
