@@ -24,7 +24,6 @@ final class CleanLastId
      */
     public function __construct()
     {
-
     }
 
     public function handle(Client $elasticsearch): void

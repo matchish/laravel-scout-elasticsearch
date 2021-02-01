@@ -27,9 +27,9 @@ final class PullFromSource
     public function handle(): void
     {
         $results = $this->source->get()->filter->shouldBeSearchable();
-        if (! $results->isEmpty()) {
+        if (!$results->isEmpty()) {
             // Cache last id
-            Cache::put('scout_import_last_id',$results->last()->getKey());
+            Cache::put('scout_import_last_id', $results->last()->getKey());
 
             $results->first()->searchableUsing()->update($results);
         }

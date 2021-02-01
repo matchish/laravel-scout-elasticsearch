@@ -25,7 +25,7 @@ class PageScope implements Scope
      */
     public function __construct(int $page, int $perPage)
     {
-        $this->page = $page;
+        $this->page    = $page;
         $this->perPage = $perPage;
     }
 
@@ -33,11 +33,11 @@ class PageScope implements Scope
      * Apply the scope to a given Eloquent query builder.
      *
      * @param \Illuminate\Database\Eloquent\Builder $builder
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param \Illuminate\Database\Eloquent\Model   $model
      * @return void
      */
     public function apply(Builder $builder, Model $model)
     {
-        $builder->forPageAfterId($this->perPage,Cache::get('scout_import_last_id',0),$model->getKeyName());
+        $builder->forPageAfterId($this->perPage, Cache::get('scout_import_last_id', 0), $model->getKeyName());
     }
 }
