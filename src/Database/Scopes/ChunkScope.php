@@ -25,25 +25,25 @@ class ChunkScope implements Scope
     public function __construct($start, $end)
     {
         $this->start = $start;
-        $this->end   = $end;
+        $this->end = $end;
     }
 
     /**
      * Apply the scope to a given Eloquent query builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder $builder
-     * @param  \Illuminate\Database\Eloquent\Model   $model
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return void
      */
     public function apply(Builder $builder, Model $model)
     {
         $start = $this->start;
-        $end   = $this->end;
+        $end = $this->end;
         $builder
-            ->when(!is_null($start), function ($query) use ($start, $model) {
+            ->when(! is_null($start), function ($query) use ($start, $model) {
                 return $query->where($model->getKeyName(), '>', $start);
             })
-            ->when(!is_null($end), function ($query) use ($end, $model) {
+            ->when(! is_null($end), function ($query) use ($end, $model) {
                 return $query->where($model->getKeyName(), '<=', $end);
             });
     }

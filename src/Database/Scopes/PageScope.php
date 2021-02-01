@@ -25,7 +25,7 @@ class PageScope implements Scope
      */
     public function __construct(int $page, int $perPage)
     {
-        $this->page    = $page;
+        $this->page = $page;
         $this->perPage = $perPage;
     }
 
