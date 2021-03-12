@@ -49,10 +49,12 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
     private function registerCommands(): void
     {
         if ($this->app->runningInConsole()) {
-            $this->commands([
-                ImportCommand::class,
-                FlushCommand::class,
-            ]);
+            if (config('scout.driver') === 'Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine') {
+                $this->commands([
+                    ImportCommand::class,
+                    FlushCommand::class,
+                ]);
+            }
         }
     }
 }
