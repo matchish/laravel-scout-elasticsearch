@@ -12,7 +12,7 @@ final class FlushCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected $signature = 'scout:flush {searchable?* : The name of the searchable}';
+    protected $signature = 'mscout:flush {searchable?* : The name of the searchable}';
 
     /**
      * {@inheritdoc}

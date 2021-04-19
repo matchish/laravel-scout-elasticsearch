@@ -17,7 +17,7 @@ final class ImportCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected $signature = 'scout:import {searchable?* : The name of the searchable}';
+    protected $signature = 'mscout:import {searchable?* : The name of the searchable}';
     /**
      * {@inheritdoc}
      */
