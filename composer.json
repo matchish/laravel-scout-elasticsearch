@@ -1,7 +1,7 @@
 {
     "name": "matchish/laravel-scout-elasticsearch",
     "description": "Search among multiple models with ElasticSearch and Laravel Scout",
-    "version": "4.0.5",
+    "version": "4.0.6",
     "keywords": [
         "laravel",
         "scout",
@@ -19,7 +19,7 @@
     "require": {
         "php": "^7.2|^7.3",
         "elasticsearch/elasticsearch": ">=7.2",
-        "laravel/scout": "^8.0",
+        "laravel/scout": "^8.0 <8.6.1",
         "ongr/elasticsearch-dsl": "^7.0",
         "roave/better-reflection": "^3.3|^4.3"
     },
