@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [4.0.5] - 2021-01-05
 ### Fixed
+-  Hot fix for https://github.com/matchish/laravel-scout-elasticsearch/issues/160
+ 
+## [4.0.5] - 2021-01-05
+### Fixed
 -  Find searchable classes when inherited through traits
 
 ## [4.0.4] - 2020-12-14
