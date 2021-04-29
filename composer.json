@@ -16,11 +16,20 @@
             "email": "shlyakhov.up@gmail.com"
         }
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/matchish/ElasticsearchDSL"
+        }
+    ],
     "require": {
-        "php": "^7.2|^7.3||^8.0",
+        "monolog/monolog": "dev-bugfix"
+    }
+    "require": {
+        "php": "^7.3||^8.0",
         "elasticsearch/elasticsearch": ">=7.2",
         "laravel/scout": "^8.0",
-        "ongr/elasticsearch-dsl": "^7.0"
+        "ongr/elasticsearch-dsl": "master"
     },
     "require-dev": {
         "fzaninotto/faker": "^1.8",
