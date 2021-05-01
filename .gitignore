@@ -3,3 +3,4 @@
 composer.lock
 .env
 /vendor/
+.history
