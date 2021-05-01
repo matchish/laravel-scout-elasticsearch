@@ -9,7 +9,7 @@ use App\Product;
 use App\Ticket;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Artisan;
-use Matchish\ScoutElasticSearch\Mixed;
+use Matchish\ScoutElasticSearch\MSearch;
 use Tests\IntegrationTestCase;
 
 final class SearchTest extends IntegrationTestCase
@@ -115,7 +115,7 @@ final class SearchTest extends IntegrationTestCase
 
         Artisan::call('scout:import');
 
-        $mixed = Mixed::search('Barcelona')->within(
+        $mixed = MSearch::search('Barcelona')->within(
             implode(',', [
                 (new Book)->searchableAs(),
                 (new Ticket())->searchableAs(),
@@ -128,7 +128,7 @@ final class SearchTest extends IntegrationTestCase
     {
         Artisan::call('scout:import');
 
-        $mixed = Mixed::search('lisbon')->within(
+        $mixed = MSearch::search('lisbon')->within(
             implode(',', [(new Book)->searchableAs(),
                 (new Ticket())->searchableAs(),
             ]))->get();
