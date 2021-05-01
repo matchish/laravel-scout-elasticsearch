@@ -96,16 +96,18 @@ final class ImportCommandTest extends IntegrationTestCase
     {
         $this->app['config']['scout.key'] = 'title';
 
-        $dispatcher = Book::getEventDispatcher();
-        Book::unsetEventDispatcher();
+        $dispatcher = BookWithCustomKey::getEventDispatcher();
+        BookWithCustomKey::unsetEventDispatcher();
 
         $booksAmount = 10;
 
-        factory(Book::class, $booksAmount)->create();
+        factory(BookWithCustomKey::class, $booksAmount)->create();
 
-        Book::setEventDispatcher($dispatcher);
+        BookWithCustomKey::setEventDispatcher($dispatcher);
 
-        Artisan::call('scout:import');
+        Artisan::call('scout:import', [
+            'searchable' => BookWithCustomKey::class
+        ]);
         $params = [
             'index' => (new BookWithCustomKey())->searchableAs(),
             'body' => [
@@ -172,9 +174,12 @@ final class ImportCommandTest extends IntegrationTestCase
         $output = new BufferedOutput();
         Artisan::call('scout:import', [], $output);
 
-        $output = array_map('trim', explode("\n", $output->fetch()));
-
-        $this->assertContains(trans('scout::import.start', ['searchable' => Product::class]), $output);
-        $this->assertContains('[OK] '.trans('scout::import.done.queue', ['searchable' => Product::class]), $output);
+        $output = explode("\n", $output->fetch());
+        $this->assertEquals(
+            trans('scout::import.start', ['searchable' => Product::class]),
+            trim($output[0]));
+        $this->assertEquals(
+            '[OK] '.trans('scout::import.done.queue', ['searchable' => Product::class]),
+            trim($output[2]));
     }
 }

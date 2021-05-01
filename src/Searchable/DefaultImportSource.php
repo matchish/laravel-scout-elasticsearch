@@ -1,15 +1,19 @@
 <?php
+declare(strict_types=1);
 
 namespace Matchish\ScoutElasticSearch\Searchable;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\LazyCollection;
+use Matchish\ScoutElasticSearch\Database\Scopes\FromScope;
 use Matchish\ScoutElasticSearch\Database\Scopes\PageScope;
 
 final class DefaultImportSource implements ImportSource
 {
     const DEFAULT_CHUNK_SIZE = 500;
+    const DEFAULT_WORKERS = 1;
 
     /**
      * @var string
@@ -19,6 +23,14 @@ final class DefaultImportSource implements ImportSource
      * @var array
      */
     private $scopes;
+    /**
+     * @var ?object
+     */
+    private $last;
+    /**
+     * @var int
+     */
+    private $count;
 
     /**
      * DefaultImportSource constructor.
@@ -46,22 +58,29 @@ final class DefaultImportSource implements ImportSource
         return $this->model()->searchableAs();
     }
 
-    public function chunked(): Collection
+    public function chunked(): LazyCollection
     {
-        $query = $this->newQuery();
-        $totalSearchables = $query->count();
-        if ($totalSearchables) {
+        return LazyCollection::make(function () {
             $chunkSize = (int) config('scout.chunk.searchable', self::DEFAULT_CHUNK_SIZE);
-            $totalChunks = (int) ceil($totalSearchables / $chunkSize);
+            $workers = (int) config('scout.parallel.workers', self::DEFAULT_WORKERS);
 
-            return collect(range(1, $totalChunks))->map(function ($page) use ($chunkSize) {
-                $chunkScope = new PageScope($page, $chunkSize);
-
-                return new static($this->className, array_merge($this->scopes, [$chunkScope]));
-            });
-        } else {
-            return collect();
-        }
+            $lastChunk = null;
+            while (true) {
+                $chunks = [];
+                for ($page = 1; $page <= $workers; $page++) {
+                    $chunkScopes = [];
+                    $chunkScopes[] = new PageScope($page, $chunkSize);
+                    if ($lastChunk instanceof ImportSource && $lastChunk->last() instanceof Model) {
+                        $chunkScopes[] = new FromScope($lastChunk->last()->getKey());
+                    }
+                    $chunk = new static($this->className, array_merge($this->scopes, $chunkScopes));
+                    $chunks[] = $chunk;
+                }
+                yield collect($chunks);
+                if (!isset($chunk) || !$chunk->count()) break;
+                $lastChunk = $chunk;
+            }
+        });
     }
 
     /**
@@ -94,7 +113,20 @@ final class DefaultImportSource implements ImportSource
     {
         /** @var EloquentCollection $models */
         $models = $this->newQuery()->get();
-
+        $this->last = $models->last();
+        $this->count = $models->count();
         return $models;
+    }
+
+    public function count(): int
+    {
+        if (isset($this->count)) return $this->count;
+        return $this->newQuery()->count();
+    }
+
+    public function last(): ?object
+    {
+        if ($this->last) return $this->last;
+        return $this->get()->last();
     }
 }

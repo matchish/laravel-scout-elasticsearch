@@ -1,8 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Matchish\ScoutElasticSearch\Jobs;
 
-use Illuminate\Support\Collection;
+use Illuminate\Support\LazyCollection;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Jobs\Stages\CleanUp;
 use Matchish\ScoutElasticSearch\Jobs\Stages\CreateWriteIndex;
@@ -11,22 +12,23 @@ use Matchish\ScoutElasticSearch\Jobs\Stages\RefreshIndex;
 use Matchish\ScoutElasticSearch\Jobs\Stages\SwitchToNewAndRemoveOldIndex;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
-class ImportStages extends Collection
+class ImportStages extends LazyCollection
 {
     /**
      * @param ImportSource $source
-     * @return Collection
+     * @return LazyCollection
      */
     public static function fromSource(ImportSource $source)
     {
         $index = Index::fromSource($source);
 
-        return (new self([
-            new CleanUp($source),
-            new CreateWriteIndex($source, $index),
-            PullFromSource::chunked($source),
-            new RefreshIndex($index),
-            new SwitchToNewAndRemoveOldIndex($source, $index),
-        ]))->flatten()->filter();
+        return self::make(function () use ($source, $index) {
+                yield new CleanUp($source);
+                yield new CreateWriteIndex($source, $index);
+                yield PullFromSource::chunked($source);
+                yield new RefreshIndex($index);
+                yield new SwitchToNewAndRemoveOldIndex($source, $index);
+        });
     }
+
 }

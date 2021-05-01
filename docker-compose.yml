@@ -28,16 +28,16 @@ services:
     networks:
       - default
   db:
-    image: mysql:5.7.22
+    image: mariadb:10.2
+    volumes:
+      - db-data:/var/lib/mysql
     environment:
       MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     networks:
       - default
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.1.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
     user: "1000:1000"
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
@@ -67,3 +67,4 @@ networks:
 volumes:
   elasticsearch-data:
   home-dir:
+  db-data:

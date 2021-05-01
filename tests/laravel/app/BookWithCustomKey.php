@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App;
 
@@ -16,6 +17,11 @@ class BookWithCustomKey extends Book
     public function getKeyName()
     {
         return 'custom_key';
+    }
+
+    public function getKeyType()
+    {
+        return 'string';
     }
 
     public function searchableAs()

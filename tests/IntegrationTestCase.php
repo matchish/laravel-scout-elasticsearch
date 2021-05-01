@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Tests;
 
@@ -24,6 +25,10 @@ class IntegrationTestCase extends TestCase
         $this->elasticsearch = $this->app->make(Client::class);
 
         $this->elasticsearch->indices()->delete(['index' => '_all']);
+
+//        \DB::listen(function($sql) {
+//            var_dump($sql->sql);
+//        });
     }
 
     protected function getEnvironmentSetUp($app)

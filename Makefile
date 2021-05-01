@@ -25,7 +25,7 @@ up: ## Start all containers (in background) for development
 	$(docker_compose_bin) up -d
 
 down: ## Stop all started for development containers
-	$(docker_compose_bin) down
+	$(docker_compose_bin) down -v
 
 restart: up ## Restart all started for development containers
 	$(docker_compose_bin) restart

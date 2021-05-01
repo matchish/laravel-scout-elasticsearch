@@ -7,7 +7,6 @@ parameters:
     reportUnmatchedIgnoredErrors: false
     checkMissingIterableValueType: false
     ignoreErrors:
-        - '#Call to an undefined method Illuminate\\Support\\HigherOrder#'
         -
             path: %currentWorkingDirectory%/src/Engines/ElasticSearchEngine.php
             message: '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::searchableAs\(\)\.#'
@@ -20,3 +19,9 @@ parameters:
         -
             path: %currentWorkingDirectory%/src/Jobs/Stages/SwitchToNewAndRemoveOldIndex.php
             message: '#Argument of an invalid type array\|\(callable\) supplied for foreach, only iterables are supported\.#'
+        -
+            path: %currentWorkingDirectory%/src/Jobs/Import.php
+            message: '#Unable to resolve the template type TReturn in call to function Amp\\call#'
+        -
+            path: %currentWorkingDirectory%/src/Database/Scopes/FromScope.php
+            message: '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::getScoutKeyName\(\)\.#'

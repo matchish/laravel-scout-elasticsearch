@@ -15,7 +15,7 @@
   </p>
 </p>
 
-#### For Laravel Framework < 6.0.0 use [3.x](https://github.com/matchish/laravel-scout-elasticsearch/tree/3.x) branch
+#### For Laravel Framefork < 6.0.0 use [3.x](https://github.com/matchish/laravel-scout-elasticsearch/tree/3.x) branch
 The package provides the perfect starting point to integrate
 ElasticSearch into your Laravel application. It is carefully crafted to simplify the usage
 of ElasticSearch within the [Laravel Framework](https://laravel.com).
@@ -39,7 +39,7 @@ Don't forget to :star: the package if you like it. :pray:
 
 ## :warning: Requirements
 
-- PHP version >= 7.3
+- PHP version >= 7.2.0
 - Laravel Framework version >= 6.0.0
 
 | Elasticsearch version | ElasticsearchDSL version    |
