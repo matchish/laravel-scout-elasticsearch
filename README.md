@@ -14,7 +14,7 @@
     <a href="https://packagist.org/packages/matchish/laravel-scout-elasticsearch"><img src="https://poser.pugx.org/matchish/laravel-scout-elasticsearch/license.svg" alt="License"></a>
   </p>
 </p>
-
+#### For PHP8 support use [php8](https://github.com/matchish/laravel-scout-elasticsearch/tree/php8) branch
 #### For Laravel Framework < 6.0.0 use [3.x](https://github.com/matchish/laravel-scout-elasticsearch/tree/3.x) branch
 The package provides the perfect starting point to integrate
 ElasticSearch into your Laravel application. It is carefully crafted to simplify the usage
