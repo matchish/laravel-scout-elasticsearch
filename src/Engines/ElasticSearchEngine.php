@@ -4,7 +4,7 @@ namespace Matchish\ScoutElasticSearch\Engines;
 
 use Elasticsearch\Common\Exceptions\ServerErrorResponseException;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\LazyCollection;
+use Laravel\Scout\Builder;
 use Laravel\Scout\Builder as BaseBuilder;
 use Laravel\Scout\Engines\Engine;
 use Matchish\ScoutElasticSearch\ElasticSearch\HitsIteratorAggregate;
@@ -15,7 +15,6 @@ use Matchish\ScoutElasticSearch\ElasticSearch\SearchFactory;
 use Matchish\ScoutElasticSearch\ElasticSearch\SearchResults;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Search;
-use Laravel\Scout\Builder;
 
 final class ElasticSearchEngine extends Engine
 {
@@ -132,14 +131,15 @@ final class ElasticSearchEngine extends Engine
         throw new \Error('Not implemented');
     }
 
-        /**
+    /**
      * Create a search index.
      *
      * @param  string  $name
      * @param  array  $options
      * @return mixed
      */
-    public function createIndex($name, array $options = []) {
+    public function createIndex($name, array $options = [])
+    {
         throw new \Error('Not implemented');
     }
 
@@ -149,10 +149,10 @@ final class ElasticSearchEngine extends Engine
      * @param  string  $name
      * @return mixed
      */
-    public function deleteIndex($name) {
+    public function deleteIndex($name)
+    {
         throw new \Error('Not implemented');
     }
-
 
     /**
      * {@inheritdoc}
