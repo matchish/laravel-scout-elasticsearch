@@ -30,7 +30,6 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
         });
 
         $this->registerCommands();
-
     }
 
     /**
