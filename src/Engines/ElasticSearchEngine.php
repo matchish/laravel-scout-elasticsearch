@@ -4,6 +4,7 @@ namespace Matchish\ScoutElasticSearch\Engines;
 
 use Elasticsearch\Common\Exceptions\ServerErrorResponseException;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\LazyCollection;
 use Laravel\Scout\Builder as BaseBuilder;
 use Laravel\Scout\Engines\Engine;
 use Matchish\ScoutElasticSearch\ElasticSearch\HitsIteratorAggregate;
@@ -14,6 +15,7 @@ use Matchish\ScoutElasticSearch\ElasticSearch\SearchFactory;
 use Matchish\ScoutElasticSearch\ElasticSearch\SearchResults;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Search;
+use Laravel\Scout\Builder;
 
 final class ElasticSearchEngine extends Engine
 {
@@ -116,6 +118,41 @@ final class ElasticSearchEngine extends Engine
 
         return new Collection($hits);
     }
+
+    /**
+     * Map the given results to instances of the given model via a lazy collection.
+     *
+     * @param  \Laravel\Scout\Builder  $builder
+     * @param  mixed  $results
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return \Illuminate\Support\LazyCollection
+     */
+    public function lazyMap(Builder $builder, $results, $model)
+    {
+        throw new \Error('Not implemented');
+    }
+
+        /**
+     * Create a search index.
+     *
+     * @param  string  $name
+     * @param  array  $options
+     * @return mixed
+     */
+    public function createIndex($name, array $options = []) {
+        throw new \Error('Not implemented');
+    }
+
+    /**
+     * Delete a search index.
+     *
+     * @param  string  $name
+     * @return mixed
+     */
+    public function deleteIndex($name) {
+        throw new \Error('Not implemented');
+    }
+
 
     /**
      * {@inheritdoc}

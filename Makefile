@@ -37,7 +37,7 @@ install: up ## Install application dependencies into application container
 	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" composer install --no-interaction --ansi --no-suggest
 
 test: up ## Execute application tests
-	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" ./vendor/bin/phpstan analyze
+	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" ./vendor/bin/phpstan --memory-limit=-1 analyze
 	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" ./vendor/bin/phpunit --testdox --stop-on-failure
 
 test-coverage: up ## Execute application tests and generate report
