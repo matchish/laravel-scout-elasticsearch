@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [4.0.2] - 2020-10-18
 ### Added
--  Laravel PHP 8 Support
+-  PHP 8 Support
 -  Laravel Scout 9 Support
 
 ## [4.0.2] - 2020-10-18
