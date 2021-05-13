@@ -29,7 +29,7 @@ If you need any help, [stack overflow](https://stackoverflow.com/questions/tagge
 ## :two_hearts: Features  
 Don't forget to :star: the package if you like it. :pray:
 
-- Laravel Scout 8.x support
+- Laravel Scout 9.x support
 - [Search amongst multiple models](#search-amongst-multiple-models)
 - [**Zero downtime** reimport](#zero-downtime-reimport) - it’s a breeze to import data in production.
 - [Eager load relations](#eager-load) - speed up your import.
@@ -39,8 +39,8 @@ Don't forget to :star: the package if you like it. :pray:
 
 ## :warning: Requirements
 
-- PHP version >= 7.3
-- Laravel Framework version >= 6.0.0
+- PHP version >= 8.0
+- Laravel Framework version >= 8.0.0
 
 | Elasticsearch version | ElasticsearchDSL version    |
 | --------------------- | --------------------------- |
@@ -184,9 +184,9 @@ $results = Product::search('zonga', function($client, $body) {
  And `$body` is `ONGR\ElasticsearchDSL\Search` from [ongr/elasticsearch-dsl](https://packagist.org/packages/ongr/elasticsearch-dsl) package  
 
 ### Search amongst multiple models
-You can do it with `Mixed` class, just pass indices names separated by commas to the `within` method.
+You can do it with `MixedSearch` class, just pass indices names separated by commas to the `within` method.
 ```php
-Mixed::search('title:Barcelona or to:Barcelona')
+MixedSearch::search('title:Barcelona or to:Barcelona')
     within(implode(',', [
         (new Ticket())->searchableAs(),
         (new Book())->searchableAs(),
