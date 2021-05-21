@@ -128,7 +128,20 @@ final class ElasticSearchEngine extends Engine
      */
     public function lazyMap(Builder $builder, $results, $model)
     {
-        throw new \Error('Not implemented');
+        if (count($results['hits']) === 0) {
+            return LazyCollection::make($model->newCollection());
+        }
+
+        $objectIds = collect($results['hits']['hits'])->pluck('_id')->values()->all();
+        $objectIdPositions = array_flip($objectIds);
+
+        return $model->queryScoutModelsByIds(
+            $builder, $objectIds
+        )->cursor()->filter(function ($model) use ($objectIds) {
+            return in_array($model->getScoutKey(), $objectIds);
+        })->sortBy(function ($model) use ($objectIdPositions) {
+            return $objectIdPositions[$model->getScoutKey()];
+        })->values();
     }
 
     /**
