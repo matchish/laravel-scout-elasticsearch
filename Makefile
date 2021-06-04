@@ -34,7 +34,7 @@ shell: up ## Start shell into application container
 	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" /bin/sh
 
 install: up ## Install application dependencies into application container
-	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" composer install --no-interaction --ansi --no-suggest
+	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" composer install --no-interaction --ansi
 
 test: up ## Execute application tests
 	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" ./vendor/bin/phpstan analyze
