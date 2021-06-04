@@ -28,6 +28,8 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
 
             return new ElasticSearchEngine($elasticsearch);
         });
+
+        $this->registerCommands();
     }
 
     /**
@@ -37,8 +39,6 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
     {
         $this->app->register(ScoutServiceProvider::class);
         $this->app->bind(ImportSourceFactory::class, DefaultImportSourceFactory::class);
-
-        $this->registerCommands();
     }
 
     /**
