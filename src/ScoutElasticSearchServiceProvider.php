@@ -28,7 +28,6 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
 
             return new ElasticSearchEngine($elasticsearch);
         });
-
         $this->registerCommands();
     }
 

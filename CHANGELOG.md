@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [4.0.7] - 2021-04-21
+Support Scout 9
 ## [4.0.6] - 2021-04-21
 ### Fixed
 -  Hot fix for https://github.com/matchish/laravel-scout-elasticsearch/issues/160
