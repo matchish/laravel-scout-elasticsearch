@@ -20,5 +20,7 @@ interface ImportSource
 
     public function count(): int;
 
+    public function chunksCount(): int;
+
     public function last(): ?object;
 }

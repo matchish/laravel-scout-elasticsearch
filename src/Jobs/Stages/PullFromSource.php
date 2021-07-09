@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
-use Illuminate\Support\Collection;
+use Elasticsearch\Common\Exceptions\ServerErrorResponseException;
 use Illuminate\Support\LazyCollection;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
@@ -13,29 +13,52 @@ use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 final class PullFromSource
 {
     /**
-     * @var ImportSource
+     * @var LazyCollection
      */
     private $source;
+    /**
+     * @var int
+     */
+    private $estimate;
 
     /**
-     * @param ImportSource $source
+     * @param LazyCollection $source
+     * @param int $estimate
      */
-    public function __construct(ImportSource $source)
+    public function __construct($source, $estimate)
     {
         $this->source = $source;
+        $this->estimate = $estimate;
     }
 
-    public function handle(): void
+    /**
+     * @return LazyCollection
+     */
+    public function handle()
     {
-        $results = $this->source->get()->filter->shouldBeSearchable();
-        if (! $results->isEmpty()) {
-            $results->first()->searchableUsing()->update($results);
-        }
+        return LazyCollection::make(function () {
+            foreach ($this->source as $chunk) {
+                $futures = [];
+                foreach ($chunk as $page) {
+                    $results = $page->get()->filter->shouldBeSearchable();
+                    if (!$results->isEmpty()) {
+                        $futures[] = $results->first()->searchableUsing()->updateAsync($results);
+                    }
+                }
+                foreach ($futures as $future) {
+                    if (isset($future['errors']) && $future['errors']) {
+                        throw new ServerErrorResponseException(json_encode($future, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
+                    }
+                    yield 1;
+                }
+            }
+        });
+
     }
 
     public function estimate(): int
     {
-        return 1;
+        return $this->estimate;
     }
 
     public function title(): string
@@ -45,18 +68,11 @@ final class PullFromSource
 
     /**
      * @param ImportSource $source
-     * @return LazyCollection
+     * @return static
      */
-    public static function chunked(ImportSource $source): LazyCollection
+    public static function chunked(ImportSource $source): PullFromSource
     {
-        /** @var Collection $chunked */
         $chunked = $source->chunked();
-        return LazyCollection::make(function () use ($chunked){
-            foreach ($chunked as $chunks) {
-                yield $chunks->map(function ($chunk) {
-                    return new static($chunk);
-                });
-            }
-        });
+        return new static($chunked, $source->chunksCount());
     }
 }

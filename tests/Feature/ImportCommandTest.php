@@ -152,19 +152,19 @@ final class ImportCommandTest extends IntegrationTestCase
         $output = new BufferedOutput();
         Artisan::call('scout:import', ['searchable' => [Product::class, Book::class]], $output);
 
-        $output = explode("\n", $output->fetch());
+        $output = array_values(array_filter(explode("\n", $output->fetch())));
         $this->assertEquals(
             trans('scout::import.start', ['searchable' => Product::class]),
             trim($output[0]));
         $this->assertEquals(
             '[OK] '.trans('scout::import.done', ['searchable' => Product::class]),
-            trim($output[14]));
+            trim($output[11]));
         $this->assertEquals(
             trans('scout::import.start', ['searchable' => Book::class]),
-            trim($output[16]));
+            trim($output[12]));
         $this->assertEquals(
             '[OK] '.trans('scout::import.done', ['searchable' => Book::class]),
-            trim($output[30]));
+            trim($output[23]));
     }
 
     public function test_progress_report_in_queue()
@@ -174,12 +174,12 @@ final class ImportCommandTest extends IntegrationTestCase
         $output = new BufferedOutput();
         Artisan::call('scout:import', [], $output);
 
-        $output = explode("\n", $output->fetch());
+        $output = array_values(array_filter(explode("\n", $output->fetch())));
         $this->assertEquals(
             trans('scout::import.start', ['searchable' => Product::class]),
             trim($output[0]));
         $this->assertEquals(
             '[OK] '.trans('scout::import.done.queue', ['searchable' => Product::class]),
-            trim($output[2]));
+            trim($output[1]));
     }
 }

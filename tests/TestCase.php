@@ -34,6 +34,7 @@ abstract class TestCase extends BaseTestCase
     {
         $app['config']->set('scout.driver', ElasticSearchEngine::class);
         $app['config']->set('scout.chunk.searchable', 3);
+        $app['config']->set('scout.chunk.handlers', 1);
         $app['config']->set('scout.queue', false);
         // Setup default database to use sqlite :memory:
         $app['config']->set('database.default', 'mysql');

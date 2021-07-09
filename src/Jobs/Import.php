@@ -5,12 +5,9 @@ namespace Matchish\ScoutElasticSearch\Jobs;
 
 use Elasticsearch\Client;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\LazyCollection;
-use Matchish\ScoutElasticSearch\Jobs\Stages\CallableStage;
+use Illuminate\Support\Collection;
 use Matchish\ScoutElasticSearch\ProgressReportable;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
-use Spatie\Async\Pool;
-use Throwable;
 
 /**
  * @internal
@@ -39,34 +36,26 @@ final class Import
     public function handle(Client $elasticsearch): void
     {
         $stages = $this->stages();
-//        $estimate = $stages->sum->estimate();
-        $this->progressBar()->setMaxSteps(100);
+        $estimate = $stages->sum->estimate();
         $progressbar = $this->progressBar();
+        $progressbar->setMaxSteps($estimate);
 
-        $stages->each(function ($stage) {
-
-            if (is_iterable($stage)) {
-                foreach ($stage as $s) {
-                    $pool = Pool::create();
-                    foreach ($s as $i) {
-                        $pool->add(new CallableStage($i))->then(function ($output) {
-//                             Handle success
-                        })->catch(function (Throwable $exception) {
-//                             Handle exception
-                        });
-//                        $elasticsearch = app(Client::class);
-//                        $i->handle($elasticsearch);
-                    }
-                    $pool->wait();
+        $stages->each(function ($stage) use ($elasticsearch, $progressbar){
+            $progressbar->setMessage($stage->title());
+            $progress = $stage->handle($elasticsearch);
+            if ($progress) {
+                $currentStep = $progressbar->getProgress();
+                foreach ($progress as $step) {
+                    $progressbar->advance($step);
                 }
+                $progressbar->setProgress((int) ($currentStep + $stage->estimate()));
             } else {
-                $elasticsearch = app(Client::class);
-                $stage->handle($elasticsearch);
+                $progressbar->advance($stage->estimate());
             }
         });
     }
 
-    private function stages(): LazyCollection
+    private function stages(): Collection
     {
         return ImportStages::fromSource($this->source);
     }

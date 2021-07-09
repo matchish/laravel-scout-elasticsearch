@@ -26,8 +26,11 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products_index',
             'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = new PullFromSource(DefaultImportSourceFactory::from(Product::class));
-        $stage->handle();
+        $stage = PullFromSource::chunked(DefaultImportSourceFactory::from(Product::class));
+        $stepPromises = $stage->handle();
+        foreach ($stepPromises as $stepEstimate) {
+            continue;
+        }
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
         ]);
@@ -49,8 +52,11 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products_index',
             'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = new PullFromSource(DefaultImportSourceFactory::from(Product::class));
-        $stage->handle();
+        $stage = PullFromSource::chunked(DefaultImportSourceFactory::from(Product::class));
+        $stepPromises = $stage->handle();
+        foreach ($stepPromises as $stepEstimate) {
+            continue;
+        }
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
         ]);
@@ -72,7 +78,8 @@ final class PullFromSourceTest extends IntegrationTestCase
         Product::unsetEventDispatcher();
 
         $productsAmount = 20;
-        $this->app['config']->set('scout.chunk.searchable', 5);
+        $this->app['config']->set('scout.chunk.searchable', 3);
+        $this->app['config']->set('scout.chunk.handlers', 3);
 
         factory(Product::class, $productsAmount)->create();
 
@@ -81,8 +88,11 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products_index',
             'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = new PullFromSource(DefaultImportSourceFactory::from(Product::class));
-        $stage->handle();
+        $stage = PullFromSource::chunked(DefaultImportSourceFactory::from(Product::class));
+        $stepPromises = $stage->handle();
+        foreach ($stepPromises as $stepEstimate) {
+            continue;
+        }
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
         ]);
@@ -114,8 +124,11 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products_index',
             'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = new PullFromSource(DefaultImportSourceFactory::from(Product::class));
-        $stage->handle();
+        $stage = PullFromSource::chunked(DefaultImportSourceFactory::from(Product::class));
+        $stepPromises = $stage->handle();
+        foreach ($stepPromises as $stepEstimate) {
+            continue;
+        }
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
         ]);
@@ -149,8 +162,11 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products_index',
             'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stages = PullFromSource::chunked(DefaultImportSourceFactory::from(Product::class));
-        $stages->first()->handle();
+        $stage = PullFromSource::chunked(DefaultImportSourceFactory::from(Product::class));
+        $stepPromises = $stage->handle();
+        foreach ($stepPromises as $stepEstimate) {
+            continue;
+        }
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
         ]);
@@ -168,9 +184,9 @@ final class PullFromSourceTest extends IntegrationTestCase
 
     public function test_no_searchables_no_chunks()
     {
-        $stages = PullFromSource::chunked(DefaultImportSourceFactory::from(Product::class));
-
-        $this->assertEquals(0, $stages->count());
+        $stage = PullFromSource::chunked(DefaultImportSourceFactory::from(Product::class));
+        $steps = $stage->handle();
+        $this->assertEquals(0, $steps->count());
     }
 
     public function test_chunked_pull_only_one_page()
@@ -184,8 +200,8 @@ final class PullFromSourceTest extends IntegrationTestCase
 
         Product::setEventDispatcher($dispatcher);
 
-        $chunks = PullFromSource::chunked(DefaultImportSourceFactory::from(Product::class));
-        $chunks->first()->handle();
+        $stage = PullFromSource::chunked(DefaultImportSourceFactory::from(Product::class));
+        $stage->handle()->first();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
         ]);

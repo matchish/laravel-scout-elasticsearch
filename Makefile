@@ -46,3 +46,6 @@ test-coverage: up ## Execute application tests and generate report
 
 test-filter:
 	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" ./vendor/bin/phpunit --filter=$(filter) --testdox
+
+test-failing:
+	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" ./vendor/bin/phpunit --group=failing --testdox

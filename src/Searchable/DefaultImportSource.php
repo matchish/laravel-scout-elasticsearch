@@ -13,7 +13,7 @@ use Matchish\ScoutElasticSearch\Database\Scopes\PageScope;
 final class DefaultImportSource implements ImportSource
 {
     const DEFAULT_CHUNK_SIZE = 500;
-    const DEFAULT_WORKERS = 1;
+    const DEFAULT_CHUNK_HANDLERS = 1;
 
     /**
      * @var string
@@ -62,8 +62,7 @@ final class DefaultImportSource implements ImportSource
     {
         return LazyCollection::make(function () {
             $chunkSize = (int) config('scout.chunk.searchable', self::DEFAULT_CHUNK_SIZE);
-            $workers = (int) config('scout.parallel.workers', self::DEFAULT_WORKERS);
-
+            $workers = (int) config('scout.chunk.handlers', self::DEFAULT_CHUNK_HANDLERS);
             $lastChunk = null;
             while (true) {
                 $chunks = [];
@@ -122,6 +121,12 @@ final class DefaultImportSource implements ImportSource
     {
         if (isset($this->count)) return $this->count;
         return $this->newQuery()->count();
+    }
+
+    public function chunksCount(): int
+    {
+        $chunkSize = (int) config('scout.chunk.searchable', self::DEFAULT_CHUNK_SIZE);
+        return (int) ceil($this->count() / $chunkSize);
     }
 
     public function last(): ?object

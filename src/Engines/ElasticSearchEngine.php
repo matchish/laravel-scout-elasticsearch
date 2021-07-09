@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Matchish\ScoutElasticSearch\Engines;
 
@@ -48,6 +49,23 @@ final class ElasticSearchEngine extends Engine
             $error = new ServerErrorResponseException(json_encode($response, JSON_PRETTY_PRINT));
             throw new \Exception('Bulk update error', $error->getCode(), $error);
         }
+    }
+
+    /**
+     * Update the given model in the index.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection  $models
+     * @return array
+     */
+    public function updateAsync($models)
+    {
+        $params = new Bulk();
+        $params->index($models);
+        $paramArray = $params->toArray();
+        $paramArray['client'] = [
+            'future' => 'lazy'
+        ];
+        return $this->elasticsearch->bulk($paramArray);
     }
 
     /**
