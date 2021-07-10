@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
@@ -41,7 +42,7 @@ final class PullFromSource
                 $futures = [];
                 foreach ($chunk as $page) {
                     $results = $page->get()->filter->shouldBeSearchable();
-                    if (!$results->isEmpty()) {
+                    if (! $results->isEmpty()) {
                         $futures[] = $results->first()->searchableUsing()->updateAsync($results);
                     }
                 }
@@ -53,7 +54,6 @@ final class PullFromSource
                 }
             }
         });
-
     }
 
     public function estimate(): int
@@ -73,6 +73,7 @@ final class PullFromSource
     public static function chunked(ImportSource $source): PullFromSource
     {
         $chunked = $source->chunked();
+
         return new static($chunked, $source->chunksCount());
     }
 }

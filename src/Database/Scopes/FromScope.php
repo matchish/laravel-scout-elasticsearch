@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Matchish\ScoutElasticSearch\Database\Scopes;
@@ -9,7 +10,6 @@ use Illuminate\Database\Eloquent\Scope;
 
 class FromScope implements Scope
 {
-
     /**
      * @var mixed
      */
@@ -20,7 +20,6 @@ class FromScope implements Scope
      */
     public function __construct($from)
     {
-
         $this->from = $from;
     }
 

@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\BookWithCustomKey;
 use App\Book;
+use App\BookWithCustomKey;
 use Faker\Generator as Faker;
 
 $factory->define(Book::class, function (Faker $faker) {

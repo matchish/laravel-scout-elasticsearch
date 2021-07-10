@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Matchish\ScoutElasticSearch\Jobs;
@@ -40,7 +41,7 @@ final class Import
         $progressbar = $this->progressBar();
         $progressbar->setMaxSteps($estimate);
 
-        $stages->each(function ($stage) use ($elasticsearch, $progressbar){
+        $stages->each(function ($stage) use ($elasticsearch, $progressbar) {
             $progressbar->setMessage($stage->title());
             $progress = $stage->handle($elasticsearch);
             if ($progress) {

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Matchish\ScoutElasticSearch\Jobs;
@@ -23,12 +24,11 @@ class ImportStages extends Collection
         $index = Index::fromSource($source);
 
         return self::make([
-                new CleanUp($source),
-                new CreateWriteIndex($source, $index),
-                PullFromSource::chunked($source),
-                new RefreshIndex($index),
-                new SwitchToNewAndRemoveOldIndex($source, $index),
+            new CleanUp($source),
+            new CreateWriteIndex($source, $index),
+            PullFromSource::chunked($source),
+            new RefreshIndex($index),
+            new SwitchToNewAndRemoveOldIndex($source, $index),
         ]);
     }
-
 }

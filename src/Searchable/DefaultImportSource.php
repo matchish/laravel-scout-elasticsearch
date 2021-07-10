@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Matchish\ScoutElasticSearch\Searchable;
@@ -76,7 +77,9 @@ final class DefaultImportSource implements ImportSource
                     $chunks[] = $chunk;
                 }
                 yield collect($chunks);
-                if (!isset($chunk) || !$chunk->count()) break;
+                if (! isset($chunk) || ! $chunk->count()) {
+                    break;
+                }
                 $lastChunk = $chunk;
             }
         });
@@ -114,24 +117,32 @@ final class DefaultImportSource implements ImportSource
         $models = $this->newQuery()->get();
         $this->last = $models->last();
         $this->count = $models->count();
+
         return $models;
     }
 
     public function count(): int
     {
-        if (isset($this->count)) return $this->count;
+        if (isset($this->count)) {
+            return $this->count;
+        }
+
         return $this->newQuery()->count();
     }
 
     public function chunksCount(): int
     {
         $chunkSize = (int) config('scout.chunk.searchable', self::DEFAULT_CHUNK_SIZE);
+
         return (int) ceil($this->count() / $chunkSize);
     }
 
     public function last(): ?object
     {
-        if ($this->last) return $this->last;
+        if ($this->last) {
+            return $this->last;
+        }
+
         return $this->get()->last();
     }
 }
