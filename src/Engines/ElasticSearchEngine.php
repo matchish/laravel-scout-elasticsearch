@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Matchish\ScoutElasticSearch\Engines;
@@ -63,8 +64,9 @@ final class ElasticSearchEngine extends Engine
         $params->index($models);
         $paramArray = $params->toArray();
         $paramArray['client'] = [
-            'future' => 'lazy'
+            'future' => 'lazy',
         ];
+
         return $this->elasticsearch->bulk($paramArray);
     }
 

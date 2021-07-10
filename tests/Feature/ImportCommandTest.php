@@ -106,7 +106,7 @@ final class ImportCommandTest extends IntegrationTestCase
         BookWithCustomKey::setEventDispatcher($dispatcher);
 
         Artisan::call('scout:import', [
-            'searchable' => BookWithCustomKey::class
+            'searchable' => BookWithCustomKey::class,
         ]);
         $params = [
             'index' => (new BookWithCustomKey())->searchableAs(),
