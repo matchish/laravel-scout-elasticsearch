@@ -14,7 +14,7 @@ use Tests\IntegrationTestCase;
 
 final class SearchTest extends IntegrationTestCase
 {
-    public function test_search_with_filters(): void
+    public function test_search_with_where_filters(): void
     {
         $dispatcher = Product::getEventDispatcher();
         Product::unsetEventDispatcher();
@@ -41,6 +41,36 @@ final class SearchTest extends IntegrationTestCase
             ->get();
         $this->assertEquals($iphonePromoNewAmount, $iphonePromoNew->count());
         $this->assertInstanceOf(Product::class, $iphonePromoNew->first());
+    }
+
+    public function test_search_with_where_in_filters(): void
+    {
+        $dispatcher = Product::getEventDispatcher();
+        Product::unsetEventDispatcher();
+
+        $kindleAmount = rand(1, 5);
+        $iphoneLuxuryAmount = rand(1, 5);
+        $iphonePromoUsedAmount = rand(1, 5);
+        $iphonePromoNewAmount = rand(6, 10);
+        $iphonePromoLikeNewAmount = rand(1, 5);
+        $iphoneUsedAndLikeNewAmount = $iphonePromoUsedAmount + $iphonePromoLikeNewAmount;
+
+        factory(Product::class, $kindleAmount)->states(['kindle', 'cheap'])->create();
+        factory(Product::class, $iphoneLuxuryAmount)->states(['iphone', 'luxury'])->create();
+        factory(Product::class, $iphonePromoUsedAmount)->states(['iphone', 'promo', 'used'])->create();
+        factory(Product::class, $iphonePromoNewAmount)->states(['iphone', 'promo', 'new'])->create();
+        factory(Product::class, $iphonePromoLikeNewAmount)->states(['iphone', 'promo', 'like new'])->create();
+
+        Product::setEventDispatcher($dispatcher);
+
+        Artisan::call('scout:import');
+
+        $iphoneUsedAndLikeNew = Product::search('iphone')
+            ->whereIn('type', ['used', 'like new'])
+            ->get();
+
+        $this->assertEquals($iphoneUsedAndLikeNew->count(), $iphoneUsedAndLikeNewAmount);
+        $this->assertInstanceOf(Product::class, $iphoneUsedAndLikeNew->first());
     }
 
     public function test_sorted_paginate(): void
