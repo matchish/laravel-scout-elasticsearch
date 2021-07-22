@@ -51,7 +51,7 @@ final class SearchFactory
      */
     private static function hasWhereFilters($builder): bool
     {
-        return (static::hasWheres($builder) || static::hasWhereIns($builder));
+        return static::hasWheres($builder) || static::hasWhereIns($builder);
     }
 
     /**
@@ -88,7 +88,7 @@ final class SearchFactory
 
     /**
      * @param Builder $builder
-     * @return boolean
+     * @return bool
      */
     private static function hasWheres($builder): bool
     {
@@ -97,7 +97,7 @@ final class SearchFactory
 
     /**
      * @param Builder $builder
-     * @return boolean
+     * @return bool
      */
     private static function hasWhereIns($builder): bool
     {
