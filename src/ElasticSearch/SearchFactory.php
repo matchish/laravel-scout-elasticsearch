@@ -23,16 +23,8 @@ final class SearchFactory
         $query = new QueryStringQuery($builder->query);
         if (static::hasWhereFilters($builder)) {
             $boolQuery = new BoolQuery();
-            if (! empty($builder->wheres)) {
-                foreach ($builder->wheres as $field => $value) {
-                    $boolQuery->add(new TermQuery((string) $field, $value), BoolQuery::FILTER);
-                }
-            }
-            if (isset($builder->whereIns) && ! empty($builder->whereIns)) {
-                foreach ($builder->whereIns as $field => $arrayOfValues) {
-                    $boolQuery->add(new TermsQuery((string) $field, $arrayOfValues), BoolQuery::FILTER);
-                }
-            }
+            $boolQuery = static::addWheres($builder, $boolQuery);
+            $boolQuery = static::addWhereIns($builder, $boolQuery);
             $boolQuery->add($query, BoolQuery::MUST);
             $search->addQuery($boolQuery);
         } else {
@@ -59,6 +51,56 @@ final class SearchFactory
      */
     private static function hasWhereFilters($builder): bool
     {
-        return (! empty($builder->wheres) || (isset($builder->whereIns) && ! empty($builder->whereIns)));
+        return (static::hasWheres($builder) || static::hasWhereIns($builder));
+    }
+
+    /**
+     * @param Builder $builder
+     * @param BoolQuery $boolQuery
+     * @return BoolQuery
+     */
+    private static function addWheres($builder, $boolQuery): BoolQuery
+    {
+        if (static::hasWheres($builder)) {
+            foreach ($builder->wheres as $field => $value) {
+                $boolQuery->add(new TermQuery((string) $field, $value), BoolQuery::FILTER);
+            }
+        }
+
+        return $boolQuery;
+    }
+
+    /**
+     * @param Builder $builder
+     * @param BoolQuery $boolQuery
+     * @return BoolQuery
+     */
+    private static function addWhereIns($builder, $boolQuery): BoolQuery
+    {
+        if (static::hasWhereIns($builder)) {
+            foreach ($builder->whereIns as $field => $arrayOfValues) {
+                $boolQuery->add(new TermsQuery((string) $field, $arrayOfValues), BoolQuery::FILTER);
+            }
+        }
+
+        return $boolQuery;
+    }
+
+    /**
+     * @param Builder $builder
+     * @return boolean
+     */
+    private static function hasWheres($builder): bool
+    {
+        return ! empty($builder->wheres);
+    }
+
+    /**
+     * @param Builder $builder
+     * @return boolean
+     */
+    private static function hasWhereIns($builder): bool
+    {
+        return isset($builder->whereIns) && ! empty($builder->whereIns);
     }
 }
