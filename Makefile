@@ -21,7 +21,9 @@ help: ## Show this help
 ---------------: ## ---------------
 
 up: ## Start all containers (in background) for development
-	sudo sysctl -w vm.max_map_count=262144
+    ifeq ($(OS), Windows_NT)
+	    sudo sysctl -w vm.max_map_count=262144
+    endif
 	$(docker_compose_bin) up -d
 
 down: ## Stop all started for development containers
@@ -37,7 +39,7 @@ install: up ## Install application dependencies into application container
 	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" composer install --no-interaction --ansi
 
 test: up ## Execute application tests
-	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" ./vendor/bin/phpstan analyze
+	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" ./vendor/bin/phpstan analyze --memory-limit=4000M
 	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" ./vendor/bin/phpunit --testdox --stop-on-failure
 
 test-coverage: up ## Execute application tests and generate report

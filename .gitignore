@@ -2,4 +2,5 @@
 .phpintel
 composer.lock
 .env
+.phpunit.result.cache
 /vendor/

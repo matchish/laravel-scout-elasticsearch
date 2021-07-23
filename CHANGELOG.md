@@ -6,12 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [4.0.8] - 2021-07-23
+### Added
+-  whereIn filter support
+
 ## [4.0.7] - 2021-04-21
 Support Scout 9
 ## [4.0.6] - 2021-04-21
 ### Fixed
 -  Hot fix for https://github.com/matchish/laravel-scout-elasticsearch/issues/160
- 
+
 ## [4.0.5] - 2021-01-05
 ### Fixed
 -  Find searchable classes when inherited through traits
@@ -94,7 +98,7 @@ Support Scout 9
 - ScoutElasticSearchService don't config elasticsearch client anymore
 
 ### Fixed
-- Empty elasticsearch host when config is cached 
+- Empty elasticsearch host when config is cached
 
 ### Added
 - Default config
