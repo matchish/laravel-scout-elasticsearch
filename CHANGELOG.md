@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [5.0.1] - 2021-07-23
+### Added
+- whereIn filter support
+
 ## [5.0.0] - 2021-05-13
 ### Added
 -  PHP 8 Support
@@ -69,7 +73,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 - ScoutElasticSearchService don't config elasticsearch client anymore
 
 ### Fixed
-- Empty elasticsearch host when config is cached 
+- Empty elasticsearch host when config is cached
 
 ### Added
 - Default config

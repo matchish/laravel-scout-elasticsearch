@@ -24,9 +24,12 @@ final class SearchTest extends IntegrationTestCase
         $iphonePromoUsedAmount = rand(1, 5);
         $iphonePromoNewAmount = rand(6, 10);
         $iphonePromoLikeNewAmount = rand(1, 5);
+        $iphoneLikeNewAmount = rand(1, 5);
+        $iphonePromoUsedAndLikeNewAmount = $iphonePromoLikeNewAmount + $iphonePromoUsedAmount;
 
         factory(Product::class, $kindleAmount)->states(['kindle', 'cheap'])->create();
         factory(Product::class, $iphoneLuxuryAmount)->states(['iphone', 'luxury'])->create();
+        factory(Product::class, $iphoneLikeNewAmount)->states(['iphone', 'like new'])->create();
         factory(Product::class, $iphonePromoUsedAmount)->states(['iphone', 'promo', 'used'])->create();
         factory(Product::class, $iphonePromoNewAmount)->states(['iphone', 'promo', 'new'])->create();
         factory(Product::class, $iphonePromoLikeNewAmount)->states(['iphone', 'promo', 'like new'])->create();
@@ -35,12 +38,13 @@ final class SearchTest extends IntegrationTestCase
 
         Artisan::call('scout:import');
 
-        $iphonePromoNew = Product::search('iphone')
-            ->where('price', '100')
-            ->where('type', 'new')
+        $iphonePromoUsedAndLikeNew = Product::search('iphone')
+            ->where('price', 100)
+            ->whereIn('type', ['used', 'like new'])
             ->get();
-        $this->assertEquals($iphonePromoNewAmount, $iphonePromoNew->count());
-        $this->assertInstanceOf(Product::class, $iphonePromoNew->first());
+
+        $this->assertEquals($iphonePromoUsedAndLikeNew->count(), $iphonePromoUsedAndLikeNewAmount);
+        $this->assertInstanceOf(Product::class, $iphonePromoUsedAndLikeNew->first());
     }
 
     public function test_sorted_paginate(): void
