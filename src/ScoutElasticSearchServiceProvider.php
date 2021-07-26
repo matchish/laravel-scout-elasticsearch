@@ -39,6 +39,7 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
     {
         $this->app->register(ScoutServiceProvider::class);
         $this->app->bind(ImportSourceFactory::class, DefaultImportSourceFactory::class);
+        $this->app->bind(\Laravel\Scout\Builder::class, \Matchish\ScoutElasticSearch\Builder::class);
     }
 
     /**
