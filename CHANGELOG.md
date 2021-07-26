@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [5.0.2] - 2021-07-26
+### Added
+- where filter support with operators
+
 ## [5.0.1] - 2021-07-23
 ### Added
 - whereIn filter support
