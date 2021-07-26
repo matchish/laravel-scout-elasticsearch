@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Collection;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Builder as BaseBuilder;
 use Laravel\Scout\Engines\Engine;
+use Matchish\ScoutElasticSearch\ElasticSearch\BuildSearchBodyAction;
 use Matchish\ScoutElasticSearch\ElasticSearch\HitsIteratorAggregate;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Refresh;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Search as SearchParams;
-use Matchish\ScoutElasticSearch\ElasticSearch\SearchFactory;
 use Matchish\ScoutElasticSearch\ElasticSearch\SearchResults;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Search;
@@ -169,7 +169,7 @@ final class ElasticSearchEngine extends Engine
      */
     private function performSearch(BaseBuilder $builder, $options = [])
     {
-        $searchBody = SearchFactory::create($builder, $options);
+        $searchBody = app(BuildSearchBodyAction::class)->handle($builder, $options);
         if ($builder->callback) {
             /** @var callable */
             $callback = $builder->callback;
