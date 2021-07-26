@@ -20,6 +20,13 @@ $factory->state(Product::class, 'iphone', function (Faker $faker) {
     ];
 });
 
+$factory->state(Product::class, 'iphonePro', function (Faker $faker) {
+    return [
+        'title' => 'IPhonePro '.$faker->randomDigitNotNull,
+        'price' => $faker->numberBetween(200, 300),
+    ];
+});
+
 $factory->state(Product::class, 'kindle', function (Faker $faker) {
     return [
         'title' => 'Amazon Kindle Fire '.$faker->randomDigitNotNull,
@@ -42,6 +49,7 @@ $factory->state(Product::class, 'used', function (Faker $faker) {
 $factory->state(Product::class, 'like new', function (Faker $faker) {
     return [
         'type' => 'like new',
+        'description' => 'used only for 1 month',
     ];
 });
 
