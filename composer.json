@@ -1,7 +1,7 @@
 {
     "name": "matchish/laravel-scout-elasticsearch",
     "description": "Search among multiple models with ElasticSearch and Laravel Scout",
-    "version": "5.0.1",
+    "version": "5.0.2",
     "keywords": [
         "laravel",
         "scout",
