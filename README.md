@@ -2,7 +2,7 @@
   <a href="https://github.com/matchish/laravel-scout-elasticsearch">
     <img alt="Scout ElasticSearch" src="https://raw.githubusercontent.com/matchish/laravel-scout-elasticsearch/master/docs/banner.svg?sanitize=true" >
   </a>
-  
+
   <img alt="Import progress report" src="https://raw.githubusercontent.com/matchish/laravel-scout-elasticsearch/master/docs/demo.gif" >
 
   <p align="center">
@@ -36,6 +36,7 @@ Don't forget to :star: the package if you like it. :pray:
 - Import all searchable models at once.
 - A fully configurable mapping for each model.
 - Full power of ElasticSearch in your queries.
+- [Available filters](#available-filters)
 
 ## :warning: Requirements
 
@@ -58,9 +59,9 @@ Set env variables
 SCOUT_DRIVER=Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine
 ```
 
-The package uses `\ElasticSearch\Client` from official package, but does not try to configure it, 
-so feel free do it in your app service provider. 
-But if you don't want to do it right now, 
+The package uses `\ElasticSearch\Client` from official package, but does not try to configure it,
+so feel free do it in your app service provider.
+But if you don't want to do it right now,
 you can use `Matchish\ElasticSearchServiceProvider` from the package.  
 Register the provider, adding to `config/app.php`
 ```php
@@ -84,14 +85,14 @@ And publish config example for elasticsearch
 ### Index [settings](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html#create-index-settings) and [mappings](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html#mappings)
 It is very important to define the mapping when we create an index — an inappropriate preliminary definition and mapping may result in the wrong search results.
 
-To define mappings or settings for index, set config with right value. 
+To define mappings or settings for index, set config with right value.
 
-For example if method `searchableAs` returns 
+For example if method `searchableAs` returns
 `products` string
 
 Config key for mappings should be  
 `elasticsearch.indices.mappings.products`  
-Or you you can specify default mappings with config key 
+Or you you can specify default mappings with config key
 `elasticsearch.indices.mappings.default`
 
 Same way you can define settings
@@ -112,7 +113,7 @@ use Matchish\ScoutElasticSearch\Searchable\ImportSourceFactory;
 public function register(): void
 {
 $this->app->bind(ImportSourceFactory::class, MyImportSourceFactory::class);
-``` 
+```
 Here is an example of `MyImportSourceFactory`
 ```php
 namespace Matchish\ScoutElasticSearch\Searchable;
@@ -166,16 +167,16 @@ $results = Product::search('zonga', function($client, $body) {
 
     $minPriceAggregation = new MinAggregation('min_price');
     $minPriceAggregation->setField('price');
-    
+
     $maxPriceAggregation = new MaxAggregation('max_price');
     $maxPriceAggregation->setField('price');
-    
+
     $brandTermAggregation = new TermsAggregation('brand');
     $brandTermAggregation->setField('brand');
 
     $body->addAggregation($minPriceAggregation);
     $body->addAggregation($brandTermAggregation);
-    
+
     return $client->search(['index' => 'products', 'body' => $body->toArray()]);
 })->raw();
 ```
@@ -201,6 +202,20 @@ Often your response isn't collection of models but aggregations or models with h
 In this case you need to implement your own implementation of `HitsIteratorAggregate` and bind it in your service provider
 
 [Here is a case](https://github.com/matchish/laravel-scout-elasticsearch/issues/28)
+
+## Available filters
+
+Method | Example | Description
+--- | --- | ---
+where($field, $value) | where('price', 100) | Checks whether the value is equal to the given value.
+where($field, $operator, $value) | where('price', '!=', 100) | Filters the results based on the given operator and value. The available operators are: =, <, >, <=, >=, <>, != .    
+whereIn($field, $value) | whereIn('price', [100, 200, 300]) | Filters the results based on the given array of values.
+whereNotIn($field, $value) | whereNotIn('price', [100, 200, 300]) | Filters the results based on the values that are not in the given array of values.
+whereBetween($field, $value) | whereBetween('price', [100, 200]) | Filters the results based on the given range of values.
+whereNotBetween($field, $value) | whereNotBetween('price', [100, 200]) | Filters the results based on the values that are not in the given range.
+whereExists($field) | whereExists('unemployed') | Checks if a value is defined.
+whereNotExists($field) | whereNotExists('unemployed') | Checks if a value is not defined.
+[Check when a value is defined] (https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html)
 
 ## :free: License
 Scout ElasticSearch is an open-sourced software licensed under the [MIT license](LICENSE.md).
