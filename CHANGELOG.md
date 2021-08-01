@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [4.0.10] - 2021-08-01
+### Fixed
+-  Avoid ambiguous In Some Cases
+
+## [4.0.9] - 2021-07-29
+### Fixed
+-  Avoid Conflict Helper Function `resolve()` In Some Packages
+
 ## [4.0.8] - 2021-07-23
 ### Added
 -  whereIn filter support
