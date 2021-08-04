@@ -64,23 +64,29 @@ final class DefaultImportSource implements ImportSource
         return LazyCollection::make(function () {
             $chunkSize = (int) config('scout.chunk.searchable', self::DEFAULT_CHUNK_SIZE);
             $workers = (int) config('scout.chunk.handlers', self::DEFAULT_CHUNK_HANDLERS);
-            $lastChunk = null;
+            $from = null;
             while (true) {
                 $chunks = [];
                 for ($page = 1; $page <= $workers; $page++) {
                     $chunkScopes = [];
-                    $chunkScopes[] = new PageScope($page, $chunkSize);
-                    if ($lastChunk instanceof ImportSource && $lastChunk->last() instanceof Model) {
-                        $chunkScopes[] = new FromScope($lastChunk->last()->getKey());
+                    if ($from) {
+                        $chunkScopes[] = $from;
                     }
+                    $chunkScopes[] = new PageScope($page, $chunkSize);
                     $chunk = new static($this->className, array_merge($this->scopes, $chunkScopes));
+                    if ($page === 1 && ! $chunk->count()) {
+                        break 2;
+                    }
                     $chunks[] = $chunk;
                 }
                 yield collect($chunks);
-                if (! isset($chunk) || ! $chunk->count()) {
+
+                $last = isset($chunk) ? $chunk->last() : null;
+                if ($last instanceof Model) {
+                    $from = new FromScope($last->getKey());
+                } else {
                     break;
                 }
-                $lastChunk = $chunk;
             }
         });
     }

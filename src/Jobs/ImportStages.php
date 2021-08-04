@@ -17,18 +17,18 @@ class ImportStages extends Collection
 {
     /**
      * @param ImportSource $source
-     * @return Collection
+     * @return array
      */
     public static function fromSource(ImportSource $source)
     {
         $index = Index::fromSource($source);
 
-        return self::make([
+        return [self::make([
             new CleanUp($source),
             new CreateWriteIndex($source, $index),
             PullFromSource::chunked($source),
             new RefreshIndex($index),
             new SwitchToNewAndRemoveOldIndex($source, $index),
-        ]);
+        ]), $source->chunksCount() + 4];
     }
 }

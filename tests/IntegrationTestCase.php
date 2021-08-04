@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use Elasticsearch\Client;
+use Illuminate\Support\Facades\Artisan;
 
 /**
  * Class IntegrationTestCase.
@@ -22,7 +23,6 @@ class IntegrationTestCase extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
         $this->elasticsearch = $this->app->make(Client::class);
 
         $this->elasticsearch->indices()->delete(['index' => '_all']);
@@ -37,6 +37,7 @@ class IntegrationTestCase extends TestCase
         parent::getEnvironmentSetUp($app);
 
         $app['config']->set('elasticsearch', require(__DIR__.'/../config/elasticsearch.php'));
+        $app['config']->set('job-status', require(__DIR__.'/../vendor/imtigger/laravel-job-status/config/job-status.php'));
         $app['config']->set('elasticsearch.indices.mappings.products', [
             'properties' => [
                 'type' => [

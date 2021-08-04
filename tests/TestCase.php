@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use Illuminate\Support\Facades\Artisan;
+use Imtigger\LaravelJobStatus\LaravelJobStatusServiceProvider;
 use Laravel\Scout\ScoutServiceProvider;
 use Matchish\ScoutElasticSearch\ElasticSearchServiceProvider;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
@@ -21,7 +22,8 @@ abstract class TestCase extends BaseTestCase
 
         $this->withFactories(database_path('factories'));
 
-        Artisan::call('migrate:fresh', ['--database' => 'mysql']);
+        $this->artisan('vendor:publish', ['--tag' => 'migration']);
+        $this->artisan('migrate:fresh', ['--database' => 'mysql']);
     }
 
     /**
@@ -38,6 +40,7 @@ abstract class TestCase extends BaseTestCase
         $app['config']->set('scout.queue', false);
         // Setup default database to use sqlite :memory:
         $app['config']->set('database.default', 'mysql');
+        $app['config']->set('job-status.database_connection', 'mysql');
     }
 
     protected function getPackageProviders($app)
@@ -46,6 +49,7 @@ abstract class TestCase extends BaseTestCase
             ScoutServiceProvider::class,
             ScoutElasticSearchServiceProvider::class,
             ElasticSearchServiceProvider::class,
+            LaravelJobStatusServiceProvider::class
         ];
     }
 }

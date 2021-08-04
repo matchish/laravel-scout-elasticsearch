@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Matchish\ScoutElasticSearch\Jobs;
 
-use Elasticsearch\Client;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Collection;
+use Imtigger\LaravelJobStatus\Trackable;
 use Matchish\ScoutElasticSearch\ProgressReportable;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
@@ -15,6 +14,7 @@ use Matchish\ScoutElasticSearch\Searchable\ImportSource;
  */
 final class Import
 {
+    use Trackable;
     use Queueable;
     use ProgressReportable;
 
@@ -31,32 +31,25 @@ final class Import
         $this->source = $source;
     }
 
-    /**
-     * @param Client $elasticsearch
-     */
-    public function handle(Client $elasticsearch): void
+    public function handle(): void
     {
-        $stages = $this->stages();
-        $estimate = $stages->sum->estimate();
-        $progressbar = $this->progressBar();
-        $progressbar->setMaxSteps($estimate);
+        list($stages, $estimate) = $this->stages();
 
-        $stages->each(function ($stage) use ($elasticsearch, $progressbar) {
-            $progressbar->setMessage($stage->title());
-            $progress = $stage->handle($elasticsearch);
-            if ($progress) {
-                $currentStep = $progressbar->getProgress();
-                foreach ($progress as $step) {
-                    $progressbar->advance($step);
-                }
-                $progressbar->setProgress((int) ($currentStep + $stage->estimate()));
-            } else {
-                $progressbar->advance($stage->estimate());
+        $this->progressMax = $estimate;
+        $stages->each(function ($stage) {
+            if (! is_iterable($stage)) {
+            // @phpstan-ignore-next-line
+                app()->call([$stage, 'handle']);
+                return;
+            }
+            foreach ($stage as $sub) {
+                dispatch((new TrackableJob())->chain([$sub])->allOnConnection($this->source->syncWithSearchUsing())
+                ->allOnQueue($this->source->syncWithSearchUsingQueue()));
             }
         });
     }
 
-    private function stages(): Collection
+    private function stages(): array
     {
         return ImportStages::fromSource($this->source);
     }

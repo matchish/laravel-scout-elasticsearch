@@ -20,6 +20,7 @@
         "php": "^8.0",
         "elasticsearch/elasticsearch": "^7.12",
         "handcraftedinthealps/elasticsearch-dsl": "7.2.0.4",
+        "imtigger/laravel-job-status": "^1.2",
         "laravel/scout": "^9.0"
     },
     "require-dev": {
