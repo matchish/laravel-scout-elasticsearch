@@ -42,9 +42,11 @@ final class Import
                 app()->call([$stage, 'handle']);
                 return;
             }
-            foreach ($stage as $sub) {
+            $queues = $this->source->syncWithSearchUsingQueues();
+            foreach ($stage as $key => $sub) {
+                $queue = $queues[$key % count($queues)];
                 dispatch((new TrackableJob())->chain([$sub])->allOnConnection($this->source->syncWithSearchUsing())
-                ->allOnQueue($this->source->syncWithSearchUsingQueue()));
+                ->allOnQueue($queue));
             }
         });
     }

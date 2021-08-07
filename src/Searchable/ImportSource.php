@@ -10,6 +10,7 @@ use Illuminate\Support\LazyCollection;
 interface ImportSource
 {
     public function syncWithSearchUsingQueue(): ?string;
+    public function syncWithSearchUsingQueues(): array;
 
     public function syncWithSearchUsing(): ?string;
 

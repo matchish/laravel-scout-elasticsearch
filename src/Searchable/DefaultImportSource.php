@@ -54,6 +54,17 @@ final class DefaultImportSource implements ImportSource
         return $this->model()->syncWithSearchUsing();
     }
 
+    public function syncWithSearchUsingQueues(): array
+    {
+        return [
+            'import-1',
+            'import-2',
+            'import-3',
+            'import-4',
+            'import-5',
+        ];
+    }
+
     public function searchableAs(): string
     {
         return $this->model()->searchableAs();
