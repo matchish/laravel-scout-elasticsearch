@@ -41,7 +41,7 @@ Don't forget to :star: the package if you like it. :pray:
 
 ## :warning: Requirements
 
-- PHP version >= 7.3
+- PHP version >= 8.0.12
 - Laravel Framework version >= 6.0.0
 
 | Elasticsearch version | ElasticsearchDSL version    |
