@@ -15,7 +15,7 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\ParserFactory;
 use Roave\BetterReflection\BetterReflection;
-use Roave\BetterReflection\Reflector\ClassReflector;
+use Roave\BetterReflection\Reflector\Reflector;
 use Roave\BetterReflection\Reflector\Exception\IdentifierNotFound;
 use Symfony\Component\Finder\Finder;
 
@@ -38,9 +38,9 @@ final class SearchableListFactory
      */
     private $errors = [];
     /**
-     * @var ClassReflector
+     * @var Reflector
      */
-    private $classReflector;
+    private $reflector;
 
     /**
      * @param string $namespace
@@ -147,7 +147,7 @@ final class SearchableListFactory
     private function findSearchableTraitRecursively(string $class): bool
     {
         try {
-            $reflection = $this->classReflector()->reflect($class);
+            $reflection = $this->reflector()->reflectClass($class);
 
             if (in_array(Searchable::class, $traits = $reflection->getTraitNames())) {
                 return true;
@@ -174,14 +174,14 @@ final class SearchableListFactory
     }
 
     /**
-     * @return ClassReflector
+     * @return Reflector
      */
-    private function classReflector(): ClassReflector
+    private function reflector(): Reflector
     {
-        if (null === $this->classReflector) {
-            $this->classReflector = (new BetterReflection())->classReflector();
+        if (null === $this->reflector) {
+            $this->reflector = (new BetterReflection())->reflector();
         }
 
-        return $this->classReflector;
+        return $this->reflector;
     }
 }

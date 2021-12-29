@@ -188,7 +188,7 @@ $results = Product::search('zonga', function($client, $body) {
 ### Search amongst multiple models
 You can do it with `Mixed` class, just pass indices names separated by commas to the `within` method.
 ```php
-Mixed::search('title:Barcelona or to:Barcelona')
+MixedSearch::search('title:Barcelona or to:Barcelona')
     within(implode(',', [
         (new Ticket())->searchableAs(),
         (new Book())->searchableAs(),

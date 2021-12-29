@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Searchable;
 
-final class Mixed
+final class MixedSearch
 {
     /**
      * Perform a search against the model's indexed data.
