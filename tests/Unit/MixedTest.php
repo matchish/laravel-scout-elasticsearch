@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use Laravel\Scout\Searchable;
-use Matchish\ScoutElasticSearch\Mixed;
+use Matchish\ScoutElasticSearch\MixedSearch;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -14,7 +14,7 @@ class MixedTest extends TestCase
         $searchable = new ReflectionClass(Searchable::class);
         $searchableParameters = $searchable->getMethod('search')->getParameters();
         $searchableDoc = $searchable->getMethod('search')->getDocComment();
-        $mixed = new ReflectionClass(Mixed::class);
+        $mixed = new ReflectionClass(MixedSearch::class);
         $mixedParameters = $mixed->getMethod('search')->getParameters();
         $mixedDoc = $mixed->getMethod('search')->getDocComment();
 
