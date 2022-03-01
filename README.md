@@ -1,7 +1,10 @@
 <p align="center">
-  <a href="https://github.com/matchish/laravel-scout-elasticsearch">
-    <img alt="Scout ElasticSearch" src="https://raw.githubusercontent.com/matchish/laravel-scout-elasticsearch/master/docs/banner.svg?sanitize=true" >
+  <a href="https://savelife.in.ua/en/donate/">
+    <img alt="Support Ukraine" src="http://supportua.org.ua/wp-content/uploads/2015/05/content-logo-main.png" >
   </a>
+<!--   <a href="https://github.com/matchish/laravel-scout-elasticsearch">
+    <img alt="Scout ElasticSearch" src="https://raw.githubusercontent.com/matchish/laravel-scout-elasticsearch/master/docs/banner.svg?sanitize=true" >
+  </a> -->
   
   <img alt="Import progress report" src="https://raw.githubusercontent.com/matchish/laravel-scout-elasticsearch/master/docs/demo.gif" >
 
