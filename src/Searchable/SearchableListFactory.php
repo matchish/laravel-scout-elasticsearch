@@ -15,8 +15,8 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\ParserFactory;
 use Roave\BetterReflection\BetterReflection;
-use Roave\BetterReflection\Reflector\Reflector;
 use Roave\BetterReflection\Reflector\Exception\IdentifierNotFound;
+use Roave\BetterReflection\Reflector\Reflector;
 use Symfony\Component\Finder\Finder;
 
 final class SearchableListFactory
@@ -43,8 +43,8 @@ final class SearchableListFactory
     private ?Reflector $reflector = null;
 
     /**
-     * @param string $namespace
-     * @param string $appPath
+     * @param  string  $namespace
+     * @param  string  $appPath
      */
     public function __construct(string $namespace, string $appPath)
     {
@@ -134,7 +134,7 @@ final class SearchableListFactory
     }
 
     /**
-     * @param string $class
+     * @param  string  $class
      * @return bool
      */
     private function findSearchableTraitRecursively(string $class): bool
