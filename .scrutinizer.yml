@@ -10,7 +10,7 @@ filter:
 build:
   environment:
     php:
-      version: '8.1'
+      version: '8.0.16'
     variables:
       ELASTICSEARCH_HOST: 'localhost:9200'
       DB_HOST: '127.0.0.1'

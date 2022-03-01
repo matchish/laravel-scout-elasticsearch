@@ -130,6 +130,7 @@ final class SearchableListFactory
         }
 
         $stmts = Collection::make($stmts)->flatten(1)->toArray();
+
         return $nodeTraverser->traverse($stmts);
     }
 
