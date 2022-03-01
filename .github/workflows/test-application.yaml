@@ -1,0 +1,71 @@
+name: Test application
+
+on:
+    pull_request:
+    push:
+        branches:
+            - master
+
+jobs:
+    php:
+        name: 'Run tests with php ${{ matrix.php-version }}'
+        runs-on: ubuntu-latest
+
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - php-version: '7.3'
+                    - php-version: '7.4'
+        services:
+            elasticsearch:
+                image: docker.elastic.co/elasticsearch/elasticsearch:7.17.1
+                ports:
+                    - 9200:9200
+                env:
+                    discovery.type: 'single-node'
+                    xpack.security.enabled: 'false'
+                options: --health-cmd="curl http://localhost:9200/_cluster/health" --health-interval=10s --health-timeout=5s --health-retries=5
+            mysql:
+                image: mysql:5.7.22
+                env:
+                    MYSQL_ALLOW_EMPTY_PASSWORD: yes
+                    MYSQL_DATABASE: unittest
+                ports:
+                    - 3306:3306
+                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+        steps:
+            -   name: Checkout project
+                uses: actions/checkout@v2
+
+            -   name: Install and configure PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php-version }}
+                    tools: 'composer'
+
+            -   name: Get composer cache directory
+                id: composer-cache-dir
+                run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+            -   name: Cache dependencies
+                uses: actions/cache@v2
+                id: composer-cache
+                with:
+                    path: ${{ steps.composer-cache-dir.outputs.dir }}
+                    key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+                    restore-keys: |
+                        ${{ runner.os }}-composer-
+
+            -   name: Install dependencies
+                run: |
+                    composer validate --strict
+                    composer install --no-interaction --prefer-dist
+
+            -   name: Run tests
+                run: vendor/bin/phpunit --coverage-clover=coverage.clover
+                env:
+                    DB_DATABASE: unittest
+                    DB_USERNAME: root
+                    ELASTICSEARCH_HOST: '127.0.0.1:9200'
