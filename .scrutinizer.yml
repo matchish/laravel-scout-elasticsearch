@@ -35,4 +35,5 @@ build:
               format: 'clover'
   dependencies:
     override:
-      - composer update --no-interaction --no-suggest --prefer-source
+      - command: composer update --no-interaction --no-suggest --prefer-source
+        idle_timeout: 2000
