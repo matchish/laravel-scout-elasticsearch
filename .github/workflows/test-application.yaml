@@ -16,7 +16,6 @@ jobs:
             max-parallel: 1  # all versions are using same elasticsearch and mysql service. They need to run 1 by 1.
             matrix:
                 include:
-                    - php-version: '7.4'
                     - php-version: '8.0.16'
                     - php-version: '8.1'
         services:
