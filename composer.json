@@ -26,7 +26,7 @@
         "laravel/legacy-factories": "^1.0",
         "nunomaduro/larastan": "~0.6",
         "orchestra/testbench": "^6.18",
-        "phpunit/phpunit": "^8.0|~9.4.0"
+        "phpunit/phpunit": "~9.4.0"
     },
     "autoload-dev": {
         "psr-4": {
