@@ -29,7 +29,7 @@ build:
         override:
           - php-scrutinizer-run
           -
-            command: 'vendor/bin/phpunit --coverage-clover=coverage.clover'
+            command: 'vendor/bin/phpunit --coverage-clover /home/scrutinizer/build/coverage.clover'
             coverage:
               file: 'coverage.clover'
               format: 'clover'
