@@ -22,8 +22,8 @@ final class EloquentHitsIteratorAggregate implements IteratorAggregate
     private $callback;
 
     /**
-     * @param array $results
-     * @param callable|null $callback
+     * @param  array  $results
+     * @param  callable|null  $callback
      */
     public function __construct(array $results, callable $callback = null)
     {
@@ -33,9 +33,12 @@ final class EloquentHitsIteratorAggregate implements IteratorAggregate
 
     /**
      * Retrieve an external iterator.
+     *
      * @link https://php.net/manual/en/iteratoraggregate.getiterator.php
+     *
      * @return Traversable An instance of an object implementing <b>Iterator</b> or
-     * <b>Traversable</b>
+     *                     <b>Traversable</b>
+     *
      * @since 5.0.0
      */
     public function getIterator()
@@ -45,12 +48,14 @@ final class EloquentHitsIteratorAggregate implements IteratorAggregate
             $hits = $this->results['hits']['hits'];
             $models = collect($hits)->groupBy('_source.__class_name')
                 ->map(function ($results, $class) {
+                    /** @var Searchable $model */
                     $model = new $class;
+                    $model->setKeyType('string');
                     $builder = new Builder($model, '');
                     if (! empty($this->callback)) {
                         $builder->query($this->callback);
                     }
-                    /* @var Searchable $model */
+
                     return $models = $model->getScoutModelsByIds(
                         $builder, $results->pluck('_id')->all()
                     );

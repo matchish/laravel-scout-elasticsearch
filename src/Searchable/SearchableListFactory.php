@@ -15,35 +15,36 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\ParserFactory;
 use Roave\BetterReflection\BetterReflection;
-use Roave\BetterReflection\Reflector\ClassReflector;
 use Roave\BetterReflection\Reflector\Exception\IdentifierNotFound;
+use Roave\BetterReflection\Reflector\Reflector;
 use Symfony\Component\Finder\Finder;
 
 final class SearchableListFactory
 {
     /**
-     * @var array
+     * @var array|null
      */
-    private static $searchableClasses;
+    private static ?array $searchableClasses = null;
     /**
      * @var string
      */
-    private $namespace;
+    private string $namespace;
     /**
      * @var string
      */
-    private $appPath;
+    private string $appPath;
     /**
      * @var array
      */
-    private $errors = [];
+    private array $errors = [];
     /**
-     * @var ClassReflector
+     * @var Reflector|null
      */
-    private $classReflector;
+    private ?Reflector $reflector = null;
 
     /**
-     * @param string $namespace
+     * @param  string  $namespace
+     * @param  string  $appPath
      */
     public function __construct(string $namespace, string $appPath)
     {
@@ -76,7 +77,7 @@ final class SearchableListFactory
     {
         $appNamespace = $this->namespace;
 
-        return array_values(array_filter($this->getSearchableClasses(), function (string $class) use ($appNamespace) {
+        return array_values(array_filter($this->getSearchableClasses(), static function (string $class) use ($appNamespace) {
             return Str::startsWith($class, $appNamespace);
         }));
     }
@@ -87,9 +88,7 @@ final class SearchableListFactory
     private function getSearchableClasses(): array
     {
         if (self::$searchableClasses === null) {
-            $projectClasses = $this->getProjectClasses();
-
-            self::$searchableClasses = $projectClasses->filter(function ($class) {
+            self::$searchableClasses = $this->getProjectClasses()->filter(function ($class) {
                 return $this->findSearchableTraitRecursively($class);
             })->toArray();
         }
@@ -102,9 +101,8 @@ final class SearchableListFactory
      */
     private function getProjectClasses(): Collection
     {
-        $nodeFinder = new NodeFinder();
         /** @var Class_[] $nodes */
-        $nodes = $nodeFinder->find($this->getStmts(), function (Node $node) {
+        $nodes = (new NodeFinder())->find($this->getStmts(), function (Node $node) {
             return $node instanceof Class_;
         });
 
@@ -123,31 +121,27 @@ final class SearchableListFactory
         $nodeTraverser = new NodeTraverser();
         $nodeTraverser->addVisitor($nameResolverVisitor);
         $stmts = [];
-        $finder = Finder::create()->files()->name('*.php')->in($this->appPath);
-
-        foreach ($finder as $file) {
+        foreach (Finder::create()->files()->name('*.php')->in($this->appPath) as $file) {
             try {
                 $stmts[] = $parser->parse($file->getContents());
             } catch (Error $e) {
                 $this->errors[] = $e->getMessage();
-                continue;
             }
         }
 
         $stmts = Collection::make($stmts)->flatten(1)->toArray();
-        $stmts = $nodeTraverser->traverse($stmts);
 
-        return $stmts;
+        return $nodeTraverser->traverse($stmts);
     }
 
     /**
-     * @param string $class
+     * @param  string  $class
      * @return bool
      */
     private function findSearchableTraitRecursively(string $class): bool
     {
         try {
-            $reflection = $this->classReflector()->reflect($class);
+            $reflection = $this->reflector()->reflectClass($class);
 
             if (in_array(Searchable::class, $traits = $reflection->getTraitNames())) {
                 return true;
@@ -159,13 +153,7 @@ final class SearchableListFactory
                 }
             }
 
-            if ($parent = $reflection->getParentClass()) {
-                if ($this->findSearchableTraitRecursively($parent->getName())) {
-                    return true;
-                }
-            }
-
-            return false;
+            return ($parent = $reflection->getParentClass()) && $this->findSearchableTraitRecursively($parent->getName());
         } catch (IdentifierNotFound $e) {
             $this->errors[] = $e->getMessage();
 
@@ -174,14 +162,14 @@ final class SearchableListFactory
     }
 
     /**
-     * @return ClassReflector
+     * @return Reflector
      */
-    private function classReflector(): ClassReflector
+    private function reflector(): Reflector
     {
-        if (null === $this->classReflector) {
-            $this->classReflector = (new BetterReflection())->classReflector();
+        if (null === $this->reflector) {
+            $this->reflector = (new BetterReflection())->reflector();
         }
 
-        return $this->classReflector;
+        return $this->reflector;
     }
 }
