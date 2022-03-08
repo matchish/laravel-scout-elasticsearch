@@ -13,7 +13,7 @@ final class DefaultAlias implements Alias
     private $name;
 
     /**
-     * @param string $name
+     * @param  string  $name
      */
     public function __construct(string $name)
     {

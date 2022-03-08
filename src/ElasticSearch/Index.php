@@ -29,9 +29,10 @@ final class Index
 
     /**
      * Index constructor.
-     * @param string $name
-     * @param array $settings
-     * @param array $mappings
+     *
+     * @param  string  $name
+     * @param  array  $settings
+     * @param  array  $mappings
      */
     public function __construct(string $name, array $settings = null, array $mappings = null)
     {
@@ -57,7 +58,7 @@ final class Index
     }
 
     /**
-     * @param Alias $alias
+     * @param  Alias  $alias
      */
     public function addAlias(Alias $alias): void
     {

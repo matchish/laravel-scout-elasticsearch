@@ -14,7 +14,8 @@ final class Delete
 
     /**
      * Delete constructor.
-     * @param string $index
+     *
+     * @param  string  $index
      */
     public function __construct(string $index)
     {

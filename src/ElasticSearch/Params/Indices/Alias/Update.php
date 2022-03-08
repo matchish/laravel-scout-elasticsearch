@@ -13,7 +13,7 @@ final class Update
     private $actions = [];
 
     /**
-     * @param array $actions
+     * @param  array  $actions
      */
     public function __construct(array $actions = [])
     {

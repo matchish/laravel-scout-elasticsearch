@@ -13,8 +13,8 @@ use ONGR\ElasticsearchDSL\Sort\FieldSort;
 final class SearchFactory
 {
     /**
-     * @param Builder $builder
-     * @param array $options
+     * @param  Builder  $builder
+     * @param  array  $options
      * @return Search
      */
     public static function create(Builder $builder, array $options = []): Search
@@ -46,7 +46,7 @@ final class SearchFactory
     }
 
     /**
-     * @param Builder $builder
+     * @param  Builder  $builder
      * @return bool
      */
     private static function hasWhereFilters($builder): bool
@@ -55,8 +55,8 @@ final class SearchFactory
     }
 
     /**
-     * @param Builder $builder
-     * @param BoolQuery $boolQuery
+     * @param  Builder  $builder
+     * @param  BoolQuery  $boolQuery
      * @return BoolQuery
      */
     private static function addWheres($builder, $boolQuery): BoolQuery
@@ -71,8 +71,8 @@ final class SearchFactory
     }
 
     /**
-     * @param Builder $builder
-     * @param BoolQuery $boolQuery
+     * @param  Builder  $builder
+     * @param  BoolQuery  $boolQuery
      * @return BoolQuery
      */
     private static function addWhereIns($builder, $boolQuery): BoolQuery
@@ -87,7 +87,7 @@ final class SearchFactory
     }
 
     /**
-     * @param Builder $builder
+     * @param  Builder  $builder
      * @return bool
      */
     private static function hasWheres($builder): bool
@@ -96,7 +96,7 @@ final class SearchFactory
     }
 
     /**
-     * @param Builder $builder
+     * @param  Builder  $builder
      * @return bool
      */
     private static function hasWhereIns($builder): bool

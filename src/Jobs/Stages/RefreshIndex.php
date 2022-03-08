@@ -18,7 +18,8 @@ final class RefreshIndex
 
     /**
      * RefreshIndex constructor.
-     * @param Index $index
+     *
+     * @param  Index  $index
      */
     public function __construct(Index $index)
     {

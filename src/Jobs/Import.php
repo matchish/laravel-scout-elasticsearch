@@ -22,7 +22,7 @@ final class Import
     private $source;
 
     /**
-     * @param ImportSource $source
+     * @param  ImportSource  $source
      */
     public function __construct(ImportSource $source)
     {
@@ -30,7 +30,7 @@ final class Import
     }
 
     /**
-     * @param Client $elasticsearch
+     * @param  Client  $elasticsearch
      */
     public function handle(Client $elasticsearch): void
     {

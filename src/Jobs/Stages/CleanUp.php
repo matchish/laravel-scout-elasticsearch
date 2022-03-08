@@ -19,7 +19,7 @@ final class CleanUp
     private $source;
 
     /**
-     * @param ImportSource $source
+     * @param  ImportSource  $source
      */
     public function __construct(ImportSource $source)
     {

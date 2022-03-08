@@ -18,7 +18,7 @@ final class Bulk
     private $deleteDocs = [];
 
     /**
-     * @param array|object $docs
+     * @param  array|object  $docs
      */
     public function delete($docs): void
     {
@@ -85,7 +85,7 @@ final class Bulk
     }
 
     /**
-     * @param array|object $docs
+     * @param  array|object  $docs
      */
     public function index($docs): void
     {

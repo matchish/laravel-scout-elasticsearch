@@ -22,8 +22,9 @@ final class DefaultImportSource implements ImportSource
 
     /**
      * DefaultImportSource constructor.
-     * @param string $className
-     * @param array $scopes
+     *
+     * @param  string  $className
+     * @param  array  $scopes
      */
     public function __construct(string $className, array $scopes = [])
     {

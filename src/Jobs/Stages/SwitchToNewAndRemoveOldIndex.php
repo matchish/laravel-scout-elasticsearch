@@ -23,8 +23,8 @@ final class SwitchToNewAndRemoveOldIndex
     private $index;
 
     /**
-     * @param ImportSource $source
-     * @param Index $index
+     * @param  ImportSource  $source
+     * @param  Index  $index
      */
     public function __construct(ImportSource $source, Index $index)
     {
