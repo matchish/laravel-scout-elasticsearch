@@ -18,8 +18,9 @@ final class Get
 
     /**
      * Get constructor.
-     * @param string $alias
-     * @param string $index
+     *
+     * @param  string  $alias
+     * @param  string  $index
      */
     public function __construct(string $alias, string $index = '*')
     {

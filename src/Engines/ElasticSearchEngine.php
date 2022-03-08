@@ -28,7 +28,7 @@ final class ElasticSearchEngine extends Engine
     /**
      * Create a new engine instance.
      *
-     * @param \Elasticsearch\Client $elasticsearch
+     * @param  \Elasticsearch\Client  $elasticsearch
      * @return void
      */
     public function __construct(\Elasticsearch\Client $elasticsearch)
@@ -163,8 +163,8 @@ final class ElasticSearchEngine extends Engine
     }
 
     /**
-     * @param BaseBuilder $builder
-     * @param array $options
+     * @param  BaseBuilder  $builder
+     * @param  array  $options
      * @return SearchResults|mixed
      */
     private function performSearch(BaseBuilder $builder, $options = [])

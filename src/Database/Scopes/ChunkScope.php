@@ -19,8 +19,9 @@ class ChunkScope implements Scope
 
     /**
      * ChunkScope constructor.
-     * @param mixed $start
-     * @param mixed $end
+     *
+     * @param  mixed  $start
+     * @param  mixed  $end
      */
     public function __construct($start, $end)
     {

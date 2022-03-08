@@ -13,7 +13,7 @@ final class WriteAlias implements Alias
     private $origin;
 
     /**
-     * @param Alias $origin
+     * @param  Alias  $origin
      */
     public function __construct(Alias $origin)
     {

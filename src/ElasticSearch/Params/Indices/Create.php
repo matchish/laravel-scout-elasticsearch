@@ -18,8 +18,9 @@ final class Create
 
     /**
      * Create constructor.
-     * @param string $index
-     * @param array $config
+     *
+     * @param  string  $index
+     * @param  array  $config
      */
     public function __construct(string $index, array $config)
     {

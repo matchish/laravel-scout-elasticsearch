@@ -14,7 +14,8 @@ final class Refresh
 
     /**
      * Refresh constructor.
-     * @param string $index
+     *
+     * @param  string  $index
      */
     public function __construct(string $index)
     {

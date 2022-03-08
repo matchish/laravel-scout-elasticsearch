@@ -14,7 +14,7 @@ use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 class ImportStages extends Collection
 {
     /**
-     * @param ImportSource $source
+     * @param  ImportSource  $source
      * @return Collection
      */
     public static function fromSource(ImportSource $source)

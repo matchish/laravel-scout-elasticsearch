@@ -19,8 +19,9 @@ class PageScope implements Scope
 
     /**
      * PageScope constructor.
-     * @param int $page
-     * @param int $perPage
+     *
+     * @param  int  $page
+     * @param  int  $perPage
      */
     public function __construct(int $page, int $perPage)
     {
@@ -31,8 +32,8 @@ class PageScope implements Scope
     /**
      * Apply the scope to a given Eloquent query builder.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $builder
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return void
      */
     public function apply(Builder $builder, Model $model)

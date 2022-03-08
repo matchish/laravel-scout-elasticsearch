@@ -13,7 +13,7 @@ class ProgressBarFactory
     private $output;
 
     /**
-     * @param OutputStyle $output
+     * @param  OutputStyle  $output
      */
     public function __construct(OutputStyle $output)
     {

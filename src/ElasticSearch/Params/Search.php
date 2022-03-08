@@ -17,8 +17,8 @@ final class Search
     private $body;
 
     /**
-     * @param string $index
-     * @param array $body
+     * @param  string  $index
+     * @param  array  $body
      */
     public function __construct(string $index, array $body)
     {
