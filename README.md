@@ -9,9 +9,8 @@
   <img alt="Import progress report" src="https://raw.githubusercontent.com/matchish/laravel-scout-elasticsearch/master/docs/demo.gif" >
 
   <p align="center">
-    <a href="https://travis-ci.com/matchish/laravel-scout-elasticsearch"><img src="https://img.shields.io/travis/com/matchish/laravel-scout-elasticsearch/master.svg" alt="Build Status"></img></a>
-    <a href="https://scrutinizer-ci.com/g/matchish/laravel-scout-elasticsearch"><img alt="Code quality" src="https://img.shields.io/scrutinizer/g/matchish/laravel-scout-elasticsearch.svg?label=quality"></img></a>
-    <a href="https://scrutinizer-ci.com/g/matchish/laravel-scout-elasticsearch"><img src="https://img.shields.io/scrutinizer/coverage/g/matchish/laravel-scout-elasticsearch.svg" alt="Coverage"></img></a>
+    <a href="#"><img src="https://github.com/matchish/laravel-scout-elasticsearch/actions/workflows/test-application.yaml/badge.svg" alt="Build Status"></img></a>
+    <a href="https://app.codecov.io/gh/matchish/laravel-scout-elasticsearch"><img src="https://codecov.io/gh/matchish/laravel-scout-elasticsearch/branch/coverage-badge/graph/badge.svg" alt="Coverage"></img></a>
     <a href="https://packagist.org/packages/matchish/laravel-scout-elasticsearch"><img src="https://poser.pugx.org/matchish/laravel-scout-elasticsearch/d/total.svg" alt="Total Downloads"></a>
     <a href="https://packagist.org/packages/matchish/laravel-scout-elasticsearch"><img src="https://poser.pugx.org/matchish/laravel-scout-elasticsearch/v/stable.svg" alt="Latest Version"></a>
     <a href="https://packagist.org/packages/matchish/laravel-scout-elasticsearch"><img src="https://poser.pugx.org/matchish/laravel-scout-elasticsearch/license.svg" alt="License"></a>
