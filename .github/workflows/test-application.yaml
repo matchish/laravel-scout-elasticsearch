@@ -72,7 +72,7 @@ jobs:
                     ELASTICSEARCH_HOST: '127.0.0.1:9200'
                     
             -   name: Upload coverage to Codecov
-            -   uses: codecov/codecov-action@v2
+                uses: codecov/codecov-action@v2
                 with:
                     files: ./coverage1.xml
                     fail_ci_if_error: true
