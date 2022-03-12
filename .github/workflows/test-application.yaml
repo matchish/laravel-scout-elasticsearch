@@ -65,8 +65,15 @@ jobs:
                     composer install --no-interaction --prefer-dist
 
             -   name: Run tests
-                run: vendor/bin/phpunit --coverage-clover=coverage.clover
+                run: vendor/bin/phpunit --coverage-clover=coverage.xml
                 env:
                     DB_DATABASE: unittest
                     DB_USERNAME: root
                     ELASTICSEARCH_HOST: '127.0.0.1:9200'
+                    
+            -   name: Upload coverage to Codecov
+                uses: codecov/codecov-action@v2
+                with:
+                    files: ./coverage.xml
+                    fail_ci_if_error: true
+                    verbose: true
