@@ -7,6 +7,7 @@ namespace Matchish\ScoutElasticSearch;
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
 use Illuminate\Support\ServiceProvider;
+use Matchish\ScoutElasticSearch\ElasticSearch\Config\Config;
 
 final class ElasticSearchServiceProvider extends ServiceProvider
 {
@@ -18,7 +19,7 @@ final class ElasticSearchServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/elasticsearch.php', 'elasticsearch');
 
         $this->app->bind(Client::class, function () {
-            return ClientBuilder::create()->setHosts([config('elasticsearch.host')])->build();
+            return ClientBuilder::create()->setHosts(Config::hosts())->build();
         });
 
         $this->app->bind(
