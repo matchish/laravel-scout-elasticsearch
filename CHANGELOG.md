@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [4.0.11] - 2022-03-24
+### Added
+-  multiple ElasticSearch nodes support
+
 ## [4.0.10] - 2021-08-01
 ### Fixed
 -  Avoid ambiguous In Some Cases
