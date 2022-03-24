@@ -78,7 +78,7 @@ Set `ELASTICSEARCH_HOST` env variable
 ```
 ELASTICSEARCH_HOST=host:port
 ```
-or
+or use commas as separator for additional nodes
 ```
 ELASTICSEARCH_HOST=host:port,host:port
 ```
