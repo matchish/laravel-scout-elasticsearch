@@ -1,6 +1,7 @@
 <?php
 
 namespace Matchish\ScoutElasticSearch\ElasticSearch\Config;
+
 /**
  * @method static array hosts()
  */
