@@ -4,11 +4,14 @@ namespace Matchish\ScoutElasticSearch\ElasticSearch\Config;
 
 class Storage
 {
+    protected string $config;
+
     /**
      * @param string $config
      */
-    private function __construct(protected string $config)
+    private function __construct(string $config)
     {
+        $this->config = $config;
     }
 
     /**
