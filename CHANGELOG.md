@@ -6,9 +6,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
-## [4.0.11] - 2022-03-24
+## [5.0.2] - 2022-03-24
 ### Added
 -  multiple ElasticSearch nodes support
+
+## [5.0.1] - 2021-07-23
+### Added
+- whereIn filter support
+
+## [5.0.0] - 2021-05-13
+### Added
+-  PHP 8 Support
+-  Laravel Scout 9 Support
 
 ## [4.0.10] - 2021-08-01
 ### Fixed
