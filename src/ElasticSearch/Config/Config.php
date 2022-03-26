@@ -8,8 +8,8 @@ namespace Matchish\ScoutElasticSearch\ElasticSearch\Config;
 class Config
 {
     /**
-     * @param string $method
-     * @param array $parameters
+     * @param  string  $method
+     * @param  array  $parameters
      * @return mixed
      */
     public function __call(string $method, array $parameters)
@@ -18,8 +18,8 @@ class Config
     }
 
     /**
-     * @param string $method
-     * @param array $parameters
+     * @param  string  $method
+     * @param  array  $parameters
      * @return mixed
      */
     public static function __callStatic(string $method, array $parameters)

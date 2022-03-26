@@ -7,7 +7,7 @@ class Storage
     protected string $config;
 
     /**
-     * @param string $config
+     * @param  string  $config
      */
     private function __construct(string $config)
     {
@@ -15,7 +15,7 @@ class Storage
     }
 
     /**
-     * @param string $config
+     * @param  string  $config
      * @return Storage
      */
     public static function load(string $config): Storage
@@ -32,7 +32,7 @@ class Storage
     }
 
     /**
-     * @param string $path
+     * @param  string  $path
      * @return mixed
      */
     private function loadConfig(string $path): mixed
@@ -41,7 +41,7 @@ class Storage
     }
 
     /**
-     * @param string $path
+     * @param  string  $path
      * @return string
      */
     private function getKey(string $path): string
