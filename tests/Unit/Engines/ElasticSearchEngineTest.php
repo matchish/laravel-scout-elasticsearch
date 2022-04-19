@@ -4,10 +4,8 @@ namespace Tests\Unit\Engines;
 
 use App\Product;
 use Elastic\Elasticsearch\Client;
-use Elastic\Elasticsearch\ClientBuilder;
 use Laravel\Scout\Builder;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
-use Mockery as m;
 use Tests\TestCase;
 
 class ElasticSearchEngineTest extends TestCase
