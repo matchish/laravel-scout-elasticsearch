@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Matchish\ScoutElasticSearch\Console\Commands;
 
+use Elastic\Elasticsearch\Exception\ClientResponseException;
 use Illuminate\Console\Command;
 use Matchish\ScoutElasticSearch\Searchable\SearchableListFactory;
 

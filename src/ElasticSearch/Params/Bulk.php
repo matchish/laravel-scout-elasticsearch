@@ -50,7 +50,6 @@ final class Bulk
                     'index' => [
                         '_index' => $model->searchableAs(),
                         '_id' => $scoutKey,
-                        '_type' => '_doc',
                         'routing' => false === empty($routing) ? $routing : $scoutKey,
                     ],
                 ];
@@ -73,7 +72,6 @@ final class Bulk
                     'delete' => [
                         '_index' => $model->searchableAs(),
                         '_id' => $scoutKey,
-                        '_type' => '_doc',
                         'routing' => false === empty($routing) ? $routing : $scoutKey,
                     ],
                 ];

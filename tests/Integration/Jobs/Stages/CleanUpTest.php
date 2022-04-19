@@ -27,8 +27,8 @@ class CleanUpTest extends IntegrationTestCase
 
         $stage = new CleanUp(DefaultImportSourceFactory::from(Product::class));
         $stage->handle($this->elasticsearch);
-        $writeIndexExist = $this->elasticsearch->indices()->exists(['index' => 'products_new']);
-        $readIndexExist = $this->elasticsearch->indices()->exists(['index' => 'products_old']);
+        $writeIndexExist = $this->elasticsearch->indices()->exists(['index' => 'products_new'])->asBool();
+        $readIndexExist = $this->elasticsearch->indices()->exists(['index' => 'products_old'])->asBool();
 
         $this->assertFalse($writeIndexExist);
         $this->assertTrue($readIndexExist);

@@ -21,7 +21,6 @@ final class RefreshIndexTest extends IntegrationTestCase
             ['index' => [
                 '_index' => 'products',
                 '_id' => 'id',
-                '_type' => '_doc',
             ]],
             [
                 'id' => 1,
@@ -40,7 +39,7 @@ final class RefreshIndexTest extends IntegrationTestCase
                 ],
             ],
         ];
-        $response = $this->elasticsearch->search($params);
+        $response = $this->elasticsearch->search($params)->asArray();
         $this->assertEquals(1, $response['hits']['total']['value']);
     }
 }

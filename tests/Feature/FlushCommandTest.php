@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Product;
+use Elastic\Elasticsearch\Exception\ClientResponseException;
 use Illuminate\Support\Facades\Artisan;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Refresh;

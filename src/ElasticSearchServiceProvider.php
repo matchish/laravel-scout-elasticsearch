@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Matchish\ScoutElasticSearch;
 
-use Elasticsearch\Client;
-use Elasticsearch\ClientBuilder;
+use Elastic\Elasticsearch\Client;
+use Elastic\Elasticsearch\ClientBuilder;
 use Illuminate\Support\ServiceProvider;
 use Matchish\ScoutElasticSearch\ElasticSearch\Config\Config;
 

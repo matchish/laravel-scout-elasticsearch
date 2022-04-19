@@ -17,7 +17,7 @@ class BulkTest extends TestCase
         $params = $bulk->toArray();
 
         $this->assertEquals([
-            'body' => [['delete' => ['_index' => 'products', '_type' => '_doc', '_id' => 2, 'routing' => 2]]],
+            'body' => [['delete' => ['_index' => 'products', '_id' => 2, 'routing' => 2]]],
         ], $params);
     }
 
@@ -31,7 +31,7 @@ class BulkTest extends TestCase
         $params = $bulk->toArray();
 
         $this->assertEquals([
-            'body' => [['delete' => ['_index' => 'products', '_type' => '_doc', '_id' => 'Scout', 'routing' => 'Scout']]],
+            'body' => [['delete' => ['_index' => 'products', '_id' => 'Scout', 'routing' => 'Scout']]],
         ], $params);
     }
 
@@ -45,7 +45,7 @@ class BulkTest extends TestCase
 
         $this->assertEquals([
             'body' => [
-                ['index' => ['_index' => 'products', '_type' => '_doc', '_id' => 2, 'routing' => 2]],
+                ['index' => ['_index' => 'products', '_id' => 2, 'routing' => 2]],
                 ['title' => 'Scout', 'id' => 2, '__class_name' => 'App\Product'],
             ],
         ], $params);
@@ -62,7 +62,7 @@ class BulkTest extends TestCase
 
         $this->assertEquals([
             'body' => [
-                ['index' => ['_index' => 'products', '_type' => '_doc', '_id' => 'Scout', 'routing' => 'Scout']],
+                ['index' => ['_index' => 'products', '_id' => 'Scout', 'routing' => 'Scout']],
                 ['title' => 'Scout', 'id' => 2, '__class_name' => 'App\Product'],
             ],
         ], $params);
@@ -78,7 +78,7 @@ class BulkTest extends TestCase
         $params = $bulk->toArray();
         $this->assertEquals([
             'body' => [
-                ['index' => ['_index' => 'products', '_type' => '_doc', '_id' => 2, 'routing' => 2]],
+                ['index' => ['_index' => 'products', '_id' => 2, 'routing' => 2]],
                 ['title' => 'Scout', '__soft_deleted' => 0, 'id' => 2, '__class_name' => 'App\Product'],
             ],
         ], $params);
