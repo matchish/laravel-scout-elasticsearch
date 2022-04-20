@@ -16,15 +16,14 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
         Product::unsetEventDispatcher();
 
         $productsAmount = random_int(1, 5);
-        $products = factory(Product::class, $productsAmount)->states(['iphone'])->create();
+        factory(Product::class, $productsAmount)->states(['iphone'])->create();
         Product::setEventDispatcher($dispatcher);
 
         Artisan::call('scout:import');
 
-        $results = Product::search('Quia', static function($client, $body) {
+        $results = Product::search('Quia', static function ($client, $body) {
             return $client->search(['index' => 'products', 'body' => $body->toArray()]);
         })->raw();
-
         $this->assertEmpty($results['hits']['hits']);
     }
 
@@ -39,7 +38,7 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
 
         Artisan::call('scout:import');
 
-        $results = Product::search('iphone', static function($client, $body) {
+        $results = Product::search('iphone', static function ($client, $body) {
             return $client->search(['index' => 'products', 'body' => $body->toArray()]);
         })->raw();
 
