@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use Elasticsearch\Client;
+use Elastic\Elasticsearch\Client;
 
 /**
  * Class IntegrationTestCase.

@@ -2,7 +2,7 @@
 
 namespace Matchish\ScoutElasticSearch\Engines;
 
-use Elasticsearch\Common\Exceptions\ServerErrorResponseException;
+use Elastic\Elasticsearch\Exception\ServerResponseException;
 use Illuminate\Database\Eloquent\Collection;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Builder as BaseBuilder;
@@ -21,17 +21,17 @@ final class ElasticSearchEngine extends Engine
     /**
      * The ElasticSearch client.
      *
-     * @var \Elasticsearch\Client
+     * @var \Elastic\Elasticsearch\Client
      */
     protected $elasticsearch;
 
     /**
      * Create a new engine instance.
      *
-     * @param  \Elasticsearch\Client  $elasticsearch
+     * @param  \Elastic\Elasticsearch\Client  $elasticsearch
      * @return void
      */
-    public function __construct(\Elasticsearch\Client $elasticsearch)
+    public function __construct(\Elastic\Elasticsearch\Client $elasticsearch)
     {
         $this->elasticsearch = $elasticsearch;
     }
@@ -43,9 +43,9 @@ final class ElasticSearchEngine extends Engine
     {
         $params = new Bulk();
         $params->index($models);
-        $response = $this->elasticsearch->bulk($params->toArray());
+        $response = $this->elasticsearch->bulk($params->toArray())->asArray();
         if (array_key_exists('errors', $response) && $response['errors']) {
-            $error = new ServerErrorResponseException(json_encode($response, JSON_PRETTY_PRINT));
+            $error = new ServerResponseException(json_encode($response, JSON_PRETTY_PRINT));
             throw new \Exception('Bulk update error', $error->getCode(), $error);
         }
     }
@@ -66,7 +66,7 @@ final class ElasticSearchEngine extends Engine
     public function flush($model)
     {
         $indexName = $model->searchableAs();
-        $exist = $this->elasticsearch->indices()->exists(['index' => $indexName]);
+        $exist = $this->elasticsearch->indices()->exists(['index' => $indexName])->asBool();
         if ($exist) {
             $body = (new Search())->addQuery(new MatchAllQuery())->toArray();
             $params = new SearchParams($indexName, $body);
@@ -185,6 +185,6 @@ final class ElasticSearchEngine extends Engine
         $indexName = $builder->index ?: $model->searchableAs();
         $params = new SearchParams($indexName, $searchBody->toArray());
 
-        return $this->elasticsearch->search($params->toArray());
+        return $this->elasticsearch->search($params->toArray())->asArray();
     }
 }

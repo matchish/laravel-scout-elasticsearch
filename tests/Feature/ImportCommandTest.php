@@ -142,7 +142,7 @@ final class ImportCommandTest extends IntegrationTestCase
 
         Artisan::call('scout:import');
 
-        $this->assertFalse($this->elasticsearch->indices()->exists(['index' => 'products_old']), 'Old index must be deleted');
+        $this->assertFalse($this->elasticsearch->indices()->exists(['index' => 'products_old'])->asBool(), 'Old index must be deleted');
     }
 
     public function test_progress_report()
