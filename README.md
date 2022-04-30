@@ -45,10 +45,11 @@ Don't forget to :star: the package if you like it. :pray:
 - PHP version >= 8.0
 - Laravel Framework version >= 8.0.0
 
-| Elasticsearch version | ElasticsearchDSL version    |
-| --------------------- | --------------------------- |
-| >= 7.0                | >= 3.0.0                    |
-| >= 6.0, < 7.0         | < 3.0.0                     |
+| Elasticsearch version | ElasticsearchDSL version |
+|-----------------------|--------------------------|
+| >= 8.0                | >= 8.0.0                 |
+| >= 7.0                | >= 3.0.0                 |
+| >= 6.0, < 7.0         | < 3.0.0                  |
 
 ## :rocket: Installation
 
