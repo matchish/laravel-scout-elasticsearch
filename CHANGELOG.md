@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [6.0.0] - 2022-04-30
+### Added
+- Elasticsearch 8 Support
+
 ## [5.0.2] - 2022-03-24
 ### Added
 -  multiple ElasticSearch nodes support
