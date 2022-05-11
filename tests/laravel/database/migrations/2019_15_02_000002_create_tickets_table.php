@@ -23,6 +23,6 @@ final class CreateTicketsTable extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('books');
+        Schema::dropIfExists('tickets');
     }
 }
