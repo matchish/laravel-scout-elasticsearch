@@ -133,7 +133,7 @@ final class ElasticSearchEngine extends Engine
             throw new \Error('Not implemented for MixedSearch');
         }
 
-        if (count($results['hits']) === 0) {
+        if (count($results['hits']['hits']) === 0) {
             return LazyCollection::make($model->newCollection());
         }
 
