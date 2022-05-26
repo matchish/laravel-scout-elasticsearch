@@ -17,9 +17,6 @@ final class MixedSearch
      */
     public static function search(string $query = '', $callback = null): Builder
     {
-        return new Builder(new class extends Model
-        {
-            use Searchable;
-        }, $query, $callback);
+        return new Builder(new MixedModel(), $query, $callback);
     }
 }
