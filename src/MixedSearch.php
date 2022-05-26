@@ -2,9 +2,7 @@
 
 namespace Matchish\ScoutElasticSearch;
 
-use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Builder;
-use Laravel\Scout\Searchable;
 
 final class MixedSearch
 {
