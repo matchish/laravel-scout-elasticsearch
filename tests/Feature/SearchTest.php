@@ -166,4 +166,14 @@ final class SearchTest extends IntegrationTestCase
         $this->assertEquals(LazyCollection::class, get_class($kindle));
         $this->assertEquals($kindleAmount, $kindle->count());
     }
+
+    public function test_cursor_no_results()
+    {
+        Artisan::call('scout:import');
+
+        $kindle = Product::search('lisbon')
+            ->cursor();
+        $this->assertEquals(LazyCollection::class, get_class($kindle));
+        $this->assertEquals(0, $kindle->count());
+    }
 }
