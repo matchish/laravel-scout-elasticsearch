@@ -3,7 +3,9 @@
 namespace Tests\Integration\Engines;
 
 use App\Product;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Builder;
+use Laravel\Scout\Searchable;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Create;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
@@ -130,6 +132,36 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
         $results = ['hits' => ['hits' => $keys, 'total' => $models->count()]];
         $mappedModels = $this->engine->map(new Builder(new Product(), 'zonga'), $results, new Product());
         $this->assertEquals($models->map->id->all(), $mappedModels->map->id->all());
+    }
+
+    public function test_lazy_map()
+    {
+        $models = Product::all();
+        $keys = $models->map(function ($product) {
+            return ['_id' => $product->getScoutKey(), '_source' => [
+                '__class_name' => Product::class,
+            ]];
+        })->all();
+        $results = ['hits' => ['hits' => $keys, 'total' => $models->count()]];
+        $mappedModels = $this->engine->lazyMap(new Builder(new Product(), 'zonga'), $results, new Product());
+        $this->assertEquals($models->map->id->all(), $mappedModels->map->id->all());
+    }
+
+    public function test_lazy_map_for_mixed_search()
+    {
+        $this->expectErrorMessage('Not implemented for MixedSearch');
+        $this->expectException(\Error::class);
+        $models = Product::all();
+        $keys = $models->map(function ($product) {
+            return ['_id' => $product->getScoutKey(), '_source' => [
+                '__class_name' => Product::class,
+            ]];
+        })->all();
+        $results = ['hits' => ['hits' => $keys, 'total' => $models->count()]];
+        $mappedModels = $this->engine->lazyMap(new Builder(new Product(), 'zonga'), $results, new class extends Model
+        {
+            use Searchable;
+        });
     }
 
     private function refreshIndex(string $index): void

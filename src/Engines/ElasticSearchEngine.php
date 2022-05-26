@@ -14,7 +14,6 @@ use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Refresh;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Search as SearchParams;
 use Matchish\ScoutElasticSearch\ElasticSearch\SearchFactory;
 use Matchish\ScoutElasticSearch\ElasticSearch\SearchResults;
-use Matchish\ScoutElasticSearch\MixedModel;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Search;
 
@@ -130,7 +129,7 @@ final class ElasticSearchEngine extends Engine
      */
     public function lazyMap(Builder $builder, $results, $model)
     {
-        if ($model instanceof MixedModel) {
+        if ((new \ReflectionClass($model))->isAnonymous()) {
             throw new \Error('Not implemented for MixedSearch');
         }
 
