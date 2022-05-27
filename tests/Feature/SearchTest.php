@@ -9,6 +9,7 @@ use App\Product;
 use App\Ticket;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\LazyCollection;
 use Matchish\ScoutElasticSearch\MixedSearch;
 use Tests\IntegrationTestCase;
 
@@ -137,5 +138,42 @@ final class SearchTest extends IntegrationTestCase
                 (new Ticket())->searchableAs(),
             ]))->get();
         $this->assertEquals(0, $mixed->count());
+    }
+
+    public function test_mixed_cursor()
+    {
+        $this->expectException(\Error::class);
+        $this->expectErrorMessage('Not implemented for MixedSearch');
+        Artisan::call('scout:import');
+
+        $mixed = MixedSearch::search('*')->within(
+            implode(',', [(new Book)->searchableAs(),
+                (new Ticket())->searchableAs(),
+            ]))->cursor();
+    }
+
+    public function test_cursor()
+    {
+        $dispatcher = Product::getEventDispatcher();
+        Product::unsetEventDispatcher();
+        $kindleAmount = rand(1, 5);
+        factory(Product::class, $kindleAmount)->state('kindle')->create();
+        Product::setEventDispatcher($dispatcher);
+        Artisan::call('scout:import');
+
+        $kindle = Product::search('kindle')
+            ->cursor();
+        $this->assertEquals(LazyCollection::class, get_class($kindle));
+        $this->assertEquals($kindleAmount, $kindle->count());
+    }
+
+    public function test_cursor_no_results()
+    {
+        Artisan::call('scout:import');
+
+        $kindle = Product::search('lisbon')
+            ->cursor();
+        $this->assertEquals(LazyCollection::class, get_class($kindle));
+        $this->assertEquals(0, $kindle->count());
     }
 }

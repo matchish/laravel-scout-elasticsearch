@@ -4,6 +4,7 @@ namespace Matchish\ScoutElasticSearch\Engines;
 
 use Elastic\Elasticsearch\Exception\ServerResponseException;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\LazyCollection;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Builder as BaseBuilder;
 use Laravel\Scout\Engines\Engine;
@@ -128,7 +129,24 @@ final class ElasticSearchEngine extends Engine
      */
     public function lazyMap(Builder $builder, $results, $model)
     {
-        throw new \Error('Not implemented');
+        if ((new \ReflectionClass($model))->isAnonymous()) {
+            throw new \Error('Not implemented for MixedSearch');
+        }
+
+        if (count($results['hits']['hits']) === 0) {
+            return LazyCollection::make($model->newCollection());
+        }
+
+        $objectIds = collect($results['hits']['hits'])->pluck('_id')->values()->all();
+        $objectIdPositions = array_flip($objectIds);
+
+        return $model->queryScoutModelsByIds(
+            $builder, $objectIds
+        )->cursor()->filter(function ($model) use ($objectIds) {
+            return in_array($model->getScoutKey(), $objectIds);
+        })->sortBy(function ($model) use ($objectIdPositions) {
+            return $objectIdPositions[$model->getScoutKey()];
+        })->values();
     }
 
     /**
