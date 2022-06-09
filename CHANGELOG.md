@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [6.0.1] - 2022-06-09
+### Added
+- LazyMap implemented for ElasticsearchEngine
+
 ## [6.0.0] - 2022-04-30
 ### Added
 - Elasticsearch 8 Support
