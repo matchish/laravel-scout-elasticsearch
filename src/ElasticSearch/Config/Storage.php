@@ -32,17 +32,17 @@ class Storage
     }
 
     /**
-     * @return string
+     * @return ?string
      */
-    public function user(): string
+    public function user(): ?string
     {
         return $this->loadConfig('user');
     }
 
     /**
-     * @return string
+     * @return ?string
      */
-    public function password(): string
+    public function password(): ?string
     {
         return $this->loadConfig('password');
     }
