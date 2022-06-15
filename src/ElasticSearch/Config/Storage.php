@@ -32,6 +32,22 @@ class Storage
     }
 
     /**
+     * @return string
+     */
+    public function user(): string
+    {
+        return $this->loadConfig('user');
+    }
+
+    /**
+     * @return string
+     */
+    public function password(): string
+    {
+        return $this->loadConfig('password');
+    }
+
+    /**
      * @param  string  $path
      * @return mixed
      */

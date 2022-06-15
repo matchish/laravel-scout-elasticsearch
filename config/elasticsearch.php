@@ -2,6 +2,8 @@
 
 return [
     'host' => env('ELASTICSEARCH_HOST'),
+    'user' => env('ELASTICSEARCH_USER'),
+    'password' => env('ELASTICSEARCH_PASSWORD'),
     'indices' => [
         'mappings' => [
             'default' => [

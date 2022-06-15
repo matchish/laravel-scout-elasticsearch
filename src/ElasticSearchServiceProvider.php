@@ -8,6 +8,8 @@ use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\ClientBuilder;
 use Illuminate\Support\ServiceProvider;
 use Matchish\ScoutElasticSearch\ElasticSearch\Config\Config;
+use Matchish\ScoutElasticSearch\ElasticSearch\EloquentHitsIteratorAggregate;
+use Matchish\ScoutElasticSearch\ElasticSearch\HitsIteratorAggregate;
 
 final class ElasticSearchServiceProvider extends ServiceProvider
 {
@@ -19,12 +21,17 @@ final class ElasticSearchServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/elasticsearch.php', 'elasticsearch');
 
         $this->app->bind(Client::class, function () {
-            return ClientBuilder::create()->setHosts(Config::hosts())->build();
+            $clientBuilder = ClientBuilder::create()->setHosts(Config::hosts());
+            if ($user = Config::user()) {
+                $clientBuilder->setBasicAuthentication($user, Config::password());
+            }
+
+            return $clientBuilder->build();
         });
 
         $this->app->bind(
-            'Matchish\ScoutElasticSearch\ElasticSearch\HitsIteratorAggregate',
-            'Matchish\ScoutElasticSearch\ElasticSearch\EloquentHitsIteratorAggregate'
+            HitsIteratorAggregate::class,
+            EloquentHitsIteratorAggregate::class
         );
     }
 
