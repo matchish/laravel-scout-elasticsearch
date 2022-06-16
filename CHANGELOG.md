@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [6.0.2] - 2022-06-16
+### Added
+- Elasticsearch basic authentication support
+- Elasticsearch CloudId and Api Key credential support
+
 ## [6.0.1] - 2022-06-09
 ### Added
 - LazyMap implemented for ElasticsearchEngine
