@@ -32,6 +32,38 @@ class Storage
     }
 
     /**
+     * @return ?string
+     */
+    public function user(): ?string
+    {
+        return $this->loadConfig('user');
+    }
+
+    /**
+     * @return ?string
+     */
+    public function password(): ?string
+    {
+        return $this->loadConfig('password');
+    }
+
+    /**
+     * @return ?string
+     */
+    public function elasticCloudId(): ?string
+    {
+        return $this->loadConfig('cloud_id');
+    }
+
+    /**
+     * @return ?string
+     */
+    public function apiKey(): ?string
+    {
+        return $this->loadConfig('api_key');
+    }
+
+    /**
      * @param  string  $path
      * @return mixed
      */
