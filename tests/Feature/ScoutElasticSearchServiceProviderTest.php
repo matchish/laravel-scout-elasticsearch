@@ -3,6 +3,8 @@
 namespace Matchish\ScoutElasticSearch;
 
 use Elastic\Elasticsearch\Client;
+use Elastic\Elasticsearch\ClientBuilder;
+use Elastic\Transport\Exception\NoNodeAvailableException;
 use Tests\TestCase;
 
 class ScoutElasticSearchServiceProviderTest extends TestCase
@@ -44,6 +46,12 @@ class ScoutElasticSearchServiceProviderTest extends TestCase
         $this->assertEquals([Client::class], $provider->provides());
         /** @var Client $client */
         $client = $this->app[Client::class];
+        try {
+        $client->info();
+        } catch (NoNodeAvailableException $e) {
+            $this->assertTrue(true);
+        }
+        $this->assertEquals('elastic:pass', $client->getTransport()->getLastRequest()->getUri()->getUserInfo());
     }
 
     public function test_config_with_cloud_id()
