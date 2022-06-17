@@ -3,7 +3,6 @@
 namespace Matchish\ScoutElasticSearch;
 
 use Elastic\Elasticsearch\Client;
-use Elastic\Elasticsearch\ClientBuilder;
 use Elastic\Transport\Exception\NoNodeAvailableException;
 use Tests\TestCase;
 
@@ -47,7 +46,7 @@ class ScoutElasticSearchServiceProviderTest extends TestCase
         /** @var Client $client */
         $client = $this->app[Client::class];
         try {
-        $client->info();
+            $client->info();
         } catch (NoNodeAvailableException $e) {
             $this->assertTrue(true);
         }
