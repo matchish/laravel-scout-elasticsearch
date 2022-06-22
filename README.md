@@ -150,6 +150,36 @@ class WithCommentsScope implements Scope {
     }
 }
 ```
+
+You can also customize your indexed data when you save models by leveraging the (`toSearchableArray`)[https://laravel.com/docs/9.x/scout#configuring-searchable-data] method
+provided by Laravel Scout through the `Searchable` trait
+
+#### Example:
+```php
+class Product extends Model 
+{
+    use Searchable;
+
+    /**
+     * Get the indexable data array for the model.
+     *
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        $with = [
+            'categories',
+        ];
+
+        $this->loadMissing($with);
+
+        return $this->toArray();
+    }
+}
+```
+
+This example will make sure the categories relationship gets always loaded on the model when 
+saving it.
 ### Zero downtime reimport
 While working in production, to keep your existing search experience available while reimporting your data, you also can use `scout:import` Artisan command:  
 
