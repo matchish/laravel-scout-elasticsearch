@@ -48,6 +48,7 @@ services:
       - discovery.type=single-node
       - cluster.routing.allocation.disk.threshold_enabled=false
       - bootstrap.memory_lock=true
+      - action.destructive_requires_name=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
       memlock:
