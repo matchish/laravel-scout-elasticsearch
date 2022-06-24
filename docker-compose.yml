@@ -21,6 +21,8 @@ services:
       XDEBUG_CONFIG: ${XDEBUG_CONFIG}
       PHP_IDE_CONFIG: ${PHP_IDE_CONFIG}
       ELASTICSEARCH_HOST: ${ELASTICSEARCH_HOST}
+      ELASTICSEARCH_USER: ${ELASTICSEARCH_USER}
+      ELASTICSEARCH_PASSWORD: ${ELASTICSEARCH_PASSWORD}
       DB_HOST: ${DB_HOST}
       DB_DATABASE: ${DB_DATABASE}
       DB_USERNAME: ${DB_USERNAME}
@@ -37,14 +39,16 @@ services:
     networks:
       - default
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.1.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.1.3
     user: "1000:1000"
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
     environment:
+      - ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
       - discovery.type=single-node
       - cluster.routing.allocation.disk.threshold_enabled=false
       - bootstrap.memory_lock=true
+      - action.destructive_requires_name=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
       memlock:

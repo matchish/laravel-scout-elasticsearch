@@ -57,6 +57,7 @@ class ScoutElasticSearchServiceProviderTest extends TestCase
     {
         $this->app['config']->set('elasticsearch.cloud_id', 'Test:ZXUtY2VudHJhbC0xLmF3cy5jbG91ZC5lcy5pbyQ0ZGU0NmNlZDhkOGQ0NTk2OTZlNTQ0ZmU1ZjMyYjk5OSRlY2I0YTJlZmY0OTA0ZDliOTE5NzMzMmQwOWNjOTY5Ng==');
         $this->app['config']->set('elasticsearch.api_key', '123456');
+        $this->app['config']->set('elasticsearch.user', null);
         $provider = new ElasticSearchServiceProvider($this->app);
         $this->assertEquals([Client::class], $provider->provides());
         /** @var Client $client */
