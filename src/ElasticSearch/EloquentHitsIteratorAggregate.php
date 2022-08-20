@@ -6,6 +6,7 @@ use IteratorAggregate;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Searchable;
 use Traversable;
+use Elastic\Elasticsearch\Response\Elasticsearch;
 
 /**
  * @internal
@@ -22,10 +23,10 @@ final class EloquentHitsIteratorAggregate implements IteratorAggregate
     private $callback;
 
     /**
-     * @param  array  $results
+     * @param  array|Elasticsearch  $results
      * @param  callable|null  $callback
      */
-    public function __construct(array $results, callable $callback = null)
+    public function __construct(array|Elasticsearch $results, callable $callback = null)
     {
         $this->results = $results;
         $this->callback = $callback;
