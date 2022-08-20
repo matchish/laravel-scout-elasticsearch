@@ -2,11 +2,11 @@
 
 namespace Matchish\ScoutElasticSearch\ElasticSearch;
 
+use Elastic\Elasticsearch\Response\Elasticsearch;
 use IteratorAggregate;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Searchable;
 use Traversable;
-use Elastic\Elasticsearch\Response\Elasticsearch;
 
 /**
  * @internal
