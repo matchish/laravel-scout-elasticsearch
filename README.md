@@ -215,7 +215,7 @@ $results = Product::search('zonga', function($client, $body) {
     $body->addAggregation($minPriceAggregation);
     $body->addAggregation($brandTermAggregation);
     
-    return $client->search(['index' => 'products', 'body' => $body->toArray()]);
+    return $client->search(['index' => 'products', 'body' => $body->toArray()])->asArray();
 })->raw();
 ```
 
