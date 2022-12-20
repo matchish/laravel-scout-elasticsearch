@@ -157,7 +157,7 @@ final class SearchTest extends IntegrationTestCase
                 (new Book)->searchableAs(),
                 (new Ticket())->searchableAs(),
             ]))->paginate(3);
-        $this->assertEquals(3, $mixed->count());
+        $this->assertEquals(3, $mixedPage->count());
     }
     
     public function test_mixed_no_results()
