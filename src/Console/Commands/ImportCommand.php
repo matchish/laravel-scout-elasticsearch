@@ -51,6 +51,7 @@ final class ImportCommand extends Command
 
         if (config('scout.queue')) {
             $job = (new QueueableJob())->chain([$job]);
+            $job->timeout = config('elasticsearch.queue.timeout');
         }
 
         $bar = (new ProgressBarFactory($this->output))->create();

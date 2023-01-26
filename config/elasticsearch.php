@@ -6,6 +6,9 @@ return [
     'password' => env('ELASTICSEARCH_PASSWORD'),
     'cloud_id' => env('ELASTICSEARCH_CLOUD_ID'),
     'api_key' => env('ELASTICSEARCH_API_KEY'),
+    'queue' => [
+        'timeout' => env('SCOUT_QUEUE_TIMEOUT', 60),
+    ],
     'indices' => [
         'mappings' => [
             'default' => [
