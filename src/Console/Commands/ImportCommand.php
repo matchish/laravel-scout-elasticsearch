@@ -48,10 +48,11 @@ final class ImportCommand extends Command
         $sourceFactory = app(ImportSourceFactory::class);
         $source = $sourceFactory::from($searchable);
         $job = new Import($source);
+        $job->timeout = config('elasticsearch.queue.timeout', 60);
 
         if (config('scout.queue')) {
             $job = (new QueueableJob())->chain([$job]);
-            $job->timeout = config('elasticsearch.queue.timeout');
+            $job->timeout = config('elasticsearch.queue.timeout', 60);
         }
 
         $bar = (new ProgressBarFactory($this->output))->create();
