@@ -199,7 +199,7 @@ final class ImportCommandTest extends IntegrationTestCase
         $this->assertContains('[OK] '.trans('scout::import.done.queue', ['searchable' => Product::class]), $output);
 
         Bus::assertDispatched(function (QueueableJob $job) {
-            return $job->timeout === 2;
+            return $job->timeout === 60;
         });
     }
 
@@ -221,7 +221,7 @@ final class ImportCommandTest extends IntegrationTestCase
         $this->assertContains('[OK] '.trans('scout::import.done.queue', ['searchable' => Product::class]), $output);
 
         Bus::assertDispatched(function (Import $job) {
-            return $job->timeout === 2;
+            return $job->timeout === 60;
         });
     }
 }
