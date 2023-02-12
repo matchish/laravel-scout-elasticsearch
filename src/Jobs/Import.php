@@ -21,7 +21,7 @@ final class Import
      */
     private $source;
 
-    public int $timeout = 60;
+    public ?int $timeout = null;
 
     /**
      * @param  ImportSource  $source

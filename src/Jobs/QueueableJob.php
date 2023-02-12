@@ -11,7 +11,7 @@ class QueueableJob implements ShouldQueue
     use Queueable;
     use ProgressReportable;
 
-    public int $timeout = 60;
+    public ?int $timeout = null;
 
     public function handle(): void
     {

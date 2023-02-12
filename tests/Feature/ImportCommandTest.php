@@ -224,4 +224,26 @@ final class ImportCommandTest extends IntegrationTestCase
             return $job->timeout === 2;
         });
     }
+
+    public function test_chained_queue_timeout_configuration_with_empty_string(): void
+    {
+        Bus::fake([
+            Import::class,
+        ]);
+
+        $this->app['config']->set('scout.queue', ['connection' => 'sync', 'queue' => 'scout']);
+        $this->app['config']->set('elasticsearch.queue.timeout', null);
+
+        $output = new BufferedOutput();
+        Artisan::call('scout:import', [], $output);
+
+        $output = array_map('trim', explode("\n", $output->fetch()));
+
+        $this->assertContains(trans('scout::import.start', ['searchable' => Product::class]), $output);
+        $this->assertContains('[OK] '.trans('scout::import.done.queue', ['searchable' => Product::class]), $output);
+
+        Bus::assertDispatched(function (Import $job) {
+            return $job->timeout === null;
+        });
+    }
 }
