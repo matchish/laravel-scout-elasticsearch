@@ -6,6 +6,7 @@ namespace Matchish\ScoutElasticSearch\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
+use Matchish\ScoutElasticSearch\ElasticSearch\Config\Config;
 use Matchish\ScoutElasticSearch\Jobs\Import;
 use Matchish\ScoutElasticSearch\Jobs\QueueableJob;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
@@ -48,9 +49,11 @@ final class ImportCommand extends Command
         $sourceFactory = app(ImportSourceFactory::class);
         $source = $sourceFactory::from($searchable);
         $job = new Import($source);
+        $job->timeout = Config::queueTimeout();
 
         if (config('scout.queue')) {
             $job = (new QueueableJob())->chain([$job]);
+            $job->timeout = Config::queueTimeout();
         }
 
         $bar = (new ProgressBarFactory($this->output))->create();

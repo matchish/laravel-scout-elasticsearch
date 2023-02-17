@@ -8,6 +8,9 @@ use App\Book;
 use App\BookWithCustomKey;
 use App\Product;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Bus;
+use Matchish\ScoutElasticSearch\Jobs\Import;
+use Matchish\ScoutElasticSearch\Jobs\QueueableJob;
 use stdClass;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Tests\IntegrationTestCase;
@@ -19,11 +22,11 @@ final class ImportCommandTest extends IntegrationTestCase
         $dispatcher = Product::getEventDispatcher();
         Product::unsetEventDispatcher();
 
-        $productsAmount = rand(1, 5);
+        $productsAmount = random_int(1, 5);
 
         factory(Product::class, $productsAmount)->create();
 
-        $productsUnsearchableAmount = rand(1, 5);
+        $productsUnsearchableAmount = random_int(1, 5);
         factory(Product::class, $productsUnsearchableAmount)->states(['archive'])->create();
 
         Product::setEventDispatcher($dispatcher);
@@ -50,7 +53,7 @@ final class ImportCommandTest extends IntegrationTestCase
         $dispatcher = Product::getEventDispatcher();
         Product::unsetEventDispatcher();
 
-        $productsAmount = rand(1, 5);
+        $productsAmount = random_int(1, 5);
         factory(Product::class, $productsAmount)->create();
 
         Product::setEventDispatcher($dispatcher);
@@ -134,7 +137,7 @@ final class ImportCommandTest extends IntegrationTestCase
         $dispatcher = Product::getEventDispatcher();
         Product::unsetEventDispatcher();
 
-        $productsAmount = rand(1, 5);
+        $productsAmount = random_int(1, 5);
 
         factory(Product::class, $productsAmount)->create();
 
@@ -145,7 +148,7 @@ final class ImportCommandTest extends IntegrationTestCase
         $this->assertFalse($this->elasticsearch->indices()->exists(['index' => 'products_old'])->asBool(), 'Old index must be deleted');
     }
 
-    public function test_progress_report()
+    public function test_progress_report(): void
     {
         $output = new BufferedOutput();
         Artisan::call('scout:import', ['searchable' => [Product::class, Book::class]], $output);
@@ -165,7 +168,7 @@ final class ImportCommandTest extends IntegrationTestCase
             trim($output[30]));
     }
 
-    public function test_progress_report_in_queue()
+    public function test_progress_report_in_queue(): void
     {
         $this->app['config']->set('scout.queue', ['connection' => 'sync', 'queue' => 'scout']);
 
@@ -176,5 +179,93 @@ final class ImportCommandTest extends IntegrationTestCase
 
         $this->assertContains(trans('scout::import.start', ['searchable' => Product::class]), $output);
         $this->assertContains('[OK] '.trans('scout::import.done.queue', ['searchable' => Product::class]), $output);
+    }
+
+    public function test_queue_timeout_configuration(): void
+    {
+        Bus::fake([
+            QueueableJob::class,
+        ]);
+
+        $this->app['config']->set('scout.queue', ['connection' => 'sync', 'queue' => 'scout']);
+        $this->app['config']->set('elasticsearch.queue.timeout', 2);
+
+        $output = new BufferedOutput();
+        Artisan::call('scout:import', [], $output);
+
+        $output = array_map('trim', explode("\n", $output->fetch()));
+
+        $this->assertContains(trans('scout::import.start', ['searchable' => Product::class]), $output);
+        $this->assertContains('[OK] '.trans('scout::import.done.queue', ['searchable' => Product::class]), $output);
+
+        Bus::assertDispatched(function (QueueableJob $job) {
+            return $job->timeout === 2;
+        });
+    }
+
+    public function test_chained_queue_timeout_configuration(): void
+    {
+        Bus::fake([
+            Import::class,
+        ]);
+
+        $this->app['config']->set('scout.queue', ['connection' => 'sync', 'queue' => 'scout']);
+        $this->app['config']->set('elasticsearch.queue.timeout', 2);
+
+        $output = new BufferedOutput();
+        Artisan::call('scout:import', [], $output);
+
+        $output = array_map('trim', explode("\n", $output->fetch()));
+
+        $this->assertContains(trans('scout::import.start', ['searchable' => Product::class]), $output);
+        $this->assertContains('[OK] '.trans('scout::import.done.queue', ['searchable' => Product::class]), $output);
+
+        Bus::assertDispatched(function (Import $job) {
+            return $job->timeout === 2;
+        });
+    }
+
+    public function test_chained_queue_timeout_configuration_with_null_value(): void
+    {
+        Bus::fake([
+            Import::class,
+        ]);
+
+        $this->app['config']->set('scout.queue', ['connection' => 'sync', 'queue' => 'scout']);
+        $this->app['config']->set('elasticsearch.queue.timeout', null);
+
+        $output = new BufferedOutput();
+        Artisan::call('scout:import', [], $output);
+
+        $output = array_map('trim', explode("\n", $output->fetch()));
+
+        $this->assertContains(trans('scout::import.start', ['searchable' => Product::class]), $output);
+        $this->assertContains('[OK] '.trans('scout::import.done.queue', ['searchable' => Product::class]), $output);
+
+        Bus::assertDispatched(function (Import $job) {
+            return $job->timeout === null;
+        });
+    }
+
+    public function test_chained_queue_timeout_configuration_with_empty_string(): void
+    {
+        Bus::fake([
+            Import::class,
+        ]);
+
+        $this->app['config']->set('scout.queue', ['connection' => 'sync', 'queue' => 'scout']);
+        $this->app['config']->set('elasticsearch.queue.timeout', '');
+
+        $output = new BufferedOutput();
+        Artisan::call('scout:import', [], $output);
+
+        $output = array_map('trim', explode("\n", $output->fetch()));
+
+        $this->assertContains(trans('scout::import.start', ['searchable' => Product::class]), $output);
+        $this->assertContains('[OK] '.trans('scout::import.done.queue', ['searchable' => Product::class]), $output);
+
+        Bus::assertDispatched(function (Import $job) {
+            return $job->timeout === null;
+        });
     }
 }

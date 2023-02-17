@@ -64,6 +64,14 @@ class Storage
     }
 
     /**
+     * @return ?int
+     */
+    public function queueTimeout(): ?int
+    {
+        return (int) $this->loadConfig('queue.timeout') ?: null;
+    }
+
+    /**
      * @param  string  $path
      * @return mixed
      */
