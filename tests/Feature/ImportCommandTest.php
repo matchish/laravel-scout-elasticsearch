@@ -22,11 +22,11 @@ final class ImportCommandTest extends IntegrationTestCase
         $dispatcher = Product::getEventDispatcher();
         Product::unsetEventDispatcher();
 
-        $productsAmount = rand(1, 5);
+        $productsAmount = random_int(1, 5);
 
         factory(Product::class, $productsAmount)->create();
 
-        $productsUnsearchableAmount = rand(1, 5);
+        $productsUnsearchableAmount = random_int(1, 5);
         factory(Product::class, $productsUnsearchableAmount)->states(['archive'])->create();
 
         Product::setEventDispatcher($dispatcher);
@@ -53,7 +53,7 @@ final class ImportCommandTest extends IntegrationTestCase
         $dispatcher = Product::getEventDispatcher();
         Product::unsetEventDispatcher();
 
-        $productsAmount = rand(1, 5);
+        $productsAmount = random_int(1, 5);
         factory(Product::class, $productsAmount)->create();
 
         Product::setEventDispatcher($dispatcher);
@@ -137,7 +137,7 @@ final class ImportCommandTest extends IntegrationTestCase
         $dispatcher = Product::getEventDispatcher();
         Product::unsetEventDispatcher();
 
-        $productsAmount = rand(1, 5);
+        $productsAmount = random_int(1, 5);
 
         factory(Product::class, $productsAmount)->create();
 
