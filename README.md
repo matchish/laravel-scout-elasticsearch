@@ -32,7 +32,7 @@ If you need any help, [stack overflow](https://stackoverflow.com/questions/tagge
 ## :two_hearts: Features  
 Don't forget to :star: the package if you like it. :pray:
 
-- Laravel Scout 9.x support
+- Laravel Scout 10.x support
 - Laravel Nova support
 - [Search amongst multiple models](#search-amongst-multiple-models)
 - [**Zero downtime** reimport](#zero-downtime-reimport) - it’s a breeze to import data in production.
