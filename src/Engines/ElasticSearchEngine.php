@@ -2,6 +2,7 @@
 
 namespace Matchish\ScoutElasticSearch\Engines;
 
+use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\Exception\ServerResponseException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\LazyCollection;
@@ -22,17 +23,17 @@ final class ElasticSearchEngine extends Engine
     /**
      * The ElasticSearch client.
      *
-     * @var \Elastic\Elasticsearch\Client
+     * @var Client
      */
     protected $elasticsearch;
 
     /**
      * Create a new engine instance.
      *
-     * @param  \Elastic\Elasticsearch\Client  $elasticsearch
+     * @param  Client  $elasticsearch
      * @return void
      */
-    public function __construct(\Elastic\Elasticsearch\Client $elasticsearch)
+    public function __construct(Client $elasticsearch)
     {
         $this->elasticsearch = $elasticsearch;
     }

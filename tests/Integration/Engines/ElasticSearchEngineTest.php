@@ -78,7 +78,7 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
         $this->engine->update($models);
     }
 
-    public function test_delete()
+    public function test_delete(): void
     {
         $models = Product::all();
         $this->engine->update($models);
@@ -94,14 +94,17 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
                 ],
             ],
         ];
-        $response = $this->elasticsearch->search($params);
+        $response = $this->elasticsearch->search($params)->asArray();
+        $this->assertArrayHasKey('hits', $response);
+        $this->assertArrayHasKey('total', $response['hits']);
+        $this->assertArrayHasKey('value', $response['hits']['total']);
         $this->assertEquals(1, $response['hits']['total']['value']);
         foreach ($response['hits']['hits'] as $doc) {
             $this->assertEquals($shouldBeNotDeleted->getScoutKey(), $doc['_id']);
         }
     }
 
-    public function test_flush()
+    public function test_flush(): void
     {
         $models = Product::all();
         $this->engine->update($models);
@@ -116,11 +119,14 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
                 ],
             ],
         ];
-        $response = $this->elasticsearch->search($params);
+        $response = $this->elasticsearch->search($params)->asArray();
+        $this->assertArrayHasKey('hits', $response);
+        $this->assertArrayHasKey('total', $response['hits']);
+        $this->assertArrayHasKey('value', $response['hits']['total']);
         $this->assertEquals(0, $response['hits']['total']['value']);
     }
 
-    public function test_map_with_custom_key_name()
+    public function test_map_with_custom_key_name(): void
     {
         $this->app['config']['scout.key'] = 'custom_key';
         $models = Product::all();
@@ -134,7 +140,7 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
         $this->assertEquals($models->map->id->all(), $mappedModels->map->id->all());
     }
 
-    public function test_lazy_map()
+    public function test_lazy_map(): void
     {
         $models = Product::all();
         $keys = $models->map(function ($product) {
@@ -147,10 +153,10 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
         $this->assertEquals($models->map->id->all(), $mappedModels->map->id->all());
     }
 
-    public function test_lazy_map_for_mixed_search()
+    public function test_lazy_map_for_mixed_search(): void
     {
-        $this->expectErrorMessage('Not implemented for MixedSearch');
         $this->expectException(\Error::class);
+        $this->expectExceptionMessage('Not implemented for MixedSearch');
         $models = Product::all();
         $keys = $models->map(function ($product) {
             return ['_id' => $product->getScoutKey(), '_source' => [

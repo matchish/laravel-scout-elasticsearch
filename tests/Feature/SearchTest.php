@@ -143,7 +143,7 @@ final class SearchTest extends IntegrationTestCase
     public function test_mixed_cursor()
     {
         $this->expectException(\Error::class);
-        $this->expectErrorMessage('Not implemented for MixedSearch');
+        $this->expectExceptionMessage('Not implemented for MixedSearch');
         Artisan::call('scout:import');
 
         $mixed = MixedSearch::search('*')->within(
