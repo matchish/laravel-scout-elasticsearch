@@ -19,7 +19,7 @@
         "php": "^8.0.12|^8.1",
         "elasticsearch/elasticsearch": "^8.0",
         "handcraftedinthealps/elasticsearch-dsl": "^8.0",
-        "laravel/scout": "^8.0|^9.0|^10.x-dev",
+        "laravel/scout": "^8.0|^9.0|^10.0",
         "roave/better-reflection": "^4.3|^5.0"
     },
     "require-dev": {
