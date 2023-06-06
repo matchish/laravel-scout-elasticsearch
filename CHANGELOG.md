@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
-## [7.2.1] - 2023-06-06
+## [7.2.2] - 2023-06-06
 ### Fixed
 - [No duplicates in search on reindex anymore. updates/inserts will be visible only after reindex. For most projects should be ok but for some could be breaking changes](https://github.com/matchish/laravel-scout-elasticsearch/issues/247)
 
