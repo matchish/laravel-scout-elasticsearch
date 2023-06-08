@@ -1,175 +1,99 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Matchish\ScoutElasticSearch\Searchable;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use Laravel\Scout\Searchable;
-use PhpParser\Error;
-use PhpParser\Node;
-use PhpParser\Node\Stmt\Class_;
-use PhpParser\NodeFinder;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor\NameResolver;
-use PhpParser\ParserFactory;
-use Roave\BetterReflection\BetterReflection;
-use Roave\BetterReflection\Reflector\Exception\IdentifierNotFound;
-use Roave\BetterReflection\Reflector\Reflector;
-use Symfony\Component\Finder\Finder;
+use Illuminate\Support\Facades\File;
+use RuntimeException;
 
-final class SearchableListFactory
-{
+final class SearchableListFactory  
+{  
     /**
      * @var array|null
      */
-    private static ?array $searchableClasses = null;
-    /**
-     * @var string
-     */
-    private string $namespace;
-    /**
-     * @var string
-     */
-    private string $appPath;
+    private static ?array $searchableClasses = null;  
+
     /**
      * @var array
      */
-    private array $errors = [];
+    private array $errors = [];  
+
     /**
      * @var Reflector|null
      */
-    private ?Reflector $reflector = null;
+    private ?Reflector $reflector = null;  
 
     /**
-     * @param  string  $namespace
-     * @param  string  $appPath
+     * @return array  
      */
-    public function __construct(string $namespace, string $appPath)
-    {
-        $this->namespace = $namespace;
-        $this->appPath = $appPath;
-    }
+    public function getErrors(): array  
+    {  
+        return $this->errors;  
+    }  
 
     /**
-     * @return array
+     * @return Collection  
      */
-    public function getErrors(): array
-    {
-        return $this->errors;
-    }
+    public function make(): Collection  
+    {  
+        return new Collection($this->find());  
+    }  
 
-    /**
-     * @return Collection
-     */
-    public function make(): Collection
+    private function find(): array  
     {
-        return new Collection($this->find());
-    }
-
-    /**
-     * Get a list of searchable models.
-     *
-     * @return string[]
-     */
-    private function find(): array
-    {
-        $appNamespace = $this->namespace;
-
-        return array_values(array_filter($this->getSearchableClasses(), static function (string $class) use ($appNamespace) {
-            return Str::startsWith($class, $appNamespace);
-        }));
-    }
-
-    /**
-     * @return string[]
-     */
-    private function getSearchableClasses(): array
-    {
-        if (self::$searchableClasses === null) {
-            self::$searchableClasses = $this->getProjectClasses()->filter(function ($class) {
-                return $this->findSearchableTraitRecursively($class);
-            })->toArray();
+        list($sources, $namespaces) = $this->inferProjectSourcePaths();
+        
+        $classes = [];
+        foreach($sources as $index => $source) {
+            $appPath = $source;
+            $namespace = $namespaces[$index];
+            $classes = array_merge($classes, $this->getSearchableClasses($namespace, $appPath));
         }
 
-        return self::$searchableClasses;
-    }
+        return array_values($classes);
+    }  
 
-    /**
-     * @return Collection
-     */
-    private function getProjectClasses(): Collection
-    {
-        /** @var Class_[] $nodes */
-        $nodes = (new NodeFinder())->find($this->getStmts(), function (Node $node) {
-            return $node instanceof Class_;
-        });
+    private function getSearchableClasses(string $namespace, string $appPath): array  
+    {  
+        if (self::$searchableClasses === null) {  
+            self::$searchableClasses = $this->getProjectClasses($namespace, $appPath)->filter(function ($class) {  
+                return $this->findSearchableTraitRecursively($class);  
+            })->toArray();  
+        }  
 
-        return Collection::make($nodes)->map(function ($node) {
-            return $node->namespacedName->toCodeString();
-        });
-    }
+        return self::$searchableClasses;  
+    }  
 
-    /**
-     * @return array
-     */
-    private function getStmts(): array
-    {
-        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
-        $nameResolverVisitor = new NameResolver();
-        $nodeTraverser = new NodeTraverser();
-        $nodeTraverser->addVisitor($nameResolverVisitor);
-        $stmts = [];
-        foreach (Finder::create()->files()->name('*.php')->in($this->appPath) as $file) {
-            try {
-                $stmts[] = $parser->parse($file->getContents());
-            } catch (Error $e) {
-                $this->errors[] = $e->getMessage();
-            }
-        }
+    private function getProjectClasses(string $namespace, string $appPath): Collection  
+    {  
+        /** @var Class_[] $nodes */  
+        $nodes = (new NodeFinder())->find($this->getStmts($namespace, $appPath), function (Node $node) {  
+            return $node instanceof Class_;  
+        });  
 
-        $stmts = Collection::make($stmts)->flatten(1)->toArray();
+        return Collection::make($nodes)->map(function ($node) {  
+            return $node->namespacedName->toCodeString();  
+        });  
+    }  
 
-        return $nodeTraverser->traverse($stmts);
-    }
+    private function inferProjectSourcePaths(): array  
+    {  
+        if (! ($composer = file_get_contents(base_path('composer.json')))) {  
+            throw new RuntimeException('Error reading composer.json');  
+        }  
+        $autoload = json_decode($composer, true)['autoload'] ?? [];  
 
-    /**
-     * @param  string  $class
-     * @return bool
-     */
-    private function findSearchableTraitRecursively(string $class): bool
-    {
-        try {
-            $reflection = $this->reflector()->reflectClass($class);
+        if (! isset($autoload['psr-4'])) {  
+            throw new RuntimeException('psr-4 autoload mappings are not present in composer.json');  
+        }  
 
-            if (in_array(Searchable::class, $traits = $reflection->getTraitNames())) {
-                return true;
-            }
+        $psr4 = collect($autoload['psr-4']);  
 
-            foreach ($traits as $trait) {
-                if ($this->findSearchableTraitRecursively($trait)) {
-                    return true;
-                }
-            }
+        $sources = $psr4->values()->map(function ($path) {  
+            return base_path($path);  
+        })->toArray();  
+        $namespaces = $psr4->keys()->toArray();  
 
-            return ($parent = $reflection->getParentClass()) && $this->findSearchableTraitRecursively($parent->getName());
-        } catch (IdentifierNotFound $e) {
-            $this->errors[] = $e->getMessage();
-
-            return false;
-        }
-    }
-
-    /**
-     * @return Reflector
-     */
-    private function reflector(): Reflector
-    {
-        if (null === $this->reflector) {
-            $this->reflector = (new BetterReflection())->reflector();
-        }
-
-        return $this->reflector;
-    }
+        return [$sources, $namespaces];  
+    }  
 }
