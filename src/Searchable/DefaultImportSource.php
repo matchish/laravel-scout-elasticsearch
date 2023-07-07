@@ -9,7 +9,7 @@ use Matchish\ScoutElasticSearch\Database\Scopes\PageScope;
 
 final class DefaultImportSource implements ImportSource
 {
-    public const DEFAULT_CHUNK_SIZE = 500;
+    const DEFAULT_CHUNK_SIZE = 500;
 
     /**
      * @var string
@@ -70,7 +70,7 @@ final class DefaultImportSource implements ImportSource
      */
     private function model()
     {
-        return new $this->className();
+        return new $this->className;
     }
 
     private function newQuery(): Builder
