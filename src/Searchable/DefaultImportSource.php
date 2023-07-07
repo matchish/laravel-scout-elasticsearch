@@ -79,7 +79,7 @@ final class DefaultImportSource implements ImportSource
         $softDelete = $this->className::usesSoftDelete() && config('scout.soft_delete', false);
         $query
             ->when(true, function ($query) {
-                $this->className::makeAllSearchableUsing($query);
+                return $this->className::makeAllSearchableUsing($query);
             })
             ->when($softDelete, function ($query) {
                 return $query->withTrashed();
