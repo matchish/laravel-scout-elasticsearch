@@ -9,7 +9,7 @@ use Matchish\ScoutElasticSearch\Database\Scopes\PageScope;
 
 final class DefaultImportSource implements ImportSource
 {
-    const DEFAULT_CHUNK_SIZE = 500;
+    public const DEFAULT_CHUNK_SIZE = 500;
 
     /**
      * @var string
@@ -70,7 +70,7 @@ final class DefaultImportSource implements ImportSource
      */
     private function model()
     {
-        return new $this->className;
+        return new $this->className();
     }
 
     private function newQuery(): Builder
@@ -78,6 +78,9 @@ final class DefaultImportSource implements ImportSource
         $query = $this->model()->newQuery();
         $softDelete = $this->className::usesSoftDelete() && config('scout.soft_delete', false);
         $query
+            ->when(true, function ($query) {
+                $this->className::makeAllSearchableUsing($query);
+            })
             ->when($softDelete, function ($query) {
                 return $query->withTrashed();
             })
