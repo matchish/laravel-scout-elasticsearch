@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Book;
-use App\Post;
-use stdClass;
-use App\Product;
 use App\BookWithCustomKey;
-use Tests\IntegrationTestCase;
-use Illuminate\Support\Facades\Bus;
+use App\Post;
+use App\Product;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Bus;
 use Matchish\ScoutElasticSearch\Jobs\Import;
 use Matchish\ScoutElasticSearch\Jobs\QueueableJob;
+use stdClass;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Tests\IntegrationTestCase;
 
 final class ImportCommandTest extends IntegrationTestCase
 {
