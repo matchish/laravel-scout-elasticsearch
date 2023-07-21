@@ -18,8 +18,8 @@ class SearchableListFactoryTest extends TestCase
 
         $searchable = $factory->make();
 
-        // There are 4 searchable models: Book, BookWithCustomKey, Product and Ticket
-        $this->assertCount(4, $searchable);
+        // There are 5 searchable models: Book, BookWithCustomKey, Product, Ticket and Post
+        $this->assertCount(5, $searchable);
     }
 
     public function test_find_searchable_trait_within_trait()

@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Book;
-use App\BookWithCustomKey;
+use App\Post;
+use stdClass;
 use App\Product;
-use Illuminate\Support\Facades\Artisan;
+use App\BookWithCustomKey;
+use Tests\IntegrationTestCase;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Artisan;
 use Matchish\ScoutElasticSearch\Jobs\Import;
 use Matchish\ScoutElasticSearch\Jobs\QueueableJob;
-use stdClass;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Tests\IntegrationTestCase;
 
 final class ImportCommandTest extends IntegrationTestCase
 {
@@ -156,16 +157,20 @@ final class ImportCommandTest extends IntegrationTestCase
         $output = explode("\n", $output->fetch());
         $this->assertEquals(
             trans('scout::import.start', ['searchable' => Product::class]),
-            trim($output[0]));
+            trim($output[0])
+        );
         $this->assertEquals(
             '[OK] '.trans('scout::import.done', ['searchable' => Product::class]),
-            trim($output[14]));
+            trim($output[14])
+        );
         $this->assertEquals(
             trans('scout::import.start', ['searchable' => Book::class]),
-            trim($output[16]));
+            trim($output[16])
+        );
         $this->assertEquals(
             '[OK] '.trans('scout::import.done', ['searchable' => Book::class]),
-            trim($output[30]));
+            trim($output[30])
+        );
     }
 
     public function test_progress_report_in_queue(): void
@@ -267,5 +272,37 @@ final class ImportCommandTest extends IntegrationTestCase
         Bus::assertDispatched(function (Import $job) {
             return $job->timeout === null;
         });
+    }
+
+    public function test_makeAllSearchableUsing_method_is_called_in_the_product_model(): void
+    {
+        $dispatcher = Post::getEventDispatcher();
+        Post::unsetEventDispatcher();
+
+        factory(Post::class)->states('draft')->create();
+        factory(Post::class)->states('draft')->create();
+        factory(Post::class)->states('draft')->create();
+        factory(Post::class)->states('published')->create();
+
+        Post::setEventDispatcher($dispatcher);
+
+        // Call the makeAllSearchableUsing method on the Product model
+        Artisan::call('scout:import', ['searchable' => [Post::class]]);
+
+        $params = [
+            'index' => (new Post())->searchableAs(),
+            'body' => [
+                'query' => [
+                    'match_all' => new stdClass(),
+                ],
+            ],
+        ];
+
+        $response = $this->elasticsearch->search($params);
+
+        // Assert that only the published posts are searchable
+        // bacause in the Post model we have defined the makeAllSearchableUsing method
+        // which returns only the published posts.
+        $this->assertEquals(1, $response['hits']['total']['value']);
     }
 }
