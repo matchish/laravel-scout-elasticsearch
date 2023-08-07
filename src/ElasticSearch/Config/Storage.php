@@ -52,7 +52,7 @@ class Storage
      */
     public function sslVerification(): bool
     {
-        return (bool)$this->loadConfig('ssl_verification') ?? true;
+        return (bool) $this->loadConfig('ssl_verification') ?? true;
     }
 
     /**
