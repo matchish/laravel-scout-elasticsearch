@@ -46,16 +46,16 @@ class ConfigTest extends TestCase
         $this->assertEquals('123456', $config::apiKey());
     }
 
-    public function test_ssl_verification_unset_defaults_false(): void
+    public function test_ssl_verification_unset_defaults_true(): void
     {
-        $config = new ScoutConfig();
-        $this->assertEquals(false, $config::sslVerification());
-    }
-
-    public function test_ssl_verification_enables(): void
-    {
-        Config::set('elasticsearch.ssl_verification', true);
         $config = new ScoutConfig();
         $this->assertEquals(true, $config::sslVerification());
+    }
+
+    public function test_ssl_verification_can_be_disabled(): void
+    {
+        Config::set('elasticsearch.ssl_verification', false);
+        $config = new ScoutConfig();
+        $this->assertEquals(false, $config::sslVerification());
     }
 }
