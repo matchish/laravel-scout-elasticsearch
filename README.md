@@ -241,6 +241,12 @@ MixedSearch::search('title:Barcelona or to:Barcelona')
 In this example you will get collection of `Ticket` and `Book` models where ticket's arrival city or
 book title is `Barcelona`
 
+### SSL Verification
+You can disable SSL verification by setting the following in your env
+```
+ELASTICSEARCH_SSL_VERIFICATION=false
+```
+
 ### Working with results
 Often your response isn't collection of models but aggregations or models with higlights an so on.
 In this case you need to implement your own implementation of `HitsIteratorAggregate` and bind it in your service provider
