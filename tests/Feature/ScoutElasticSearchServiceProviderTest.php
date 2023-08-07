@@ -3,6 +3,7 @@
 namespace Matchish\ScoutElasticSearch;
 
 use Elastic\Elasticsearch\Client;
+use Elastic\Elasticsearch\ClientBuilder;
 use Elastic\Transport\Exception\NoNodeAvailableException;
 use Tests\TestCase;
 
@@ -64,5 +65,17 @@ class ScoutElasticSearchServiceProviderTest extends TestCase
         $client = $this->app[Client::class];
         $this->assertEquals('ApiKey 123456', $client->getTransport()->getHeaders()['Authorization']);
         $this->assertEquals('4de46ced8d8d459696e544fe5f32b999.eu-central-1.aws.cloud.es.io', $client->getTransport()->getNodePool()->nextNode()->getUri()->getHost());
+    }
+
+    public function test_config_with_ssl_verification_disabled(): void
+    {
+        $this->app['config']->set('elasticsearch.ssl_verification', false);
+        $mock = $this->createPartialMock(ClientBuilder::class, 'setSSLVerification');
+        $mock
+            ->expects($this->once())
+            ->method('setSSLVerification')
+            ->with(false);
+        $this->app->instance(ClientBuilder::class, $mock);
+        $provider = new ElasticSearchServiceProvider($this->app);
     }
 }
