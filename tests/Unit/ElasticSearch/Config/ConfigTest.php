@@ -45,4 +45,17 @@ class ConfigTest extends TestCase
         $this->assertEquals('cloud-id', $config::elasticCloudId());
         $this->assertEquals('123456', $config::apiKey());
     }
+
+    public function test_ssl_verification_unset_defaults_false(): void
+    {
+        $config = new ScoutConfig();
+        $this->assertEquals(false, $config::sslVerification());
+    }
+
+    public function test_ssl_verification_enables(): void
+    {
+        Config::set('elasticsearch.ssl_verification', true);
+        $config = new ScoutConfig();
+        $this->assertEquals(true, $config::sslVerification());
+    }
 }

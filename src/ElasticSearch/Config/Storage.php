@@ -48,6 +48,14 @@ class Storage
     }
 
     /**
+     * @return bool
+     */
+    public function sslVerification(): bool
+    {
+        return (bool)$this->loadConfig('ssl_verification') ?? false;
+    }
+
+    /**
      * @return ?string
      */
     public function elasticCloudId(): ?string

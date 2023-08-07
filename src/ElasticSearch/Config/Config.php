@@ -6,6 +6,7 @@ namespace Matchish\ScoutElasticSearch\ElasticSearch\Config;
  * @method static array hosts()
  * @method static user()
  * @method static password()
+ * @method static sslVerification()
  * @method static elasticCloudId()
  * @method static apiKey()
  * @method static queueTimeout()
