@@ -26,6 +26,8 @@ final class ElasticSearchServiceProvider extends ServiceProvider
                 $clientBuilder->setBasicAuthentication($user, Config::password());
             }
 
+            $clientBuilder->setSSLVerification(Config::sslVerification());
+
             if ($cloudId = Config::elasticCloudId()) {
                 $clientBuilder->setElasticCloudId($cloudId)
                     ->setApiKey(Config::apiKey());
