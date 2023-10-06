@@ -3,6 +3,7 @@
 namespace Matchish\ScoutElasticSearch\ElasticSearch;
 
 use Laravel\Scout\Builder;
+use ONGR\ElasticsearchDSL\BuilderInterface;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\FullText\QueryStringQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
@@ -63,7 +64,10 @@ final class SearchFactory
     {
         if (static::hasWheres($builder)) {
             foreach ($builder->wheres as $field => $value) {
-                $boolQuery->add(new TermQuery((string) $field, $value), BoolQuery::FILTER);
+                if (!($value instanceof BuilderInterface)) {
+                    $value = new TermQuery((string) $field, $value);
+                }
+                $boolQuery->add($value, BoolQuery::FILTER);
             }
         }
 
