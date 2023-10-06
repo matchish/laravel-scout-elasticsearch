@@ -64,7 +64,7 @@ final class SearchFactory
     {
         if (static::hasWheres($builder)) {
             foreach ($builder->wheres as $field => $value) {
-                if (!($value instanceof BuilderInterface)) {
+                if (! ($value instanceof BuilderInterface)) {
                     $value = new TermQuery((string) $field, $value);
                 }
                 $boolQuery->add($value, BoolQuery::FILTER);
