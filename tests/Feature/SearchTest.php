@@ -11,6 +11,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\LazyCollection;
 use Matchish\ScoutElasticSearch\MixedSearch;
+use ONGR\ElasticsearchDSL\Query\TermLevel\RangeQuery;
 use Tests\IntegrationTestCase;
 
 final class SearchTest extends IntegrationTestCase
@@ -46,6 +47,17 @@ final class SearchTest extends IntegrationTestCase
 
         $this->assertEquals($iphonePromoUsedAndLikeNew->count(), $iphonePromoUsedAndLikeNewAmount);
         $this->assertInstanceOf(Product::class, $iphonePromoUsedAndLikeNew->first());
+
+        $iphonePromoUsedAndLikeNewWithRange = Product::search('iphone')
+            ->where('price', new RangeQuery('price', [
+                RangeQuery::GTE => 100,
+                RangeQuery::LTE => 100
+            ]))
+            ->whereIn('type', ['used', 'like new'])
+            ->get();
+
+        $this->assertEquals($iphonePromoUsedAndLikeNewWithRange->count(), $iphonePromoUsedAndLikeNewAmount);
+        $this->assertInstanceOf(Product::class, $iphonePromoUsedAndLikeNewWithRange->first());
     }
 
     public function test_sorted_paginate(): void
