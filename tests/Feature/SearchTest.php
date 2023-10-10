@@ -51,7 +51,7 @@ final class SearchTest extends IntegrationTestCase
         $iphonePromoUsedAndLikeNewWithRange = Product::search('iphone')
             ->where('price', new RangeQuery('price', [
                 RangeQuery::GTE => 100,
-                RangeQuery::LTE => 100
+                RangeQuery::LTE => 100,
             ]))
             ->whereIn('type', ['used', 'like new'])
             ->get();
