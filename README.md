@@ -228,6 +228,32 @@ $results = Product::search('zonga', function(\Elastic\Elasticsearch\Client $clie
 > Otherwise, the `HitsIteratorAggregate` class will throw an error. You can check the issue 
 > [here](https://github.com/matchish/laravel-scout-elasticsearch/issues/215).
 
+### Conditions ###
+
+Scout supports only 3 conditions: `->where(column, value)` (strict equation), `->whereIn(column, array)` and `->whereNotIn(column, array)`: 
+
+```php
+Product::search('(title:this OR description:this) AND (title:that OR description:that)')
+    ->where('price', 100)
+    ->whereIn('type', ['used', 'like new'])
+    ->whereNotIn('type', ['new', 'refurbished']);
+```
+
+Scout does not support any operators, but you can pass ElasticSearch terms like `RangeQuery` as value to `->where()`:
+
+```php
+
+use ONGR\ElasticsearchDSL\Query\TermLevel\RangeQuery;
+
+Product::search('(title:this OR description:this) AND (title:that OR description:that)')
+    ->where('price', new RangeQuery('price', [
+        RangeQuery::GTE => 100,
+        RangeQuery::LTE => 1000,
+    ]);
+```
+
+Full list of ElasticSearch terms is in `vendor/handcraftedinthealps/elasticsearch-dsl/src/Query/TermLevel`.
+
 ### Search amongst multiple models
 You can do it with `MixedSearch` class, just pass indices names separated by commas to the `within` method.
 ```php

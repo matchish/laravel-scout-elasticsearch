@@ -47,17 +47,61 @@ final class SearchTest extends IntegrationTestCase
 
         $this->assertEquals($iphonePromoUsedAndLikeNew->count(), $iphonePromoUsedAndLikeNewAmount);
         $this->assertInstanceOf(Product::class, $iphonePromoUsedAndLikeNew->first());
+    }
 
+    public function test_search_with_custom_filter()
+    {
+        $dispatcher = Product::getEventDispatcher();
+        Product::unsetEventDispatcher();
+
+        $kindleCheapAmount = rand(1, 5);
+        $iphoneLuxuryAmount = rand(1, 5);
+        $iphonePromoUsedAmount = rand(1, 5);
+        $iphonePromoNewAmount = rand(6, 10);
+        $iphonePromoLikeNewAmount = rand(1, 5);
+        $iphonePromoUsedAndLikeNewAmount = $iphonePromoLikeNewAmount + $iphonePromoUsedAmount;
+
+        factory(Product::class, $kindleCheapAmount)->states(['iphone', 'cheap'])->create();
+        factory(Product::class, $iphoneLuxuryAmount)->states(['iphone', 'luxury'])->create();
+        factory(Product::class, $iphonePromoUsedAmount)->states(['iphone', 'promo', 'used'])->create();
+        factory(Product::class, $iphonePromoNewAmount)->states(['iphone', 'promo', 'new'])->create();
+        factory(Product::class, $iphonePromoLikeNewAmount)->states(['iphone', 'promo', 'like new'])->create();
+
+        Product::setEventDispatcher($dispatcher);
+
+        Artisan::call('scout:import');
+
+        // Promo Product Test
         $iphonePromoUsedAndLikeNewWithRange = Product::search('iphone')
             ->where('price', new RangeQuery('price', [
-                RangeQuery::GTE => 100,
-                RangeQuery::LTE => 100,
+                RangeQuery::GTE => 100,  // Promo Products
+                RangeQuery::LTE => 100,  // Promo Products
             ]))
             ->whereIn('type', ['used', 'like new'])
             ->get();
 
         $this->assertEquals($iphonePromoUsedAndLikeNewWithRange->count(), $iphonePromoUsedAndLikeNewAmount);
-        $this->assertInstanceOf(Product::class, $iphonePromoUsedAndLikeNewWithRange->first());
+        $this->assertInstanceOf(Product::class, $iphonePromoUsedAndLikeNewWithRange->first(), 'Promo Product Assert');
+
+        // Luxury Product Test
+        $iphoneLuxuryUsedAndLikeNewWithRange = Product::search('iphone')
+            ->where('price', new RangeQuery('price', [
+                RangeQuery::GTE => 1000, // Luxury Products
+            ]))
+            ->get();
+
+        $this->assertEquals($iphoneLuxuryUsedAndLikeNewWithRange->count(), $iphoneLuxuryAmount, 'Luxury Product Count Assert');
+        $this->assertInstanceOf(Product::class, $iphoneLuxuryUsedAndLikeNewWithRange->first());
+
+        // Cheap Product Test
+        $iphoneCheapWithRange = Product::search('iphone')
+            ->where('price', new RangeQuery('price', [
+                RangeQuery::LTE => 70, // Cheap Products
+            ]))
+            ->get();
+
+        $this->assertEquals($kindleCheapAmount, $iphoneCheapWithRange->count(), 'Cheap Product Count Assert');
+        $this->assertInstanceOf(Product::class, $iphoneCheapWithRange->first());
     }
 
     public function test_sorted_paginate(): void
