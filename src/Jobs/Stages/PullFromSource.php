@@ -2,13 +2,14 @@
 
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
+use Elastic\Elasticsearch\Client;
 use Illuminate\Support\Collection;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
 /**
  * @internal
  */
-final class PullFromSource
+final class PullFromSource implements StageInterface
 {
     /**
      * @var ImportSource
@@ -23,7 +24,7 @@ final class PullFromSource
         $this->source = $source;
     }
 
-    public function handle(): void
+    public function handle(Client $elasticsearch = null): void
     {
         $results = $this->source->get()->filter->shouldBeSearchable();
         if (! $results->isEmpty()) {

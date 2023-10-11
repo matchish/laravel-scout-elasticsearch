@@ -9,7 +9,7 @@ use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Refresh;
 /**
  * @internal
  */
-final class RefreshIndex
+final class RefreshIndex implements StageInterface
 {
     /**
      * @var Index

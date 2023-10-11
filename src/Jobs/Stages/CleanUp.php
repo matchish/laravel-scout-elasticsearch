@@ -11,7 +11,7 @@ use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 /**
  * @internal
  */
-final class CleanUp
+final class CleanUp implements StageInterface
 {
     /**
      * @var ImportSource
