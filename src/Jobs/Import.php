@@ -5,6 +5,7 @@ namespace Matchish\ScoutElasticSearch\Jobs;
 use Elastic\Elasticsearch\Client;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Collection;
+use Matchish\ScoutElasticSearch\Jobs\Stages\StageInterface;
 use Matchish\ScoutElasticSearch\ProgressReportable;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
@@ -40,6 +41,7 @@ final class Import
         $estimate = $stages->sum->estimate();
         $this->progressBar()->setMaxSteps($estimate);
         $stages->each(function ($stage) use ($elasticsearch) {
+            /** @var StageInterface $stage */
             $this->progressBar()->setMessage($stage->title());
             $stage->handle($elasticsearch);
             $this->progressBar()->advance($stage->estimate());

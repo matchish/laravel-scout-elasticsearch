@@ -13,7 +13,7 @@ use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 /**
  * @internal
  */
-final class CreateWriteIndex
+final class CreateWriteIndex implements StageInterface
 {
     /**
      * @var ImportSource
