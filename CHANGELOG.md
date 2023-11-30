@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [7.5.0] - 2023-11-30
+### Added
+- [Added support for php 8.3](https://github.com/matchish/laravel-scout-elasticsearch/pull/266)
+  
 ## [7.3.0] - 2023-07-31
 ### Added
 - [Added support for `makeSearchableUsing` in Laravel Scout. This allows you to prepare and modify a collection of models before they are made searchable. For example, you may want to eager load a relationship so that the relationship data can be efficiently added to your search index.](https://github.com/matchish/laravel-scout-elasticsearch/pull/253)
