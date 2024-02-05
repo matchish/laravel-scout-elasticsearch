@@ -26,7 +26,9 @@ final class SearchFactory
             $boolQuery = new BoolQuery();
             $boolQuery = static::addWheres($builder, $boolQuery);
             $boolQuery = static::addWhereIns($builder, $boolQuery);
-            $boolQuery->add($query, BoolQuery::MUST);
+            if ($builder->query) {
+                $boolQuery->add($query, BoolQuery::MUST);
+            }
             $search->addQuery($boolQuery);
         } else {
             $search->addQuery($query);
@@ -64,10 +66,11 @@ final class SearchFactory
     {
         if (static::hasWheres($builder)) {
             foreach ($builder->wheres as $field => $value) {
-                if (! ($value instanceof BuilderInterface)) {
-                    $value = new TermQuery((string) $field, $value);
+                if ($value instanceof BuilderInterface) {
+                    $boolQuery->add($value, BoolQuery::FILTER);
+                } else {
+                    $boolQuery->add(new TermsQuery((string) $field, $value), BoolQuery::FILTER);
                 }
-                $boolQuery->add($value, BoolQuery::FILTER);
             }
         }
 
