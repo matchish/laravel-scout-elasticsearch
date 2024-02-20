@@ -246,11 +246,23 @@ final class SearchTest extends IntegrationTestCase
 
         Artisan::call('scout:import');
 
-        $expensiveProducts = Product::search()
+        $notCheapProducts = Product::search()
             ->where('price', new RangeQuery('price', [
-                RangeQuery::GTE => 900,
+                RangeQuery::GTE => 190,
             ]))->get();
 
-        $this->assertEquals($expensiveProducts->count(), $greaterCount);
+        $cheapProducts = Product::search()
+            ->where('price', new RangeQuery('price', [
+                RangeQuery::LTE => 190,
+            ]))->get();
+
+        $expensiveProducts = Product::search()
+            ->where('price', new RangeQuery('price', [
+                RangeQuery::GTE => 310,
+            ]))->get();
+
+        $this->assertEquals($greaterCount, $notCheapProducts->count());
+        $this->assertEquals(0, $cheapProducts->count());
+        $this->assertEquals(0, $expensiveProducts->count());
     }
 }
