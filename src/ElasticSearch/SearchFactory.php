@@ -26,7 +26,7 @@ final class SearchFactory
             $boolQuery = new BoolQuery();
             $boolQuery = static::addWheres($builder, $boolQuery);
             $boolQuery = static::addWhereIns($builder, $boolQuery);
-            if (! is_null($builder->query)) {
+            if (! empty($builder->query)) {
                 $boolQuery->add($query, BoolQuery::MUST);
             }
             $search->addQuery($boolQuery);

@@ -249,7 +249,7 @@ final class SearchTest extends IntegrationTestCase
         $notCheapProducts = Product::search()
             ->where('price', new RangeQuery('price', [
                 RangeQuery::GTE => 190,
-            ]))->get();
+            ]))->paginate(100);
 
         $cheapProducts = Product::search()
             ->where('price', new RangeQuery('price', [
@@ -261,7 +261,7 @@ final class SearchTest extends IntegrationTestCase
                 RangeQuery::GTE => 310,
             ]))->get();
 
-        $this->assertEquals($greaterCount, $notCheapProducts->count());
+        $this->assertEquals($greaterCount, $notCheapProducts->total());
         $this->assertEquals(0, $cheapProducts->count());
         $this->assertEquals(0, $expensiveProducts->count());
     }
