@@ -112,7 +112,7 @@ final class ElasticSearchEngine extends Engine
         $hits = app()->makeWith(
             HitsIteratorAggregate::class,
             [
-                'results'  => $results,
+                'results' => $results,
                 'callback' => $builder->queryCallback,
             ]
         );
