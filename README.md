@@ -252,6 +252,18 @@ Product::search('(title:this OR description:this) AND (title:that OR description
     ]);
 ```
 
+And if you just want to search using RangeQuery without any query_string, you can call the search() method directly and leave the param empty.
+
+```php
+
+use ONGR\ElasticsearchDSL\Query\TermLevel\RangeQuery;
+
+Product::search()
+    ->where('price', new RangeQuery('price', [
+        RangeQuery::GTE => 100,
+    ]);
+```
+
 Full list of ElasticSearch terms is in `vendor/handcraftedinthealps/elasticsearch-dsl/src/Query/TermLevel`.
 
 ### Search amongst multiple models

@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [7.6.0] - 2024-02-23
+### Added
+- Add one more condition. If the search() method does not pass any parameter, there is no need to add QueryStringQuery object.
+  
 ## [7.5.0] - 2023-11-30
 ### Added
 - [Added support for php 8.3](https://github.com/matchish/laravel-scout-elasticsearch/pull/266)

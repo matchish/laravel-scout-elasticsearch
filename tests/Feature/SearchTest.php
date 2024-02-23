@@ -232,4 +232,37 @@ final class SearchTest extends IntegrationTestCase
         $this->assertEquals(LazyCollection::class, get_class($kindle));
         $this->assertEquals(0, $kindle->count());
     }
+
+    public function test_empty_query_string()
+    {
+        $dispatcher = Product::getEventDispatcher();
+        Product::unsetEventDispatcher();
+
+        $greaterCount = rand(10, 100);
+
+        factory(Product::class, $greaterCount)->create(['price' => rand(200, 300)]);
+
+        Product::setEventDispatcher($dispatcher);
+
+        Artisan::call('scout:import');
+
+        $notCheapProducts = Product::search()
+            ->where('price', new RangeQuery('price', [
+                RangeQuery::GTE => 190,
+            ]))->paginate(100);
+
+        $cheapProducts = Product::search()
+            ->where('price', new RangeQuery('price', [
+                RangeQuery::LTE => 190,
+            ]))->get();
+
+        $expensiveProducts = Product::search()
+            ->where('price', new RangeQuery('price', [
+                RangeQuery::GTE => 310,
+            ]))->get();
+
+        $this->assertEquals($greaterCount, $notCheapProducts->total());
+        $this->assertEquals(0, $cheapProducts->count());
+        $this->assertEquals(0, $expensiveProducts->count());
+    }
 }
