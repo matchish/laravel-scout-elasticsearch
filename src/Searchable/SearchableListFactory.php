@@ -116,7 +116,7 @@ final class SearchableListFactory
      */
     private function getStmts(): array
     {
-        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+        $parser = (new ParserFactory())->createForHostVersion();
         $nameResolverVisitor = new NameResolver();
         $nodeTraverser = new NodeTraverser();
         $nodeTraverser->addVisitor($nameResolverVisitor);
