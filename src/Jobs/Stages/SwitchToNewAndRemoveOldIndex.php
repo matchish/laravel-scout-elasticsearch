@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elastic\Elasticsearch\Client;
+use Elastic\Elasticsearch\Response\Elasticsearch;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias\Get;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias\Update;
@@ -17,6 +20,7 @@ final class SwitchToNewAndRemoveOldIndex implements StageInterface
      * @var ImportSource
      */
     private $source;
+
     /**
      * @var Index
      */
@@ -32,11 +36,16 @@ final class SwitchToNewAndRemoveOldIndex implements StageInterface
         $this->index = $index;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function handle(Client $elasticsearch): void
     {
         $source = $this->source;
         $params = Get::anyIndex($source->searchableAs());
-        $response = $elasticsearch->indices()->getAlias($params->toArray())->asArray();
+        /** @var Elasticsearch $elasticResponse */
+        $elasticResponse = $elasticsearch->indices()->getAlias($params->toArray());
+        $response = $elasticResponse->asArray();
 
         $params = new Update();
         foreach ($response as $indexName => $alias) {
@@ -49,13 +58,35 @@ final class SwitchToNewAndRemoveOldIndex implements StageInterface
         $elasticsearch->indices()->updateAliases($params->toArray());
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function estimate(): int
     {
         return 1;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function title(): string
     {
         return 'Switching to the new index';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function advance(): int
+    {
+        return 1;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function completed(): bool
+    {
+        return true;
     }
 }

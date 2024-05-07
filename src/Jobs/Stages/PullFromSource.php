@@ -3,7 +3,8 @@
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elastic\Elasticsearch\Client;
-use Illuminate\Support\Collection;
+use Matchish\ScoutElasticSearch\Database\Scopes\FromScope;
+use Matchish\ScoutElasticSearch\Database\Scopes\PageScope;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
 /**
@@ -17,6 +18,11 @@ final class PullFromSource implements StageInterface
     private $source;
 
     /**
+     * @var int
+     */
+    private $handledChunks = 0;
+
+    /**
      * @param  ImportSource  $source
      */
     public function __construct(ImportSource $source)
@@ -26,13 +32,24 @@ final class PullFromSource implements StageInterface
 
     public function handle(Client $elasticsearch = null): void
     {
+        $this->handledChunks++;
         $results = $this->source->get()->filter->shouldBeSearchable();
         if (! $results->isEmpty()) {
             $results->first()->searchableUsing()->update($results);
+            if ($results->first()->getKeyType() !== 'int') {
+                $this->source->setChunkScope(new PageScope($this->handledChunks, $this->source->getChunkSize()));
+            } else {
+                $this->source->setChunkScope(new FromScope($results->last()->getKey(), $this->source->getChunkSize()));
+            }
         }
     }
 
     public function estimate(): int
+    {
+        return $this->source->getTotalChunks() + 1;
+    }
+
+    public function advance(): int
     {
         return 1;
     }
@@ -42,14 +59,21 @@ final class PullFromSource implements StageInterface
         return 'Indexing...';
     }
 
+    public function completed(): bool
+    {
+        return ($this->handledChunks - 1) >= $this->source->getTotalChunks();
+    }
+
     /**
      * @param  ImportSource  $source
-     * @return Collection
+     * @return PullFromSource
      */
-    public static function chunked(ImportSource $source): Collection
+    public static function chunked(ImportSource $source): ?PullFromSource
     {
-        return $source->chunked()->map(function ($chunk) {
-            return new static($chunk);
-        });
+        $source = $source->chunked();
+        if($source === null) {
+            return null;
+        }
+        return new static($source);
     }
 }

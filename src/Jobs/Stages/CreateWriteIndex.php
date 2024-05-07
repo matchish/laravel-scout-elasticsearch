@@ -61,4 +61,14 @@ final class CreateWriteIndex implements StageInterface
     {
         return 1;
     }
+
+    public function advance(): int
+    {
+        return 1;
+    }
+
+    public function completed(): bool
+    {
+        return true;
+    }
 }

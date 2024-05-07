@@ -9,7 +9,6 @@ use Illuminate\Support\Collection;
 use Matchish\ScoutElasticSearch\ElasticSearch\Config\Config;
 use Matchish\ScoutElasticSearch\Jobs\Import;
 use Matchish\ScoutElasticSearch\Jobs\QueueableJob;
-use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 use Matchish\ScoutElasticSearch\Searchable\ImportSourceFactory;
 use Matchish\ScoutElasticSearch\Searchable\SearchableListFactory;
 
@@ -18,7 +17,8 @@ final class ImportCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected $signature = 'scout:import {searchable?* : The name of the searchable}';
+    protected $signature = 'scout:import {searchable?* : The name of the searchable} {--P|parallel : Index items in parallel}';
+
     /**
      * {@inheritdoc}
      */
@@ -29,12 +29,23 @@ final class ImportCommand extends Command
      */
     public function handle(): void
     {
+        $parallel = false;
+
+        if($this->option('parallel')) {
+            $parallel = true;
+        }
+
         $this->searchableList((array) $this->argument('searchable'))
-        ->each(function ($searchable) {
-            $this->import($searchable);
+        ->each(function (string $searchable) use ($parallel) {
+            $this->import($searchable, $parallel);
         });
     }
 
+    /**
+     * @param array<string> $argument
+     * 
+     * @return Collection<int, string>
+     */
     private function searchableList(array $argument): Collection
     {
         return collect($argument)->whenEmpty(function () {
@@ -44,18 +55,32 @@ final class ImportCommand extends Command
         });
     }
 
-    private function import(string $searchable): void
+    /**
+     * @param string $searchable
+     * @param bool $parallel
+     * 
+     * @return void
+     */
+    private function import(string $searchable, bool $parallel): void
     {
         $sourceFactory = app(ImportSourceFactory::class);
         $source = $sourceFactory::from($searchable);
         $job = new Import($source);
-        $job->timeout = Config::queueTimeout();
+        /** @var int|null $queueTimeout */
+        $queueTimeout = Config::queueTimeout();
+        if($queueTimeout !== null) {
+            $job->timeout = (int) $queueTimeout;
+        }
+        $job->parallel = $parallel;
 
         if (config('scout.queue')) {
             $job = (new QueueableJob())->chain([$job]);
-            $job->timeout = Config::queueTimeout();
+            /** @var int|null $queueTimeout */
+            $queueTimeout = Config::queueTimeout();
+            if($queueTimeout !== null) {
+                $job->timeout = (int) $queueTimeout;
+            }
         }
-
         $bar = (new ProgressBarFactory($this->output))->create();
         $job->withProgressReport($bar);
 

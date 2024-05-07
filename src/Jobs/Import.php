@@ -21,6 +21,10 @@ final class Import
      * @var ImportSource
      */
     private $source;
+    /**
+     * @var boolean
+     */
+    public $parallel = false;
 
     public ?int $timeout = null;
 
@@ -40,16 +44,31 @@ final class Import
         $stages = $this->stages();
         $estimate = $stages->sum->estimate();
         $this->progressBar()->setMaxSteps($estimate);
-        $stages->each(function ($stage) use ($elasticsearch) {
-            /** @var StageInterface $stage */
-            $this->progressBar()->setMessage($stage->title());
-            $stage->handle($elasticsearch);
-            $this->progressBar()->advance($stage->estimate());
-        });
+
+        /** @var StageInterface $currentStage */
+        $currentStage = $stages->shift();
+
+        while ($currentStage !== null) {
+            $this->progressBar()->setMessage($currentStage->title());
+            $currentStage->handle($elasticsearch);
+            $this->progressBar()->advance($currentStage->advance());
+            if($currentStage->completed()) {
+                if($stages->isEmpty()) {
+                    /** @var null $currentStage */
+                    $currentStage = null;
+                } else {
+                    /** @var StageInterface $currentStage */
+                    $currentStage = $stages->shift();
+                }
+            }
+        }
     }
 
+    /**
+     * @return Collection<int, StageInterface>
+     */
     private function stages(): Collection
     {
-        return ImportStages::fromSource($this->source);
+        return ImportStages::fromSource($this->source, $this->parallel);
     }
 }
