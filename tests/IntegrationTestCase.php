@@ -32,6 +32,7 @@ class IntegrationTestCase extends TestCase
         parent::getEnvironmentSetUp($app);
 
         $app['config']->set('elasticsearch', require(__DIR__.'/../config/elasticsearch.php'));
+        $app['config']->set('trackable-job', require(__DIR__.'/../vendor/mateusjunges/laravel-trackable-jobs/config/trackable-jobs.php'));
         $app['config']->set('elasticsearch.indices.mappings.products', [
             'properties' => [
                 'type' => [
