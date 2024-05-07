@@ -14,6 +14,10 @@ class ConfigTest extends TestCase
 
         $config = new ScoutConfig();
         $this->assertEquals(['http://localhost:9200'], $config::hosts());
+
+        Config::set('elasticsearch.host', 9001);
+        $config = new ScoutConfig();
+        $this->assertEquals([], $config::hosts());
     }
 
     public function test_parse_multihost(): void

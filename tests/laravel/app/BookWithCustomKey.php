@@ -13,6 +13,11 @@ class BookWithCustomKey extends Book
         'year',
     ];
 
+    public function getKeyType()
+    {
+        return 'string';
+    }
+
     public function getKeyName()
     {
         return 'custom_key';

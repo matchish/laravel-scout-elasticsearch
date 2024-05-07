@@ -48,6 +48,6 @@ class ProcessSearchable implements ShouldQueue
         /** @var \Laravel\Scout\Engines\Engine $engine */
         $engine = $model->searchableUsing();
 
-        $engine->update($this->data); // @phpstan-ignore-line
+        $engine->update($this->data);
     }
 }

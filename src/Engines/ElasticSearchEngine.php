@@ -3,6 +3,7 @@
 namespace Matchish\ScoutElasticSearch\Engines;
 
 use Elastic\Elasticsearch\Client;
+use Elastic\Elasticsearch\Response\Elasticsearch;
 use Elastic\Elasticsearch\Exception\ServerResponseException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\LazyCollection;
@@ -15,6 +16,8 @@ use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Refresh;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Search as SearchParams;
 use Matchish\ScoutElasticSearch\ElasticSearch\SearchFactory;
 use Matchish\ScoutElasticSearch\ElasticSearch\SearchResults;
+use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Search;
 
@@ -39,21 +42,29 @@ final class ElasticSearchEngine extends Engine
     }
 
     /**
-     * {@inheritdoc}
+     * @param Collection<int, Model|Searchable> $models
      */
     public function update($models)
     {
         $params = new Bulk();
         $params->index($models);
-        $response = $this->elasticsearch->bulk($params->toArray())->asArray();
+        /** @var Elasticsearch $elasticResponse */
+        $elasticResponse = $this->elasticsearch->bulk($params->toArray());
+        $response = $elasticResponse->asArray();
         if (array_key_exists('errors', $response) && $response['errors']) {
-            $error = new ServerResponseException(json_encode($response, JSON_PRETTY_PRINT));
+            /** @var string|bool $json */
+            $json = json_encode($response, JSON_PRETTY_PRINT);
+            if ($json === false) {
+                throw new \Exception('Bulk update error');
+            }
+            /** @var string $json */
+            $error = new ServerResponseException($json);
             throw new \Exception('Bulk update error', $error->getCode(), $error);
         }
     }
 
     /**
-     * {@inheritdoc}
+     * @param Collection<int, Model|Searchable> $models
      */
     public function delete($models)
     {
@@ -63,12 +74,14 @@ final class ElasticSearchEngine extends Engine
     }
 
     /**
-     * {@inheritdoc}
+     * @param Model|Searchable $model
      */
     public function flush($model)
     {
         $indexName = $model->searchableAs();
-        $exist = $this->elasticsearch->indices()->exists(['index' => $indexName])->asBool();
+        /** @var Elasticsearch $response */
+        $response = $this->elasticsearch->indices()->exists(['index' => $indexName]);
+        $exist = $response->asBool();
         if ($exist) {
             $body = (new Search())->addQuery(new MatchAllQuery())->toArray();
             $params = new SearchParams($indexName, $body);
@@ -98,10 +111,15 @@ final class ElasticSearchEngine extends Engine
 
     /**
      * {@inheritdoc}
+     * @return Collection<int, int>
      */
     public function mapIds($results)
     {
-        return collect($results['hits']['hits'])->pluck('_id');
+        $hits = isset($results['hits']) ? $results['hits'] : [];
+        if (! isset($hits['hits'])) {
+            return collect();
+        }
+        return collect($hits['hits'])->pluck('_id');
     }
 
     /**

@@ -2,6 +2,9 @@
 
 namespace Matchish\ScoutElasticSearch\ElasticSearch\Params;
 
+use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
+
 /**
  * @internal
  */
@@ -27,6 +30,7 @@ final class Bulk
                 $this->delete($doc);
             }
         } else {
+            /** @var Model|Searchable $docs */
             $this->deleteDocs[$docs->getScoutKey()] = $docs;
         }
     }
@@ -98,6 +102,7 @@ final class Bulk
                 $this->index($doc);
             }
         } else {
+            /** @var Model|Searchable $docs */
             $this->indexDocs[$docs->getScoutKey()] = $docs;
         }
     }

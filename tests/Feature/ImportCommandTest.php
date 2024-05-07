@@ -72,6 +72,35 @@ final class ImportCommandTest extends IntegrationTestCase
         $this->assertEquals($productsAmount, $response['hits']['total']['value']);
     }
 
+    public function test_import_entites_in_parallel(): void
+    {
+        $this->app['config']->set('scout.queue', ['connection' => 'sync', 'queue' => 'scout']);
+
+        $dispatcher = Product::getEventDispatcher();
+        Product::unsetEventDispatcher();
+
+        $productsAmount = random_int(1, 5);
+        factory(Product::class, $productsAmount)->create();
+
+        Product::setEventDispatcher($dispatcher);
+
+        Artisan::call('scout:import', [
+            '--parallel' => true,
+        ]);
+        
+        $params = [
+            'index' => 'products',
+            'body' => [
+                'query' => [
+                    'match_all' => new stdClass(),
+                ],
+            ],
+        ];
+        $response = $this->elasticsearch->search($params);
+        $this->assertEquals($productsAmount, $response['hits']['total']['value']);
+    }
+
+
     public function test_import_all_pages(): void
     {
         $dispatcher = Product::getEventDispatcher();
@@ -100,16 +129,48 @@ final class ImportCommandTest extends IntegrationTestCase
     {
         $this->app['config']['scout.key'] = 'title';
 
-        $dispatcher = Book::getEventDispatcher();
-        Book::unsetEventDispatcher();
+        $dispatcher = BookWithCustomKey::getEventDispatcher();
+        BookWithCustomKey::unsetEventDispatcher();
 
         $booksAmount = 10;
 
-        factory(Book::class, $booksAmount)->create();
+        factory(BookWithCustomKey::class, $booksAmount)->create();
 
-        Book::setEventDispatcher($dispatcher);
+        BookWithCustomKey::setEventDispatcher($dispatcher);
 
-        Artisan::call('scout:import');
+        Artisan::call('scout:import', [
+            'searchable' => BookWithCustomKey::class,
+        ]);
+        $params = [
+            'index' => (new BookWithCustomKey())->searchableAs(),
+            'body' => [
+                'query' => [
+                    'match_all' => new stdClass(),
+                ],
+            ],
+        ];
+        $response = $this->elasticsearch->search($params);
+        $this->assertEquals($booksAmount, $response['hits']['total']['value']);
+    }
+
+    public function test_import_with_custom_key_all_pages_in_parallel(): void
+    {
+        $this->app['config']->set('scout.queue', ['connection' => 'sync', 'queue' => 'scout']);
+        $this->app['config']['scout.key'] = 'title';
+
+        $dispatcher = BookWithCustomKey::getEventDispatcher();
+        BookWithCustomKey::unsetEventDispatcher();
+
+        $booksAmount = 10;
+
+        factory(BookWithCustomKey::class, $booksAmount)->create();
+
+        BookWithCustomKey::setEventDispatcher($dispatcher);
+
+        Artisan::call('scout:import', [
+            'searchable' => BookWithCustomKey::class,
+            '--parallel' => true,
+        ]);
         $params = [
             'index' => (new BookWithCustomKey())->searchableAs(),
             'body' => [

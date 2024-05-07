@@ -170,6 +170,20 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
         });
     }
 
+    public function test_create_index(): void
+    {
+        $this->expectException(\Error::class);
+        $this->expectExceptionMessage('Not implemented');
+        $this->engine->createIndex('products');
+    }
+    
+    public function test_delete_index(): void
+    {
+        $this->expectException(\Error::class);
+        $this->expectExceptionMessage('Not implemented');
+        $this->engine->deleteIndex('products');
+    }
+
     private function refreshIndex(string $index): void
     {
         $params = [

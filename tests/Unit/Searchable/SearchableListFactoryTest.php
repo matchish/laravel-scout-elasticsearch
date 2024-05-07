@@ -20,6 +20,7 @@ class SearchableListFactoryTest extends TestCase
 
         // There are 5 searchable models: Book, BookWithCustomKey, Product, Ticket and Post
         $this->assertCount(5, $searchable);
+        $this->assertIsArray($factory->getErrors());
     }
 
     public function test_find_searchable_trait_within_trait()
