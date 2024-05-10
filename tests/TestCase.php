@@ -8,7 +8,6 @@ use Laravel\Scout\ScoutServiceProvider;
 use Matchish\ScoutElasticSearch\ElasticSearchServiceProvider;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
 use Matchish\ScoutElasticSearch\ScoutElasticSearchServiceProvider;
-use Junges\TrackableJobs\Providers\TrackableJobsServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
@@ -38,18 +37,21 @@ abstract class TestCase extends BaseTestCase
         $app['config']->set('scout.queue', false);
         // Setup default database to use sqlite :memory:
         $app['config']->set('database.default', 'mysql');
-        $app['config']->set('elasticsearch.host', 'elasticsearch:9200');
-        $app['config']->set('elasticsearch.user', 'elasticsearch');
-        $app['config']->set('elasticsearch.password', 'password');
     }
 
     protected function getPackageProviders($app)
     {
-        return [
+        /** @var array<class-string> $providers */
+        $providers = [
             ScoutServiceProvider::class,
             ScoutElasticSearchServiceProvider::class,
             ElasticSearchServiceProvider::class,
-            TrackableJobsServiceProvider::class,
         ];
+
+        if (class_exists(\Junges\TrackableJobs\Providers\TrackableJobsServiceProvider::class)) {
+            $providers[] = \Junges\TrackableJobs\Providers\TrackableJobsServiceProvider::class;
+        }
+
+        return $providers;
     }
 }

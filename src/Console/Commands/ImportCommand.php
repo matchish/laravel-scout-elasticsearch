@@ -31,7 +31,7 @@ final class ImportCommand extends Command
     {
         $parallel = false;
 
-        if($this->option('parallel')) {
+        if ($this->option('parallel')) {
             $parallel = true;
         }
 
@@ -42,7 +42,7 @@ final class ImportCommand extends Command
     }
 
     /**
-     * @param array<string> $argument
+     * @param  array<string>  $argument
      * 
      * @return Collection<int, string>
      */
@@ -56,8 +56,8 @@ final class ImportCommand extends Command
     }
 
     /**
-     * @param string $searchable
-     * @param bool $parallel
+     * @param  string  $searchable
+     * @param  bool  $parallel
      * 
      * @return void
      */
@@ -68,7 +68,7 @@ final class ImportCommand extends Command
         $job = new Import($source);
         /** @var int|null $queueTimeout */
         $queueTimeout = Config::queueTimeout();
-        if($queueTimeout !== null) {
+        if ($queueTimeout !== null) {
             $job->timeout = (int) $queueTimeout;
         }
         $job->parallel = $parallel;
@@ -77,7 +77,7 @@ final class ImportCommand extends Command
             $job = (new QueueableJob())->chain([$job]);
             /** @var int|null $queueTimeout */
             $queueTimeout = Config::queueTimeout();
-            if($queueTimeout !== null) {
+            if ($queueTimeout !== null) {
                 $job->timeout = (int) $queueTimeout;
             }
         }

@@ -4,8 +4,8 @@ namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elastic\Elasticsearch\Client;
 use Junges\TrackableJobs\Models\TrackedJob;
-use Matchish\ScoutElasticSearch\Database\Scopes\PageScope;
 use Matchish\ScoutElasticSearch\Database\Scopes\FromScope;
+use Matchish\ScoutElasticSearch\Database\Scopes\PageScope;
 use Matchish\ScoutElasticSearch\Jobs\ProcessSearchable;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
@@ -33,7 +33,7 @@ final class PullFromSourceParallel implements StageInterface
      * @var array
      */
     private $dispatchedJobIds = [];
-    
+
     /**
      * @var int
      */
@@ -52,7 +52,7 @@ final class PullFromSourceParallel implements StageInterface
     public function __construct(ImportSource $source)
     {
         $this->source = $source;
-        $this->queues = collect(config('scout.chunk.handlers', self::DEFAULT_HANDLER_COUNT))->map(function($i) {
+        $this->queues = collect(config('scout.chunk.handlers', self::DEFAULT_HANDLER_COUNT))->map(function ($i) {
             return 'import_'.$i;
         })->toArray();
     }
@@ -65,6 +65,7 @@ final class PullFromSourceParallel implements StageInterface
         /** @var string $queue */
         $queue = array_shift($this->queues);
         $this->queues[] = $queue;
+
         return $queue;
     }
 
@@ -73,22 +74,22 @@ final class PullFromSourceParallel implements StageInterface
      */
     public function handle(Client $elasticsearch = null): void
     {
-        if(count($this->dispatchedJobIds) > 0) {
+        if (count($this->dispatchedJobIds) > 0) {
             $jobs = TrackedJob::findMany($this->dispatchedJobIds);
-            $finishedJobs = $jobs->filter(function($job) {
+            $finishedJobs = $jobs->filter(function ($job) {
                 return $job->status === TrackedJob::STATUS_FINISHED;
             });
             $this->handledJobs = array_merge($this->handledJobs, $finishedJobs->pluck('id')->toArray());
             $this->advanceBy += $finishedJobs->count();
-            $this->dispatchedJobIds = $jobs->filter(function($job) {
+            $this->dispatchedJobIds = $jobs->filter(function ($job) {
                 return $job->status !== TrackedJob::STATUS_FINISHED;
             })->pluck('id')->toArray();
         }
-        
-        if(count($this->dispatchedJobIds) >= $this->source->getTotalChunks()) {
+
+        if (count($this->dispatchedJobIds) >= $this->source->getTotalChunks()) {
             return;
         }
-        
+
         $results = $this->source->get()->filter->shouldBeSearchable();
 
         if (! $results->isEmpty()) {
@@ -98,7 +99,7 @@ final class PullFromSourceParallel implements StageInterface
             if ($results->first()->getKeyType() !== 'int') {
                 $this->source->setChunkScope(
                     new PageScope(
-                        count($this->handledJobs) + count($this->dispatchedJobIds), 
+                        count($this->handledJobs) + count($this->dispatchedJobIds),
                         $this->source->getChunkSize())
                 );
             } else {
@@ -122,6 +123,7 @@ final class PullFromSourceParallel implements StageInterface
     {
         $advance = $this->advanceBy;
         $this->advanceBy = 0;
+
         return $advance;
     }
 
@@ -149,10 +151,10 @@ final class PullFromSourceParallel implements StageInterface
     {
         $source = $source->chunked();
 
-        if($source === null) {
+        if ($source === null) {
             return null;
         }
-        
+
         return new static($source);
     }
 }

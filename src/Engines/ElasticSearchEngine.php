@@ -3,21 +3,21 @@
 namespace Matchish\ScoutElasticSearch\Engines;
 
 use Elastic\Elasticsearch\Client;
-use Elastic\Elasticsearch\Response\Elasticsearch;
 use Elastic\Elasticsearch\Exception\ServerResponseException;
+use Elastic\Elasticsearch\Response\Elasticsearch;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\LazyCollection;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Builder as BaseBuilder;
 use Laravel\Scout\Engines\Engine;
+use Laravel\Scout\Searchable;
 use Matchish\ScoutElasticSearch\ElasticSearch\HitsIteratorAggregate;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Refresh;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Search as SearchParams;
 use Matchish\ScoutElasticSearch\ElasticSearch\SearchFactory;
 use Matchish\ScoutElasticSearch\ElasticSearch\SearchResults;
-use Illuminate\Database\Eloquent\Model;
-use Laravel\Scout\Searchable;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Search;
 
@@ -42,7 +42,7 @@ final class ElasticSearchEngine extends Engine
     }
 
     /**
-     * @param Collection<int, Model|Searchable> $models
+     * @param  Collection<int, Model|Searchable>  $models
      */
     public function update($models)
     {
@@ -64,7 +64,7 @@ final class ElasticSearchEngine extends Engine
     }
 
     /**
-     * @param Collection<int, Model|Searchable> $models
+     * @param  Collection<int, Model|Searchable>  $models
      */
     public function delete($models)
     {
@@ -74,7 +74,7 @@ final class ElasticSearchEngine extends Engine
     }
 
     /**
-     * @param Model|Searchable $model
+     * @param  Model|Searchable  $model
      */
     public function flush($model)
     {
@@ -111,6 +111,7 @@ final class ElasticSearchEngine extends Engine
 
     /**
      * {@inheritdoc}
+     * 
      * @return Collection<int, int>
      */
     public function mapIds($results)

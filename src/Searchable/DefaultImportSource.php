@@ -6,11 +6,11 @@ namespace Matchish\ScoutElasticSearch\Searchable;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Scope;
+use Laravel\Scout\Searchable;
 use Matchish\ScoutElasticSearch\Database\Scopes\FromScope;
 use Matchish\ScoutElasticSearch\Database\Scopes\PageScope;
-use Illuminate\Database\Eloquent\Scope;
-use Illuminate\Database\Eloquent\Model;
-use Laravel\Scout\Searchable;
 
 final class DefaultImportSource implements ImportSource
 {
@@ -47,9 +47,9 @@ final class DefaultImportSource implements ImportSource
     /**
      * DefaultImportSource constructor.
      *
-     * @param string $className
-     * @param array<Scope> $scopes
-     * @param Scope|null $chunkScope
+     * @param  string  $className
+     * @param  array<Scope>  $scopes
+     * @param  Scope|null  $chunkScope
      */
     public function __construct(string $className, array $scopes = [], Scope|null $chunkScope = null)
     {
@@ -124,8 +124,10 @@ final class DefaultImportSource implements ImportSource
             } else {
                 $this->chunkScope = new FromScope(0, $this->chunkSize);
             }
+
             return $this;
         }
+
         return null;
     }
 
@@ -150,9 +152,9 @@ final class DefaultImportSource implements ImportSource
                 return $query->withTrashed();
             })
             ->orderBy($this->model()->getQualifiedKeyName());
-        
+
         $scopes = $this->scopes;
-        
+
         if ($this->chunkScope) {
             $scopes = array_merge($scopes, [$this->chunkScope]);
         }

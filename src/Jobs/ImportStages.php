@@ -3,13 +3,13 @@
 namespace Matchish\ScoutElasticSearch\Jobs;
 
 use Illuminate\Support\Collection;
-use Matchish\ScoutElasticSearch\Jobs\Stages\StageInterface;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Jobs\Stages\CleanUp;
 use Matchish\ScoutElasticSearch\Jobs\Stages\CreateWriteIndex;
 use Matchish\ScoutElasticSearch\Jobs\Stages\PullFromSource;
 use Matchish\ScoutElasticSearch\Jobs\Stages\PullFromSourceParallel;
 use Matchish\ScoutElasticSearch\Jobs\Stages\RefreshIndex;
+use Matchish\ScoutElasticSearch\Jobs\Stages\StageInterface;
 use Matchish\ScoutElasticSearch\Jobs\Stages\SwitchToNewAndRemoveOldIndex;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
@@ -28,7 +28,7 @@ class ImportStages extends Collection
     {
         $index = Index::fromSource($source);
 
-        if($parallel) {
+        if ($parallel && class_exists(\Junges\TrackableJobs\Providers\TrackableJobsServiceProvider::class)) {
             return (new self([
                 new CleanUp($source),
                 new CreateWriteIndex($source, $index),

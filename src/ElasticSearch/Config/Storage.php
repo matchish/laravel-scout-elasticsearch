@@ -93,7 +93,7 @@ class Storage
         if (is_numeric($queueTimeoutConfig)) {
             return intval($queueTimeoutConfig);
         }
-        
+
         return null;
     }
 

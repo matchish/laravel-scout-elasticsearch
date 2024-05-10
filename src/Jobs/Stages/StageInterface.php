@@ -27,7 +27,7 @@ interface StageInterface
     public function completed(): bool;
 
     /**
-     * @param Client $elasticsearch
+     * @param  Client  $elasticsearch
      * @return void
      */
     public function handle(Client $elasticsearch): void;

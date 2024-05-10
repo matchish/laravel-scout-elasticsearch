@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Matchish\ScoutElasticSearch\Jobs;
 
-
-use Illuminate\Support\Collection;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Collection;
 use Junges\TrackableJobs\Concerns\Trackable;
-use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
 
 class ProcessSearchable implements ShouldQueue
@@ -27,7 +26,7 @@ class ProcessSearchable implements ShouldQueue
     private $data;
 
     /**
-     * @param Collection<int, Model|Searchable> $data
+     * @param  Collection<int, Model|Searchable>  $data
      */
     public function __construct(Collection $data)
     {
@@ -37,7 +36,7 @@ class ProcessSearchable implements ShouldQueue
 
     /**
      * Handles the job execution.
-     * 
+     *
      * @return void
      */
     public function handle(): void

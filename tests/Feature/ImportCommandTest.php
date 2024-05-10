@@ -87,7 +87,6 @@ final class ImportCommandTest extends IntegrationTestCase
         Artisan::call('scout:import', [
             '--parallel' => true,
         ]);
-        
         $params = [
             'index' => 'products',
             'body' => [

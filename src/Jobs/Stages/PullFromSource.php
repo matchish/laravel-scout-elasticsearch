@@ -71,7 +71,7 @@ final class PullFromSource implements StageInterface
     public static function chunked(ImportSource $source): ?PullFromSource
     {
         $source = $source->chunked();
-        if($source === null) {
+        if ($source === null) {
             return null;
         }
         return new static($source);

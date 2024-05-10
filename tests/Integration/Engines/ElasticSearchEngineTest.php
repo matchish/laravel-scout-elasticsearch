@@ -176,7 +176,7 @@ final class ElasticSearchEngineTest extends IntegrationTestCase
         $this->expectExceptionMessage('Not implemented');
         $this->engine->createIndex('products');
     }
-    
+
     public function test_delete_index(): void
     {
         $this->expectException(\Error::class);

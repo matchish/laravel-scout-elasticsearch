@@ -134,6 +134,7 @@ final class SearchableListFactory
         }
 
         $stmts = Collection::make($stmts)->flatten(1)->toArray();
+
         /** @var \PhpParser\Node[] $stmts */
         return $nodeTraverser->traverse($stmts);
     }

@@ -22,7 +22,7 @@ final class Import
      */
     private $source;
     /**
-     * @var boolean
+     * @var bool
      */
     public $parallel = false;
 
@@ -52,8 +52,8 @@ final class Import
             $this->progressBar()->setMessage($currentStage->title());
             $currentStage->handle($elasticsearch);
             $this->progressBar()->advance($currentStage->advance());
-            if($currentStage->completed()) {
-                if($stages->isEmpty()) {
+            if ($currentStage->completed()) {
+                if ($stages->isEmpty()) {
                     /** @var null $currentStage */
                     $currentStage = null;
                 } else {

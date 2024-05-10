@@ -30,7 +30,7 @@ interface ImportSource
     public function chunked(): ?ImportSource;
 
     /**
-     * @param Scope $scope
+     * @param  Scope  $scope
      * @return void
      */
     public function setChunkScope(Scope $scope): void;
