@@ -23,7 +23,7 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
     {
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'scout');
 
-        $this->app->make(EngineManager::class)->extend(ElasticSearchEngine::class, function () {
+        $this->app->make(EngineManager::class)->extend('elasticsearch', function () {
             $elasticsearch = app(Client::class);
 
             return new ElasticSearchEngine($elasticsearch);
