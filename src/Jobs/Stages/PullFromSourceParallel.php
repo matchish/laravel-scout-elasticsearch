@@ -140,7 +140,16 @@ final class PullFromSourceParallel implements StageInterface
      */
     public function completed(): bool
     {
-        return count($this->handledJobs) >= $this->source->getTotalChunks();
+        $completed = count($this->handledJobs) >= $this->source->getTotalChunks();
+
+        // Clear tracked_jobs table, after all jobs are finished.
+        if ($completed) {
+            /** @var string $column */
+            $column = config('trackable-jobs.using_uuid', false) ? 'uuid' : 'id';
+            TrackedJob::query()->where($column, $this->handledJobs)->delete();
+        }
+
+        return $completed;
     }
 
     /**

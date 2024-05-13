@@ -41,6 +41,7 @@ final class PullFromSourceTest extends IntegrationTestCase
         ];
         $response = $this->elasticsearch->search($params);
         $this->assertEquals($productsAmount, $response['hits']['total']['value']);
+        $this->assertDatabaseEmpty('tracked_jobs');
     }
 
     public function test_dont_put_entities_if_no_entities_in_collection(): void
