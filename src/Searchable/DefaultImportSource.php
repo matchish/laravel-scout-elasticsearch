@@ -57,7 +57,7 @@ final class DefaultImportSource implements ImportSource
         $this->scopes = $scopes;
         $this->chunkScope = $chunkScope;
         $this->chunkSize = self::DEFAULT_CHUNK_SIZE;
-        $this->totalChunks = 0;
+        $this->totalChunks = 1;
     }
 
     /**

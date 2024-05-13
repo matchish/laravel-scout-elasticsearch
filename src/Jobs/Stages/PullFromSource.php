@@ -74,6 +74,7 @@ final class PullFromSource implements StageInterface
         if ($source === null) {
             return null;
         }
+
         return new static($source);
     }
 }

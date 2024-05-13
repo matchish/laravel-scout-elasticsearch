@@ -111,7 +111,7 @@ final class ElasticSearchEngine extends Engine
 
     /**
      * {@inheritdoc}
-     * 
+     *
      * @return Collection<int, int>
      */
     public function mapIds($results)

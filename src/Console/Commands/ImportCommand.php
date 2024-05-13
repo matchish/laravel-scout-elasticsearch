@@ -43,7 +43,6 @@ final class ImportCommand extends Command
 
     /**
      * @param  array<string>  $argument
-     * 
      * @return Collection<int, string>
      */
     private function searchableList(array $argument): Collection
@@ -58,7 +57,6 @@ final class ImportCommand extends Command
     /**
      * @param  string  $searchable
      * @param  bool  $parallel
-     * 
      * @return void
      */
     private function import(string $searchable, bool $parallel): void

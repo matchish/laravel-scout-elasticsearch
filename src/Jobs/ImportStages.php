@@ -21,7 +21,6 @@ class ImportStages extends Collection
     /**
      * @param  ImportSource  $source
      * @param  bool  $parallel
-     * 
      * @return Collection<int, StageInterface>
      */
     public static function fromSource(ImportSource $source, bool $parallel = false)
