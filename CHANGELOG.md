@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ## [7.6.1] - 2024-05-14
 ### Fixed
 - fix for [parser incompatibility](https://github.com/matchish/laravel-scout-elasticsearch/issues/273)
-- 
+
 ## [7.6.0] - 2024-02-23
 ### Added
 - Add one more condition. If the search() method does not pass any parameter, there is no need to add QueryStringQuery object.
