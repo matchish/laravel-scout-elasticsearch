@@ -22,7 +22,7 @@ abstract class TestCase extends BaseTestCase
 
         if (class_exists(\Junges\TrackableJobs\Providers\TrackableJobsServiceProvider::class)) {
             \Artisan::call('vendor:publish', [
-                '--tag' => 'trackable-jobs-config'
+                '--tag' => 'trackable-jobs-config',
             ]);
         }
 

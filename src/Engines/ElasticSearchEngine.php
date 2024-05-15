@@ -120,6 +120,7 @@ final class ElasticSearchEngine extends Engine
         if (! isset($hits['hits'])) {
             return collect();
         }
+
         return collect($hits['hits'])->pluck('_id');
     }
 

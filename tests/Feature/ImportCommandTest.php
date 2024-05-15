@@ -135,7 +135,7 @@ final class ImportCommandTest extends IntegrationTestCase
         Product::setEventDispatcher($dispatcher);
 
         Artisan::call('scout:import', [
-            '--parallel' => true
+            '--parallel' => true,
         ]);
         $params = [
             'index' => (new Product())->searchableAs(),
@@ -257,7 +257,7 @@ final class ImportCommandTest extends IntegrationTestCase
         Product::setEventDispatcher($dispatcher);
 
         Artisan::call('scout:import', [
-            '--parallel' => true
+            '--parallel' => true,
         ]);
 
         $this->assertFalse($this->elasticsearch->indices()->exists(['index' => 'products_old'])->asBool(), 'Old index must be deleted');
@@ -306,7 +306,7 @@ final class ImportCommandTest extends IntegrationTestCase
 
         $output = new BufferedOutput();
         Artisan::call('scout:import', [
-            '--parallel' => true
+            '--parallel' => true,
         ], $output);
 
         $output = array_map('trim', explode("\n", $output->fetch()));
