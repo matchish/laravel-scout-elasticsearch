@@ -83,7 +83,7 @@ final class PullFromSourceParallel implements StageInterface
                 $jobs->each(function (TrackedJob $job) {
                     $job->markAsFailed();
                 });
-                throw new \Exception('Failed to process jobs: ' . implode(', ', $failedJobs->pluck('id')->toArray()));
+                throw new \Exception('Failed to process jobs: '.implode(', ', $failedJobs->pluck('id')->toArray()));
             }
             $finishedJobs = $jobs->filter(function ($job) {
                 return $job->status === TrackedJob::STATUS_FINISHED;

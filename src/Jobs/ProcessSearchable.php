@@ -12,7 +12,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Junges\TrackableJobs\Concerns\Trackable;
-use Junges\TrackableJobs\Models\TrackedJob;
 use Laravel\Scout\Searchable;
 
 class ProcessSearchable implements ShouldQueue
@@ -49,7 +48,6 @@ class ProcessSearchable implements ShouldQueue
     {
         $this->trackedJob = $this->trackedJob->fresh();
         if ($this->trackedJob == null || $this->trackedJob->finished_at !== null) {
-
             return;
         }
 
