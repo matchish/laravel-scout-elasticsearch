@@ -76,6 +76,15 @@ final class PullFromSourceParallel implements StageInterface
     {
         if (count($this->dispatchedJobIds) > 0) {
             $jobs = TrackedJob::findMany($this->dispatchedJobIds);
+            $failedJobs = $jobs->filter(function ($job) {
+                return $job->status === TrackedJob::STATUS_FAILED;
+            });
+            if ($failedJobs->isNotEmpty()) {
+                $jobs->each(function (TrackedJob $job) {
+                    $job->markAsFailed();
+                });
+                throw new \Exception('Failed to process jobs: ' . implode(', ', $failedJobs->pluck('id')->toArray()));
+            }
             $finishedJobs = $jobs->filter(function ($job) {
                 return $job->status === TrackedJob::STATUS_FINISHED;
             });
@@ -140,16 +149,7 @@ final class PullFromSourceParallel implements StageInterface
      */
     public function completed(): bool
     {
-        $completed = count($this->handledJobs) >= $this->source->getTotalChunks();
-
-        // Clear tracked_jobs table, after all jobs are finished.
-        if ($completed) {
-            /** @var string $column */
-            $column = config('trackable-jobs.using_uuid', false) ? 'uuid' : 'id';
-            TrackedJob::query()->where($column, $this->handledJobs)->delete();
-        }
-
-        return $completed;
+        return count($this->handledJobs) >= $this->source->getTotalChunks();
     }
 
     /**

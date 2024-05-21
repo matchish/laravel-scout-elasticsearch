@@ -12,6 +12,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Junges\TrackableJobs\Concerns\Trackable;
+use Junges\TrackableJobs\Models\TrackedJob;
 use Laravel\Scout\Searchable;
 
 class ProcessSearchable implements ShouldQueue
@@ -31,6 +32,11 @@ class ProcessSearchable implements ShouldQueue
     public function __construct(Collection $data)
     {
         $this->__baseConstruct($data->first());
+
+        $this->trackedJob->update([
+            'trackable_type' => $data->first()->searchableAs(),
+        ]);
+
         $this->data = $data;
     }
 
@@ -41,6 +47,12 @@ class ProcessSearchable implements ShouldQueue
      */
     public function handle(): void
     {
+        $this->trackedJob = $this->trackedJob->fresh();
+        if ($this->trackedJob == null || $this->trackedJob->finished_at !== null) {
+
+            return;
+        }
+
         /** @var Model|Searchable $model */
         $model = $this->data->first();
 

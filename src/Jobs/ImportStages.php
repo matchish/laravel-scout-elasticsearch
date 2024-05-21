@@ -11,6 +11,8 @@ use Matchish\ScoutElasticSearch\Jobs\Stages\PullFromSourceParallel;
 use Matchish\ScoutElasticSearch\Jobs\Stages\RefreshIndex;
 use Matchish\ScoutElasticSearch\Jobs\Stages\StageInterface;
 use Matchish\ScoutElasticSearch\Jobs\Stages\SwitchToNewAndRemoveOldIndex;
+use Matchish\ScoutElasticSearch\Jobs\Stages\StopTrackedJobs;
+use Matchish\ScoutElasticSearch\Jobs\Stages\CleanUpTrackedJobs;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
 /**
@@ -29,9 +31,11 @@ class ImportStages extends Collection
 
         if ($parallel && class_exists(\Junges\TrackableJobs\Providers\TrackableJobsServiceProvider::class)) {
             return (new self([
+                new StopTrackedJobs($source),
                 new CleanUp($source),
                 new CreateWriteIndex($source, $index),
                 PullFromSourceParallel::chunked($source),
+                new CleanUpTrackedJobs($source),
                 new RefreshIndex($index),
                 new SwitchToNewAndRemoveOldIndex($source, $index),
             ]))->flatten()->filter();
