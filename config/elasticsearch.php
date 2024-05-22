@@ -1,5 +1,7 @@
 <?php
 
+use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
+
 return [
     'host' => env('ELASTICSEARCH_HOST'),
     'user' => env('ELASTICSEARCH_USER'),
@@ -26,4 +28,5 @@ return [
             ],
         ],
     ],
+    'extended_as' => env('ELASTICSEARCH_EXTENDED_AS',ElasticSearchEngine::class)
 ];

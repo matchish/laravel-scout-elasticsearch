@@ -7,7 +7,6 @@ namespace Tests;
 use Illuminate\Support\Facades\Artisan;
 use Laravel\Scout\ScoutServiceProvider;
 use Matchish\ScoutElasticSearch\ElasticSearchServiceProvider;
-use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
 use Matchish\ScoutElasticSearch\ScoutElasticSearchServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
@@ -32,7 +31,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('scout.driver', ElasticSearchEngine::class);
+        $app['config']->set('scout.driver', config('elasticsearch.extended_as'));
         $app['config']->set('scout.chunk.searchable', 3);
         $app['config']->set('scout.queue', false);
         // Setup default database to use sqlite :memory:
