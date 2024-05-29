@@ -28,5 +28,5 @@ return [
             ],
         ],
     ],
-    'extended_as' => env('ELASTICSEARCH_EXTENDED_AS',ElasticSearchEngine::class)
+    'driver_name' => env('ELASTICSEARCH_DRIVER_NAME', ElasticSearchEngine::class),
 ];
