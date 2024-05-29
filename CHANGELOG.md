@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [8.0.0-alpha.1] - 2024-05-29
+### Added
+- fromScope, uses forPageAfterId.
+- a new option "--parallel" for ImportCommand, can only be used with [Trackable-Jobs](https://github.com/mateusjunges/trackable-jobs-for-laravel) package currently.
+
+## Changed
+- StageInterface now has two more functions. Both are used to make PullFromSource stage an iterable one.
+- ImportSource interface now has three more functions. Chunk scope can now be set from a stage.
+- When possible (model without a custom key), by default fromScope is used instead of pageScope.
+
 ## [7.6.1] - 2024-05-14
 ### Fixed
 - fix for [parser incompatibility](https://github.com/matchish/laravel-scout-elasticsearch/issues/273)
