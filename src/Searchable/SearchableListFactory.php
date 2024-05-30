@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Laravel\Scout\Searchable;
 use PhpParser\Error;
 use PhpParser\Node;
+use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\NodeFinder;
 use PhpParser\NodeTraverser;
@@ -61,7 +62,7 @@ final class SearchableListFactory
     }
 
     /**
-     * @return Collection
+     * @return Collection<int, string>
      */
     public function make(): Collection
     {
@@ -88,7 +89,7 @@ final class SearchableListFactory
     private function getSearchableClasses(): array
     {
         if (self::$searchableClasses === null) {
-            self::$searchableClasses = $this->getProjectClasses()->filter(function ($class) {
+            self::$searchableClasses = $this->getProjectClasses()->filter(function (string $class) {
                 return $this->findSearchableTraitRecursively($class);
             })->toArray();
         }
@@ -97,7 +98,7 @@ final class SearchableListFactory
     }
 
     /**
-     * @return Collection
+     * @return Collection<int, string>
      */
     private function getProjectClasses(): Collection
     {
@@ -106,8 +107,11 @@ final class SearchableListFactory
             return $node instanceof Class_;
         });
 
-        return Collection::make($nodes)->map(function ($node) {
-            return $node->namespacedName->toCodeString();
+        return Collection::make($nodes)->map(function (Class_ $node) {
+            $namespace = $node->namespacedName;
+            if ($namespace instanceof Name) {
+                return $namespace->toCodeString();
+            }
         });
     }
 
@@ -131,6 +135,7 @@ final class SearchableListFactory
 
         $stmts = Collection::make($stmts)->flatten(1)->toArray();
 
+        /** @var \PhpParser\Node[] $stmts */
         return $nodeTraverser->traverse($stmts);
     }
 

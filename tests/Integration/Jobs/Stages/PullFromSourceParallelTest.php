@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Tests\Integration\Jobs\Stages;
 
 use App\Product;
-use Matchish\ScoutElasticSearch\Jobs\Stages\PullFromSource;
+use Matchish\ScoutElasticSearch\Jobs\Stages\PullFromSourceParallel;
 use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
 use stdClass;
 use Tests\IntegrationTestCase;
 
-final class PullFromSourceTest extends IntegrationTestCase
+final class PullFromSourceParallelTest extends IntegrationTestCase
 {
     public function test_put_all_entites_to_index(): void
     {
@@ -26,7 +26,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products_index',
             'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = new PullFromSource(DefaultImportSourceFactory::from(Product::class));
+        $stage = new PullFromSourceParallel(DefaultImportSourceFactory::from(Product::class));
         $stage->handle();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
@@ -41,7 +41,6 @@ final class PullFromSourceTest extends IntegrationTestCase
         ];
         $response = $this->elasticsearch->search($params);
         $this->assertEquals($productsAmount, $response['hits']['total']['value']);
-        $this->assertDatabaseEmpty('tracked_jobs');
     }
 
     public function test_dont_put_entities_if_no_entities_in_collection(): void
@@ -50,7 +49,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products_index',
             'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = new PullFromSource(DefaultImportSourceFactory::from(Product::class));
+        $stage = new PullFromSourceParallel(DefaultImportSourceFactory::from(Product::class));
         $stage->handle();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
@@ -82,7 +81,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products_index',
             'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = new PullFromSource(DefaultImportSourceFactory::from(Product::class));
+        $stage = new PullFromSourceParallel(DefaultImportSourceFactory::from(Product::class));
         $stage->handle();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
@@ -115,7 +114,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products_index',
             'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = new PullFromSource(DefaultImportSourceFactory::from(Product::class));
+        $stage = new PullFromSourceParallel(DefaultImportSourceFactory::from(Product::class));
         $stage->handle();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
@@ -150,7 +149,7 @@ final class PullFromSourceTest extends IntegrationTestCase
             'index' => 'products_index',
             'body' => ['aliases' => ['products' => new stdClass()]],
         ]);
-        $stage = PullFromSource::chunked(DefaultImportSourceFactory::from(Product::class));
+        $stage = PullFromSourceParallel::chunked(DefaultImportSourceFactory::from(Product::class));
         $stage->handle();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',
@@ -169,7 +168,7 @@ final class PullFromSourceTest extends IntegrationTestCase
 
     public function test_no_searchables_no_chunks()
     {
-        $stage = PullFromSource::chunked(DefaultImportSourceFactory::from(Product::class));
+        $stage = PullFromSourceParallel::chunked(DefaultImportSourceFactory::from(Product::class));
 
         $this->assertEquals(null, $stage);
     }
@@ -185,7 +184,7 @@ final class PullFromSourceTest extends IntegrationTestCase
 
         Product::setEventDispatcher($dispatcher);
 
-        $chunks = PullFromSource::chunked(DefaultImportSourceFactory::from(Product::class));
+        $chunks = PullFromSourceParallel::chunked(DefaultImportSourceFactory::from(Product::class));
         $chunks->handle();
         $this->elasticsearch->indices()->refresh([
             'index' => 'products',

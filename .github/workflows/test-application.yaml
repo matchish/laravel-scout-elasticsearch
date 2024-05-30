@@ -65,6 +65,7 @@ jobs:
                 run: |
                     composer validate --strict
                     composer install --no-interaction --prefer-dist
+                    composer require mateusjunges/laravel-trackable-jobs --no-interaction
 
             -   name: Run tests
                 run: vendor/bin/phpunit --coverage-clover=coverage.xml

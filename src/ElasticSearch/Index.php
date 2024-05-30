@@ -94,7 +94,9 @@ final class Index
             'number_of_replicas' => 0,
 
         ];
+        /** @var array<string> $settings */
         $settings = config($settingsConfigKey, config('elasticsearch.indices.settings.default', $defaultSettings));
+        /** @var array<string> $mappings */
         $mappings = config($mappingsConfigKey, config('elasticsearch.indices.mappings.default'));
 
         return new static($name, $settings, $mappings);

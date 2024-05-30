@@ -27,10 +27,13 @@ up: ## Start all containers (in background) for development
 	$(docker_compose_bin) up -d
 
 down: ## Stop all started for development containers
-	$(docker_compose_bin) down
+	$(docker_compose_bin) down -v
 
 restart: up ## Restart all started for development containers
 	$(docker_compose_bin) restart
+
+rebuild: down
+	$(docker_compose_bin) up --build -d
 
 shell: up ## Start shell into application container
 	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" /bin/sh
@@ -38,12 +41,13 @@ shell: up ## Start shell into application container
 install: up ## Install application dependencies into application container
 	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" composer install --no-interaction --ansi
 
-test: up ## Execute application tests
+larastan: up
 	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" ./vendor/bin/phpstan analyze --memory-limit=4000M
+
+test: up ## Execute application tests 
 	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" ./vendor/bin/phpunit --testdox --stop-on-failure
 
 test-coverage: up ## Execute application tests and generate report
-	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" ./vendor/bin/phpstan analyze
 	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" ./vendor/bin/phpunit  --coverage-html build/coverage-report
 
 test-filter:

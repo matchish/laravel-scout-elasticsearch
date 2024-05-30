@@ -107,6 +107,6 @@ final class SearchFactory
      */
     private static function hasWhereIns($builder): bool
     {
-        return isset($builder->whereIns) && ! empty($builder->whereIns);
+        return ! empty($builder->whereIns);
     }
 }

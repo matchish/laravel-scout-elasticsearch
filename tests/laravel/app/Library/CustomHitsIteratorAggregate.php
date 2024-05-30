@@ -17,7 +17,7 @@ class CustomHitsIteratorAggregate implements HitsIteratorAggregate
         $this->callback = $callback;
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         $hits = ['test1', 'test2', 'test3'];
 

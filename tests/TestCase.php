@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use Illuminate\Support\Facades\Artisan;
 use Laravel\Scout\ScoutServiceProvider;
 use Matchish\ScoutElasticSearch\ElasticSearchServiceProvider;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
@@ -21,7 +20,13 @@ abstract class TestCase extends BaseTestCase
 
         $this->withFactories(database_path('factories'));
 
-        Artisan::call('migrate:fresh', ['--database' => 'mysql']);
+        if (class_exists(\Junges\TrackableJobs\Providers\TrackableJobsServiceProvider::class)) {
+            \Artisan::call('vendor:publish', [
+                '--tag' => 'trackable-jobs-config',
+            ]);
+        }
+
+        \Artisan::call('migrate:fresh', ['--database' => 'mysql']);
     }
 
     /**
@@ -34,6 +39,7 @@ abstract class TestCase extends BaseTestCase
     {
         $app['config']->set('scout.driver', ElasticSearchEngine::class);
         $app['config']->set('scout.chunk.searchable', 3);
+        $app['config']->set('scout.chunk.handlers', 1);
         $app['config']->set('scout.queue', false);
         // Setup default database to use sqlite :memory:
         $app['config']->set('database.default', 'mysql');
@@ -41,10 +47,17 @@ abstract class TestCase extends BaseTestCase
 
     protected function getPackageProviders($app)
     {
-        return [
+        /** @var array<class-string> $providers */
+        $providers = [
             ScoutServiceProvider::class,
             ScoutElasticSearchServiceProvider::class,
             ElasticSearchServiceProvider::class,
         ];
+
+        if (class_exists(\Junges\TrackableJobs\Providers\TrackableJobsServiceProvider::class)) {
+            $providers[] = \Junges\TrackableJobs\Providers\TrackableJobsServiceProvider::class;
+        }
+
+        return $providers;
     }
 }

@@ -8,8 +8,7 @@ use Matchish\ScoutElasticSearch\ProgressReportable;
 
 class QueueableJob implements ShouldQueue
 {
-    use Queueable;
-    use ProgressReportable;
+    use Queueable, ProgressReportable;
 
     public ?int $timeout = null;
 

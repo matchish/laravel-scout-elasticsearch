@@ -28,7 +28,15 @@ class Storage
      */
     public function hosts(): array
     {
-        return explode(',', $this->loadConfig('host'));
+        /** @var mixed $hostConfig */
+        $hostConfig = $this->loadConfig('host');
+
+        if (is_string($hostConfig)) {
+            /** @var string $hostConfig */
+            return explode(',', $hostConfig);
+        }
+
+        return [];
     }
 
     /**
@@ -36,7 +44,10 @@ class Storage
      */
     public function user(): ?string
     {
-        return $this->loadConfig('user');
+        /** @var string|null $userConfig */
+        $userConfig = $this->loadConfig('user');
+
+        return $userConfig;
     }
 
     /**
@@ -44,7 +55,10 @@ class Storage
      */
     public function password(): ?string
     {
-        return $this->loadConfig('password');
+        /** @var string|null $passwordConfig */
+        $passwordConfig = $this->loadConfig('password');
+
+        return $passwordConfig;
     }
 
     /**
@@ -52,7 +66,10 @@ class Storage
      */
     public function elasticCloudId(): ?string
     {
-        return $this->loadConfig('cloud_id');
+        /** @var string|null $cloudConfig */
+        $cloudConfig = $this->loadConfig('cloud_id');
+
+        return $cloudConfig;
     }
 
     /**
@@ -60,7 +77,10 @@ class Storage
      */
     public function apiKey(): ?string
     {
-        return $this->loadConfig('api_key');
+        /** @var string|null $apiConfig */
+        $apiConfig = $this->loadConfig('api_key');
+
+        return $apiConfig;
     }
 
     /**
@@ -68,7 +88,13 @@ class Storage
      */
     public function queueTimeout(): ?int
     {
-        return (int) $this->loadConfig('queue.timeout') ?: null;
+        $queueTimeoutConfig = $this->loadConfig('queue.timeout');
+
+        if (is_numeric($queueTimeoutConfig)) {
+            return intval($queueTimeoutConfig);
+        }
+
+        return null;
     }
 
     /**

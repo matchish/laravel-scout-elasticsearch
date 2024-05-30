@@ -185,7 +185,11 @@ While working in production, to keep your existing search experience available w
 
 `php artisan scout:import`
 
-The command create new temporary index, import all models to it, and then switch to the index and remove old index.
+The command creates new temporary index, imports all models to it, and then switches to the index and remove old index.
+
+### Parallel import
+When importing massive ammounts of data, you can use the option `--parallel`, to speed up the import process.
+This however requires you to set-up the suggested trackable-jobs package and queue workers.
 
 ### Search
 

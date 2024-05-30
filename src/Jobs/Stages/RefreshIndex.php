@@ -41,4 +41,14 @@ final class RefreshIndex implements StageInterface
     {
         return 'Refreshing index';
     }
+
+    public function advance(): int
+    {
+        return 1;
+    }
+
+    public function completed(): bool
+    {
+        return true;
+    }
 }

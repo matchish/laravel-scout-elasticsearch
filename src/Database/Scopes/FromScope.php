@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 use Laravel\Scout\Searchable;
 
-class PageScope implements Scope
+class FromScope implements Scope
 {
     /**
      * @var int
      */
-    private $page;
+    private $lastId;
     /**
      * @var int
      */
@@ -21,12 +21,12 @@ class PageScope implements Scope
     /**
      * PageScope constructor.
      *
-     * @param  int  $page
+     * @param  int  $lastId
      * @param  int  $perPage
      */
-    public function __construct(int $page, int $perPage)
+    public function __construct(int $lastId, int $perPage)
     {
-        $this->page = $page;
+        $this->lastId = $lastId;
         $this->perPage = $perPage;
     }
 
@@ -39,6 +39,6 @@ class PageScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        $builder->forPage($this->page, $this->perPage);
+        $builder->forPageAfterId($this->perPage, $this->lastId);
     }
 }
