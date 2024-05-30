@@ -1,6 +1,10 @@
 <p align="center">
-  <a href="https://savelife.in.ua/en/donate/">
-    <img alt="Support Ukraine" src="http://supportua.org.ua/wp-content/uploads/2015/05/content-logo-main.png" >
+    <h1>Stay with Ukraine</h1>
+    <p><a href="https://u24.gov.ua/robots_fight">UNITED24</a> launches the first fundraiser towards terrestrial robotic platforms. Squads of robots will save the lives of our military and civilians. They will become logistics devices, tow trucks, minelayers and deminers, as well as self-destructive robots. They will fight alongside people and for people.
+
+The first robots are already proving their effectiveness on the battlefield. There will be more of them soon. Many more.</p>
+  <a href="https://u24.gov.ua/robots_fight">
+    <img alt="Support Ukraine" src="https://files.u24.gov.ua/pages/robotsFight/_processed/robots-og-en.jpg" >
   </a>
 <!--   <a href="https://github.com/matchish/laravel-scout-elasticsearch">
     <img alt="Scout ElasticSearch" src="https://raw.githubusercontent.com/matchish/laravel-scout-elasticsearch/master/docs/banner.svg?sanitize=true" >
@@ -37,10 +41,10 @@ Don't forget to :star: the package if you like it. :pray:
 - [Search amongst multiple models](#search-amongst-multiple-models)
 - [**Zero downtime** reimport](#zero-downtime-reimport) - it’s a breeze to import data in production.
 - [Eager load relations](#eager-load) - speed up your import.
+- Parallel import to make your import as fast as possible (in [alpha version](https://github.com/matchish/laravel-scout-elasticsearch/releases/tag/8.0.0-alpha.1) for now)
 - Import all searchable models at once.
 - A fully configurable mapping for each model.
 - Full power of ElasticSearch in your queries.
-
 ## :warning: Requirements
 
 - PHP version >= 8.0
