@@ -58,7 +58,7 @@ final class PullFromSourceParallel implements StageInterface
         $this->queues = [];
 
         foreach (range(1, config('scout.chunk.handlers', self::DEFAULT_HANDLER_COUNT)) as $i) {
-            $this->queues[] = config('elasticsearch.queue.name', self::DEFAULT_QUEUE_NAME) . '-' . $i;
+            $this->queues[] = config('elasticsearch.queue.name', self::DEFAULT_QUEUE_NAME).'-'.$i;
         }
     }
 
