@@ -65,7 +65,7 @@ final class SearchTest extends IntegrationTestCase
 
         Artisan::call('scout:import');
 
-        $search = Product::search('*', function($client, $body) {
+        $search = Product::search('*', function ($client, $body) {
             $body->addQuery(new MatchQuery('title', 'IPhone'), BoolQuery::SHOULD);
 
             $highlight = new Highlight();
@@ -82,7 +82,7 @@ final class SearchTest extends IntegrationTestCase
 
         /** @var Product $item */
         $item = $search->random();
-        
+
         $this->assertEquals($search->count(), $productAmount);
         $this->assertNotNull($item->getElasticsearchScore());
         $this->assertNotNull($item->getElasticsearchHighlight());

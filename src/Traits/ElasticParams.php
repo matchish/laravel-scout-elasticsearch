@@ -16,8 +16,8 @@ trait ElasticParams
 
     /**
      * Set elasticsearch score.
-     * 
-     * @param float $score
+     *
+     * @param  float  $score
      * @return void
      */
     public function setElasticsearchScore(float $score): void
@@ -27,7 +27,7 @@ trait ElasticParams
 
     /**
      * Get elasticsearch score.
-     * 
+     *
      * @return float|null
      */
     public function getElasticsearchScore(): ?float
@@ -37,7 +37,7 @@ trait ElasticParams
 
     /**
      * Set elasticsearch highlighting.
-     * 
+     *
      * @param array<string, array|string>
      * @return void
      */
@@ -48,7 +48,7 @@ trait ElasticParams
 
     /**
      * Get elasticsearch highlighting.
-     * 
+     *
      * @return array<string, array|string>|null
      */
     public function getElasticsearchHighlight(): ?array
