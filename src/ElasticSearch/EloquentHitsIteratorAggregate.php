@@ -2,6 +2,7 @@
 
 namespace Matchish\ScoutElasticSearch\ElasticSearch;
 
+use Matchish\ScoutElasticSearch\Traits\ElasticParams;
 use Illuminate\Database\Eloquent\Model;
 use IteratorAggregate;
 use Laravel\Scout\Builder;
@@ -77,7 +78,22 @@ final class EloquentHitsIteratorAggregate implements IteratorAggregate
 
                 $key = $source['__class_name'].'::'.$hit['_id'];
 
-                return isset($models[$key]) ? $models[$key] : null;
+                if (! isset($models[$key])) {
+                    return null;
+                }
+
+                /** @var Model&Searchable&ElasticParams $model */
+                $model = $models[$key];
+
+                if (isset($hit['_score']) && ! empty($hit['_score']) && method_exists($model, 'setElasticsearchScore')) {
+                    $model->setElasticsearchScore((float) $hit['_score']);
+                }
+
+                if (isset($hit['highlight']) && ! empty($hit['highlight']) && method_exists($model, 'setElasticsearchHighlight')) {
+                    $model->setElasticsearchHighlight($hit['highlight']);
+                }
+
+                return $model;
             })->filter()->all();
         }
 
