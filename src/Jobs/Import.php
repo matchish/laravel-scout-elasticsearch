@@ -25,6 +25,10 @@ final class Import
      * @var bool
      */
     public $parallel = false;
+    /**
+     * @var bool
+     */
+    public $adaptive = false;
 
     public ?int $timeout = null;
 
@@ -69,6 +73,6 @@ final class Import
      */
     private function stages(): Collection
     {
-        return ImportStages::fromSource($this->source, $this->parallel);
+        return ImportStages::fromSource($this->source, $this->parallel, $this->adaptive);
     }
 }

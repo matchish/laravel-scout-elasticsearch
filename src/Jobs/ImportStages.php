@@ -23,11 +23,27 @@ class ImportStages extends Collection
     /**
      * @param  ImportSource  $source
      * @param  bool  $parallel
+     * @param  bool  $adaptive
      * @return Collection<int, StageInterface>
      */
-    public static function fromSource(ImportSource $source, bool $parallel = false)
+    public static function fromSource(ImportSource $source, bool $parallel = false, bool $adaptive = false)
     {
         $index = Index::fromSource($source);
+
+        if ($adaptive) {
+            $source = $source->chunked();
+
+            if ($source === null) {
+                return collect();
+            }
+
+            // Performance starts to increase at 75k records for parallel indexing.
+            if ($source->getChunkSize() * $source->getTotalChunks() <= 75000) {
+                $parallel = false;
+            } else {
+                $parallel = true;
+            }
+        }
 
         if ($parallel && class_exists(\Junges\TrackableJobs\Providers\TrackableJobsServiceProvider::class)) {
             return (new self([

@@ -149,6 +149,32 @@ final class ImportCommandTest extends IntegrationTestCase
         $this->assertEquals($productsAmount, $response['hits']['total']['value']);
     }
 
+    public function test_import_all_pages_using_adaptive(): void
+    {
+        $dispatcher = Product::getEventDispatcher();
+        Product::unsetEventDispatcher();
+
+        $productsAmount = 10;
+
+        factory(Product::class, $productsAmount)->create();
+
+        Product::setEventDispatcher($dispatcher);
+
+        Artisan::call('scout:import', [
+            '--adaptive' => true,
+        ]);
+        $params = [
+            'index' => (new Product())->searchableAs(),
+            'body' => [
+                'query' => [
+                    'match_all' => new stdClass(),
+                ],
+            ],
+        ];
+        $response = $this->elasticsearch->search($params);
+        $this->assertEquals($productsAmount, $response['hits']['total']['value']);
+    }
+
     public function test_import_with_custom_key_all_pages(): void
     {
         $this->app['config']['scout.key'] = 'title';
