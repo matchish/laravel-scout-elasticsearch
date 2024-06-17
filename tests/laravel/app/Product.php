@@ -5,10 +5,11 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Scout\Searchable;
+use Matchish\ScoutElasticSearch\Traits\ElasticParams;
 
 class Product extends Model
 {
-    use Searchable, SoftDeletes;
+    use Searchable, SoftDeletes, ElasticParams;
 
     protected $fillable = [
         'title',
