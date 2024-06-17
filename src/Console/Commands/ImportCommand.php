@@ -17,7 +17,7 @@ final class ImportCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected $signature = 'scout:import {searchable?* : The name of the searchable} {--P|parallel : Index items in parallel}';
+    protected $signature = 'scout:import {searchable?* : The name of the searchable} {--P|parallel : Index items in parallel} {--A|adaptive : Index items in parallel if it is beneficial}';
 
     /**
      * {@inheritdoc}
@@ -30,14 +30,19 @@ final class ImportCommand extends Command
     public function handle(): void
     {
         $parallel = false;
+        $adaptive = false;
 
         if ($this->option('parallel')) {
             $parallel = true;
         }
 
+        if ($this->option('adaptive')) {
+            $adaptive = true;
+        }
+
         $this->searchableList((array) $this->argument('searchable'))
-        ->each(function (string $searchable) use ($parallel) {
-            $this->import($searchable, $parallel);
+        ->each(function (string $searchable) use ($parallel, $adaptive) {
+            $this->import($searchable, $parallel, $adaptive);
         });
     }
 
@@ -59,7 +64,7 @@ final class ImportCommand extends Command
      * @param  bool  $parallel
      * @return void
      */
-    private function import(string $searchable, bool $parallel): void
+    private function import(string $searchable, bool $parallel, bool $adaptive): void
     {
         $sourceFactory = app(ImportSourceFactory::class);
         $source = $sourceFactory::from($searchable);
@@ -70,6 +75,7 @@ final class ImportCommand extends Command
             $job->timeout = (int) $queueTimeout;
         }
         $job->parallel = $parallel;
+        $job->adaptive = $adaptive;
 
         if (config('scout.queue')) {
             $job = (new QueueableJob())->chain([$job]);
