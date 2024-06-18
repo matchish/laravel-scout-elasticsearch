@@ -22,7 +22,7 @@ final class PullFromSourceParallel implements StageInterface
     /**
      * @var string
      */
-    const DEFAULT_QUEUE_NAME = 'indexing-queue';
+    const DEFAULT_QUEUE_NAME = 'elasticsearch-parallel';
 
     /**
      * @var ImportSource
