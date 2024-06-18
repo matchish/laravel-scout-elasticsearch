@@ -53,7 +53,7 @@ final class EloquentHitsIteratorAggregate implements IteratorAggregate
             /** @var array<int, string> $hasTrait */
             $hasTrait = [];
             $models = collect($hits)->groupBy('_source.__class_name')
-                ->map(function ($results, $class) use(&$hasTrait) {
+                ->map(function ($results, $class) use (&$hasTrait) {
                     /** @var Model&Searchable $model */
                     $model = new $class;
                     $model->setKeyType('string');
