@@ -284,8 +284,9 @@ In this example you will get collection of `Ticket` and `Book` models where tick
 book title is `Barcelona`
 
 ### Working with results
-Often your response isn't collection of models but aggregations or models with higlights an so on.
-In this case you need to implement your own implementation of `HitsIteratorAggregate` and bind it in your service provider
+Often your response isn't collection of models but aggregations or models with higlights and so on.
+In this case you can use the 'ElasticParams' trait within your model to acquire the returned model score and highlight.
+In case you need additional data witin your results you need to implement your own implementation of `HitsIteratorAggregate` and bind it in your service provider.
 
 [Here is a case](https://github.com/matchish/laravel-scout-elasticsearch/issues/28)
 
