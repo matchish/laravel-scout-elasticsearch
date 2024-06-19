@@ -6,11 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [8.0.0-alpha.2] - 2024-
+### Added
+- ElasticParams trait, that adds 'getElasticsearchScore' and 'getElasticsearchHighlight' to the model after performing a search.
+
 ## [8.0.0-alpha.1] - 2024-05-29
 ### Added
 - fromScope, uses forPageAfterId.
 - a new option "--parallel" for ImportCommand, can only be used with [Trackable-Jobs](https://github.com/mateusjunges/trackable-jobs-for-laravel) package currently.
-- ElasticParams trait, that adds 'getElasticsearchScore' and 'getElasticsearchHighlight' to the model after performing a search.
 
 ## Changed
 - StageInterface now has two more functions. Both are used to make PullFromSource stage an iterable one.
