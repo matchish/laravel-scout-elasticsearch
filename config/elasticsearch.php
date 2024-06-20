@@ -8,6 +8,7 @@ return [
     'api_key' => env('ELASTICSEARCH_API_KEY'),
     'queue' => [
         'timeout' => env('SCOUT_QUEUE_TIMEOUT'),
+        'name' => env('SCOUT_QUEUE_NAME'),
     ],
     'indices' => [
         'mappings' => [

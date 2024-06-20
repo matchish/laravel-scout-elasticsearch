@@ -6,9 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
-## [8.0.0-alpha.2] - 2024-
+## [8.0.0-alpha.2] - 2024-06-20
 ### Added
 - ElasticParams trait, that adds 'getElasticsearchScore' and 'getElasticsearchHighlight' to the model after performing a search.
+- 'elasticsearch.queue.name' config parameter to set a custom parallel import queue name.
 
 ## [8.0.0-alpha.1] - 2024-05-29
 ### Added

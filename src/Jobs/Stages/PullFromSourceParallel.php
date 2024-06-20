@@ -20,6 +20,11 @@ final class PullFromSourceParallel implements StageInterface
     const DEFAULT_HANDLER_COUNT = 1;
 
     /**
+     * @var string
+     */
+    const DEFAULT_QUEUE_NAME = 'elasticsearch-parallel';
+
+    /**
      * @var ImportSource
      */
     private $source;
@@ -42,9 +47,7 @@ final class PullFromSourceParallel implements StageInterface
     /**
      * @var array<string>
      */
-    private $queues = [
-        'import_1',
-    ];
+    private $queues = [];
 
     /**
      * @param  ImportSource  $source
@@ -52,9 +55,11 @@ final class PullFromSourceParallel implements StageInterface
     public function __construct(ImportSource $source)
     {
         $this->source = $source;
-        $this->queues = collect(config('scout.chunk.handlers', self::DEFAULT_HANDLER_COUNT))->map(function ($i) {
-            return 'import_'.$i;
-        })->toArray();
+        $this->queues = [];
+
+        foreach (range(1, config('scout.chunk.handlers', self::DEFAULT_HANDLER_COUNT)) as $i) {
+            $this->queues[] = config('elasticsearch.queue.name', self::DEFAULT_QUEUE_NAME).'-'.$i;
+        }
     }
 
     /**
@@ -95,7 +100,7 @@ final class PullFromSourceParallel implements StageInterface
             })->pluck('id')->toArray();
         }
 
-        if (count($this->dispatchedJobIds) >= $this->source->getTotalChunks()) {
+        if (count($this->handledJobs) + count($this->dispatchedJobIds) > $this->source->getTotalChunks()) {
             return;
         }
 
