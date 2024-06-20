@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [8.0.0-alpha.2] - 2024-
+### Added
+- ElasticParams trait, that adds 'getElasticsearchScore' and 'getElasticsearchHighlight' to the model after performing a search.
+
 ## [8.0.0-alpha.1] - 2024-05-29
 ### Added
 - fromScope, uses forPageAfterId.

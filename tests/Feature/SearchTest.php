@@ -11,6 +11,9 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\LazyCollection;
 use Matchish\ScoutElasticSearch\MixedSearch;
+use ONGR\ElasticsearchDSL\Highlight\Highlight;
+use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
+use ONGR\ElasticsearchDSL\Query\FullText\MatchQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\RangeQuery;
 use Tests\IntegrationTestCase;
 
@@ -47,6 +50,44 @@ final class SearchTest extends IntegrationTestCase
 
         $this->assertEquals($iphonePromoUsedAndLikeNew->count(), $iphonePromoUsedAndLikeNewAmount);
         $this->assertInstanceOf(Product::class, $iphonePromoUsedAndLikeNew->first());
+    }
+
+    public function test_search_appends_extra_params(): void
+    {
+        $dispatcher = Product::getEventDispatcher();
+        Product::unsetEventDispatcher();
+
+        $productAmount = rand(5, 10);
+
+        $products = factory(Product::class, $productAmount)->states(['iphone', 'cheap'])->create();
+
+        Product::setEventDispatcher($dispatcher);
+
+        Artisan::call('scout:import');
+
+        $search = Product::search('*', function ($client, $body) {
+            $body->addQuery(new MatchQuery('title', 'IPhone'), BoolQuery::SHOULD);
+
+            $highlight = new Highlight();
+            $highlight->addField('title');
+            $body->addHighlight($highlight);
+
+            $elasticResponse = $client->search([
+                'index' => (new Product())->searchableAs(),
+                'body' => $body->toArray(),
+            ]);
+
+            return $elasticResponse->asArray();
+        })->get();
+
+        /** @var Product $item */
+        $item = $search->random();
+
+        $this->assertEquals($search->count(), $productAmount);
+        $this->assertNotNull($item->getElasticsearchScore());
+        $this->assertNotNull($item->getElasticsearchHighlight());
+        $this->assertTrue($item->save());
+        $this->assertInstanceOf(Product::class, $item->first());
     }
 
     public function test_search_with_custom_filter()
