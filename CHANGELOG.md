@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
+## [7.6.2] - 2024-06-24
+### Fixed
+- [Change if conditions order in soft deletes check for compatibility](https://github.com/matchish/laravel-scout-elasticsearch/pull/282).
+
 ## [7.6.1] - 2024-05-14
 ### Fixed
 - fix for [parser incompatibility](https://github.com/matchish/laravel-scout-elasticsearch/issues/273)
