@@ -67,8 +67,8 @@ Set env variables
 SCOUT_DRIVER=Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine
 ```
 
-The package uses `\ElasticSearch\Client` from official package, but does not try to configure it, 
-so feel free do it in your app service provider. 
+The package uses `\ElasticSearch\Client` from official package, but does not try to configure it 
+beyond connection configuration, so feel free do it in your app service provider. 
 But if you don't want to do it right now, 
 you can use `Matchish\ElasticSearchServiceProvider` from the package.  
 Register the provider, adding to `config/app.php`
@@ -87,6 +87,12 @@ or use commas as separator for additional nodes
 ```
 ELASTICSEARCH_HOST=host:port,host:port
 ```
+
+You can disable SSL verification by setting the following in your env
+```
+ELASTICSEARCH_SSL_VERIFICATION=false
+```
+
 And publish config example for elasticsearch  
 `php artisan vendor:publish --tag config`
 
