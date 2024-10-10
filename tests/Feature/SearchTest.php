@@ -47,6 +47,14 @@ final class SearchTest extends IntegrationTestCase
 
         $this->assertEquals($iphonePromoUsedAndLikeNew->count(), $iphonePromoUsedAndLikeNewAmount);
         $this->assertInstanceOf(Product::class, $iphonePromoUsedAndLikeNew->first());
+
+        $iphonePromoNotUsedAndNotLikeNew = Product::search('iphone')
+            ->where('price', 100)
+            ->whereNotIn('type', ['used', 'like new'])
+            ->get();
+
+        $this->assertEquals($iphonePromoNotUsedAndNotLikeNew->count(), $iphonePromoNewAmount);
+        $this->assertInstanceOf(Product::class, $iphonePromoNotUsedAndNotLikeNew->first());
     }
 
     public function test_search_with_custom_filter()
