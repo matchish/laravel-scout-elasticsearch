@@ -17,7 +17,7 @@ class MixedTest extends TestCase
 
         $mixed = new ReflectionClass(MixedSearch::class);
         $mixedParameters = $mixed->getMethod('search')->getParameters();
-        $mixedDoc = $this->stripStaticFromReturnType($mixed->getMethod('search')->getDocComment());
+        $mixedDoc = $mixed->getMethod('search')->getDocComment();
 
         $this->assertEquals($searchableParameters, $mixedParameters);
         $this->assertEquals($searchableDoc, $mixedDoc);
