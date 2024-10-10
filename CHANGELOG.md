@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
-## [7.7.0] - 2024-06-24
+## [7.8.0] - 2024-06-24
 ### Added
 - [Added supports of whereNotIn condition]([https://github.com/matchish/laravel-scout-elasticsearch/pull/282](https://github.com/matchish/laravel-scout-elasticsearch/pull/286).
 - 
