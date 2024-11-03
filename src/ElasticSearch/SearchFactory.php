@@ -34,6 +34,9 @@ final class SearchFactory
         } else {
             $search->addQuery($query);
         }
+        if (isset($builder->limit)) {
+            $search->setSize($builder->limit);
+        }
         if (array_key_exists('from', $options)) {
             $search->setFrom($options['from']);
         }
