@@ -280,11 +280,11 @@ Full list of ElasticSearch terms is in `vendor/handcraftedinthealps/elasticsearc
 You can do it with `MixedSearch` class, just pass indices names separated by commas to the `within` method.
 ```php
 MixedSearch::search('title:Barcelona or to:Barcelona')
-    within(implode(',', [
+    ->within(implode(',', [
         (new Ticket())->searchableAs(),
         (new Book())->searchableAs(),
     ]))
-->get();
+    ->get();
 ```
 In this example you will get collection of `Ticket` and `Book` models where ticket's arrival city or
 book title is `Barcelona`
