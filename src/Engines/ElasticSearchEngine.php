@@ -183,7 +183,7 @@ final class ElasticSearchEngine extends Engine
 
     /**
      * @param  BaseBuilder  $builder
-     * @param  array  $options
+     * @param array $options
      * @return SearchResults|mixed
      */
     private function performSearch(BaseBuilder $builder, $options = [])
