@@ -276,6 +276,25 @@ Product::search()
 
 Full list of ElasticSearch terms is in `vendor/handcraftedinthealps/elasticsearch-dsl/src/Query/TermLevel`.
 
+### Pagination
+The engine supports [Elasticsearch pagination](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html)
+with [Scout Builder pagination](https://laravel.com/docs/11.x/scout#pagination) or by setting page sizes 
+and offsets using the `->take($size)` method and `->options(['from' => $from])`.
+
+> Caution : Builder pagination takes precedence over the `take()` and `options()` setting.
+
+For example:
+
+```php
+Product::search()
+    ->take(20)
+    ->options([
+        'from' => 20,
+    ])
+    ->paginate(50);
+```
+This will return the first 50 results, ignoring the specified offset.
+
 ### Search amongst multiple models
 You can do it with `MixedSearch` class, just pass indices names separated by commas to the `within` method.
 ```php
