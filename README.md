@@ -31,8 +31,6 @@ It’s built on top of the latest release of [Laravel Scout](https://laravel.com
 package. Using this package, you are free to take advantage of all of Laravel Scout’s
 great features, and at the same time leverage the complete set of ElasticSearch’s search experience.
 
-If you need any help, [stack overflow](https://stackoverflow.com/questions/tagged/laravel-scout%20laravel%20elasticsearch) is the preferred and recommended way to ask support questions.
-
 ## :two_hearts: Features  
 Don't forget to :star: the package if you like it. :pray:
 
@@ -299,11 +297,11 @@ This will return the first 50 results, ignoring the specified offset.
 You can do it with `MixedSearch` class, just pass indices names separated by commas to the `within` method.
 ```php
 MixedSearch::search('title:Barcelona or to:Barcelona')
-    within(implode(',', [
+    ->within(implode(',', [
         (new Ticket())->searchableAs(),
         (new Book())->searchableAs(),
     ]))
-->get();
+    ->get();
 ```
 In this example you will get collection of `Ticket` and `Book` models where ticket's arrival city or
 book title is `Barcelona`
