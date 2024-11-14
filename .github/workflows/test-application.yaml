@@ -73,6 +73,11 @@ jobs:
                     DB_USERNAME: root
                     ELASTICSEARCH_HOST: '127.0.0.1:9200'
 
+            - name: SonarCloud Scan
+              uses: SonarSource/sonarcloud-github-action@master
+              env:
+                SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+            
             -   name: Upload coverage to Codecov
                 uses: codecov/codecov-action@v4
                 with:
