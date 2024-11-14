@@ -73,9 +73,9 @@ jobs:
                     DB_USERNAME: root
                     ELASTICSEARCH_HOST: '127.0.0.1:9200'
 
-            - name: SonarQube Cloud Scan
+            -   name: SonarCloud Scan
                 uses: SonarSource/sonarcloud-github-action@master
                 env:
-                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             
