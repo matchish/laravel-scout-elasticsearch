@@ -58,7 +58,9 @@ Don't forget to :star: the package if you like it. :pray:
 
 Use composer to install the package:
 
-`composer require matchish/laravel-scout-elasticsearch`
+```
+composer require matchish/laravel-scout-elasticsearch
+```
 
 Set env variables
 ```
