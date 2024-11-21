@@ -197,7 +197,7 @@ final class ElasticSearchEngine extends Engine
                 $callback,
                 $this->elasticsearch,
                 $searchBody
-            );
+            )->asArray();
         }
 
         $model = $builder->model;
