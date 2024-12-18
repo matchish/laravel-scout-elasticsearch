@@ -42,6 +42,9 @@ final class SearchFactory
         if (array_key_exists('size', $options)) {
             $search->setSize($options['size']);
         }
+        if (array_key_exists('source', $options)) {
+            $search->setSource($options['source']);
+        }
         if (! empty($builder->orders)) {
             foreach ($builder->orders as $order) {
                 $search->addSort(new FieldSort($order['column'], $order['direction']));
@@ -153,6 +156,7 @@ final class SearchFactory
     {
         return Arr::only($builder->options, [
             'from',
+            'source',
         ]);
     }
 }
