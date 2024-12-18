@@ -75,4 +75,16 @@ class SearchFactoryTest extends TestCase
         $this->assertEquals($expectedSize, $search->getSize());
         $this->assertEquals($expectedFrom, $search->getFrom());
     }
+
+    public function test_source_can_be_set_from_options(): void
+    {
+        $builder = new Builder(new Product(), '*');
+        $builder->options([
+            'source' => $expectedFields = ['title', 'price'],
+        ]);
+
+        $search = SearchFactory::create($builder);
+
+        $this->assertEquals($expectedFields, $search->isSource());
+    }
 }

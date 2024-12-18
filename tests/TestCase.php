@@ -21,7 +21,7 @@ abstract class TestCase extends BaseTestCase
 
         $this->withFactories(database_path('factories'));
 
-        Artisan::call('migrate:fresh', ['--database' => 'mysql']);
+        Artisan::call('migrate:fresh', ['--database' => env('DB_CONNECTION', 'mysql')]);
     }
 
     /**
