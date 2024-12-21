@@ -1,7 +1,7 @@
 name: Sonar
 on:
   workflow_run:
-    workflows: [Build]
+    workflows: [Test application]
     types: [completed]
 jobs:
   sonar:
