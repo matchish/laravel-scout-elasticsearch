@@ -21,30 +21,47 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            let allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
+            const core = require('@actions/core');
+            
+            console.log('Workflow run ID:', context.payload.workflow_run.id);
+            
+            const artifactsResponse = await github.rest.actions.listWorkflowRunArtifacts({
               owner: context.repo.owner,
               repo: context.repo.repo,
               run_id: context.payload.workflow_run.id,
             });
-            let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
-              return artifact.name == "code-coverage"
-            })[0];
-            let download = await github.rest.actions.downloadArtifact({
+            
+            console.log('Available artifacts:', artifactsResponse.data.artifacts.map(a => a.name));
+            
+            const matchArtifact = artifactsResponse.data.artifacts.find(artifact => 
+              artifact.name === "coverage-report"
+            );
+            
+            if (!matchArtifact) {
+              core.setFailed('No coverage-report artifact found. Available artifacts: ' + 
+                artifactsResponse.data.artifacts.map(a => a.name).join(', '));
+              return;
+            }
+            
+            console.log('Found coverage artifact:', matchArtifact.name, 'ID:', matchArtifact.id);
+            
+            const download = await github.rest.actions.downloadArtifact({
               owner: context.repo.owner,
               repo: context.repo.repo,
               artifact_id: matchArtifact.id,
               archive_format: 'zip',
             });
             let fs = require('fs');
-            fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/code-coverage.zip`, Buffer.from(download.data));
+            fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/coverage-report.zip`, Buffer.from(download.data));
 
       - name: Extract coverage report
-        run: unzip code-coverage.zip
+        run: unzip coverage-report.zip
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v1.1.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         with:
           args: >
             -Dsonar.scm.revision=${{ github.event.workflow_run.head_sha }}
