@@ -1,0 +1,54 @@
+name: Sonar Analysis
+on:
+  workflow_run:
+    workflows: ["Test application"]
+    types:
+      - completed
+
+jobs:
+  sonar:
+    name: SonarQube Analysis
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.workflow_run.head_repository.full_name }}
+          ref: ${{ github.event.workflow_run.head_branch }}
+          fetch-depth: 0
+
+      - name: Download code coverage
+        uses: actions/github-script@v6
+        with:
+          script: |
+            let allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.payload.workflow_run.id,
+            });
+            let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
+              return artifact.name == "code-coverage"
+            })[0];
+            let download = await github.rest.actions.downloadArtifact({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              artifact_id: matchArtifact.id,
+              archive_format: 'zip',
+            });
+            let fs = require('fs');
+            fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/code-coverage.zip`, Buffer.from(download.data));
+
+      - name: Extract coverage report
+        run: unzip code-coverage.zip
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v1.1.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.scm.revision=${{ github.event.workflow_run.head_sha }}
+            -Dsonar.coverage.jacoco.xmlReportPaths=coverage.xml
+            ${{ github.event.workflow_run.pull_requests != null && format('-Dsonar.pullrequest.key={0}', github.event.workflow_run.pull_requests[0].number) || '' }}
+            ${{ github.event.workflow_run.pull_requests != null && format('-Dsonar.pullrequest.branch={0}', github.event.workflow_run.pull_requests[0].head.ref) || '' }}
+            ${{ github.event.workflow_run.pull_requests != null && format('-Dsonar.pullrequest.base={0}', github.event.workflow_run.pull_requests[0].base.ref) || '' }}
