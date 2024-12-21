@@ -21,8 +21,6 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const core = require('@actions/core');
-            
             console.log('Workflow run ID:', context.payload.workflow_run.id);
             
             const artifactsResponse = await github.rest.actions.listWorkflowRunArtifacts({
