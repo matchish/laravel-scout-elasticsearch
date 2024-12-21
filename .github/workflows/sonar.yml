@@ -59,7 +59,6 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v1.1.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         with:
           args: >
             -Dsonar.scm.revision=${{ github.event.workflow_run.head_sha }}
