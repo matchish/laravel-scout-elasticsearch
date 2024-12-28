@@ -276,6 +276,10 @@ Product::search()
 
 Full list of ElasticSearch terms is in `vendor/handcraftedinthealps/elasticsearch-dsl/src/Query/TermLevel`.
 
+### Limiting returned fields
+Sometimes your indexed models have fields that should not appear in returned result.
+You can set returned fields in `source` option `->options(['source' => ['this', 'that', 'something', 'else']])` 
+
 ### Pagination
 The engine supports [Elasticsearch pagination](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html)
 with [Scout Builder pagination](https://laravel.com/docs/11.x/scout#pagination) or by setting page sizes 
@@ -309,7 +313,7 @@ In this example you will get collection of `Ticket` and `Book` models where tick
 book title is `Barcelona`
 
 ### Working with results
-Often your response isn't collection of models but aggregations or models with higlights an so on.
+Often your response isn't collection of models but aggregations or models with higlights and so on.
 In this case you need to implement your own implementation of `HitsIteratorAggregate` and bind it in your service provider
 
 [Here is a case](https://github.com/matchish/laravel-scout-elasticsearch/issues/28)
