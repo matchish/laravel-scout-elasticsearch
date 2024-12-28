@@ -6,7 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
 
-[7.10.0] - 2024-12-128
+
+## [7.10.0] - 2024-12-128
 ### Added
 - Use [`source` in options](https://github.com/matchish/laravel-scout-elasticsearch/pull/293) to set returned fields
 
