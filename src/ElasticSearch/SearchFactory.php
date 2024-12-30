@@ -23,18 +23,17 @@ final class SearchFactory
     {
         $options = static::prepareOptions($builder, $enforceOptions);
         $search = new Search();
-        $query = new QueryStringQuery($builder->query);
         if (static::hasWhereFilters($builder)) {
             $boolQuery = new BoolQuery();
             $boolQuery = static::addWheres($builder, $boolQuery);
             $boolQuery = static::addWhereIns($builder, $boolQuery);
             $boolQuery = static::addWhereNotIns($builder, $boolQuery);
             if (! empty($builder->query)) {
-                $boolQuery->add($query, BoolQuery::MUST);
+                $boolQuery->add(new QueryStringQuery($builder->query));
             }
             $search->addQuery($boolQuery);
-        } else {
-            $search->addQuery($query);
+        } elseif (! empty($builder->query)) {
+            $search->addQuery(new QueryStringQuery($builder->query));
         }
         if (array_key_exists('from', $options)) {
             $search->setFrom($options['from']);
