@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
-
+- FIX: SearchFactory adds empty `query_string` query even if query string is empty when no `where` clauses are set.  
 
 ## [7.10.0] - 2024-12-128
 ### Added
