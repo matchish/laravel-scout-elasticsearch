@@ -41,7 +41,7 @@ final class EloquentHitsIteratorAggregate implements IteratorAggregate
      *
      * @since 5.0.0
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         $hits = collect();
         if ($this->results['hits']['total']) {
