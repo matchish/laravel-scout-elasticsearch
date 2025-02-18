@@ -64,6 +64,6 @@ class GroupByTypeScope implements Scope
 {
     public function apply(Builder $builder, Model $model)
     {
-        $builder->groupBy('type')->havingRaw('COUNT(*) > 0');
+        $builder->groupBy('type', 'id')->havingRaw('COUNT(*) > 0');
     }
 }
