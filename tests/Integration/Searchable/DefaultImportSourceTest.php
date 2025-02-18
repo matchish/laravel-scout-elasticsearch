@@ -40,7 +40,7 @@ class DefaultImportSourceTest extends TestCase
 
         $source = new DefaultImportSource(Product::class, [new GroupByTypeScope()]);
         $results = $source->chunked();
-        
+
         $this->assertEquals(15, $results->sum(fn ($chunk) => $chunk->get()->count()));
     }
 }
