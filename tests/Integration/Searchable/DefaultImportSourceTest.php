@@ -27,6 +27,22 @@ class DefaultImportSourceTest extends TestCase
         $products = $source->get();
         $this->assertEquals($iphonePromoUsedAmount, $products->count());
     }
+
+    public function test_chunked_with_complex_scope()
+    {
+        $dispatcher = Product::getEventDispatcher();
+        Product::unsetEventDispatcher();
+
+        factory(Product::class, 5)->states(['iphone', 'promo', 'used'])->create();
+        factory(Product::class, 10)->states(['iphone', 'promo', 'new'])->create();
+
+        Product::setEventDispatcher($dispatcher);
+
+        $source = new DefaultImportSource(Product::class, [new GroupByTypeScope()]);
+        $results = $source->chunked();
+        
+        $this->assertEquals(15, $results->sum(fn ($chunk) => $chunk->get()->count()));
+    }
 }
 
 class UsedScope implements Scope
@@ -41,5 +57,13 @@ class UsedScope implements Scope
     public function apply(Builder $builder, Model $model)
     {
         $builder->where('type', 'used');
+    }
+}
+
+class GroupByTypeScope implements Scope
+{
+    public function apply(Builder $builder, Model $model)
+    {
+        $builder->groupBy('type')->havingRaw('COUNT(*) > 0');
     }
 }
