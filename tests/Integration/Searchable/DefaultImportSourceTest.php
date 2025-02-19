@@ -33,15 +33,15 @@ class DefaultImportSourceTest extends TestCase
         $dispatcher = Product::getEventDispatcher();
         Product::unsetEventDispatcher();
 
-        factory(Product::class, 5)->states(['iphone', 'promo', 'used'])->create();
-        factory(Product::class, 10)->states(['iphone', 'promo', 'new'])->create();
+        factory(Product::class, 3)->states(['iphone', 'promo', 'used'])->create();
+        factory(Product::class, 2)->states(['kindle', 'promo', 'new'])->create();
 
         Product::setEventDispatcher($dispatcher);
 
-        $source = new DefaultImportSource(Product::class, [new GroupByTypeScope()]);
+        $source = new DefaultImportSource(Product::class, [new ComplexScopeWithGroupByAndHaving()]);
         $results = $source->chunked();
 
-        $this->assertEquals(15, $results->sum(fn ($chunk) => $chunk->get()->count()));
+        $this->assertEquals(5, $results->sum(fn ($chunk) => $chunk->get()->count()));
     }
 }
 
@@ -60,10 +60,17 @@ class UsedScope implements Scope
     }
 }
 
-class GroupByTypeScope implements Scope
+class ComplexScopeWithGroupByAndHaving implements Scope
 {
     public function apply(Builder $builder, Model $model)
     {
-        $builder->groupBy('type', 'id')->havingRaw('COUNT(*) > 0');
+        $builder->select('products.*')
+                ->selectRaw('COUNT(*) as product_count')
+                ->join('products as p2', function($join) {
+                    $join->on('products.type', '=', 'p2.type')
+                         ->whereNull('p2.deleted_at');
+                })
+                ->groupBy('products.id', 'products.type')
+                ->havingRaw('product_count >= 1');
     }
 }
