@@ -50,11 +50,11 @@ final class DefaultImportSource implements ImportSource
     public function chunked(): Collection
     {
         $query = $this->newQuery();
+        $query = $this->newQuery();
+        $baseQuery = $query->toBase();
         $countQuery = $query->clone()
-            ->setQuery($query->toBase()->clone())
-            ->toBase();
-    
-        $totalSearchables = $countQuery->getCountForPagination();
+            ->setQuery($baseQuery);
+        $totalSearchables = $countQuery->toBase()->getCountForPagination();
         if ($totalSearchables) {
             $chunkSize = (int) config('scout.chunk.searchable', self::DEFAULT_CHUNK_SIZE);
             $totalChunks = (int) ceil($totalSearchables / $chunkSize);
