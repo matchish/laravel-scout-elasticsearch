@@ -66,7 +66,7 @@ class ComplexScopeWithGroupByAndHaving implements Scope
     {
         $builder->select('products.*')
                 ->selectRaw('COUNT(*) as product_count')
-                ->join('products as p2', function($join) {
+                ->join('products as p2', function ($join) {
                     $join->on('products.type', '=', 'p2.type')
                          ->whereNull('p2.deleted_at');
                 })
