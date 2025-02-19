@@ -71,7 +71,7 @@ class ComplexScopeWithGroupByAndHaving implements Scope
             ->groupBy('type');
 
         $builder
-            ->joinSub($subquery, 'type_groups', function($join) {
+            ->joinSub($subquery, 'type_groups', function ($join) {
                 $join->on('products.type', '=', 'type_groups.type')
                      ->on('products.id', '=', 'type_groups.max_id');
             });
