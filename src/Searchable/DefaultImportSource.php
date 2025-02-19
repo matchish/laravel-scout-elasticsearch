@@ -53,7 +53,7 @@ final class DefaultImportSource implements ImportSource
         $countQuery = $query->clone()
             ->setQuery($query->toBase()->clone())
             ->toBase();
-    
+
         $totalSearchables = $countQuery->getCountForPagination();
         if ($totalSearchables) {
             $chunkSize = (int) config('scout.chunk.searchable', self::DEFAULT_CHUNK_SIZE);
