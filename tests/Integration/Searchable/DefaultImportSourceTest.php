@@ -34,7 +34,7 @@ class DefaultImportSourceTest extends TestCase
         Product::unsetEventDispatcher();
 
         factory(Product::class, 3)->states(['iphone', 'promo', 'used'])->create();
-        factory(Product::class, 2)->states(['kindle', 'promo', 'new'])->create();
+        factory(Product::class, 2)->states(['kindle', 'promo', 'used'])->create();
 
         Product::setEventDispatcher($dispatcher);
 
@@ -64,13 +64,18 @@ class ComplexScopeWithGroupByAndHaving implements Scope
 {
     public function apply(Builder $builder, Model $model)
     {
+        // Create a subquery to get counts per type
+        $subquery = $model->newQuery()
+            ->select('type')
+            ->selectRaw('COUNT(*) as type_count')
+            ->groupBy('type');
+
+        // Join with the subquery and apply conditions
         $builder->select('products.*')
-                ->selectRaw('COUNT(*) as product_count')
-                ->join('products as p2', function($join) {
-                    $join->on('products.type', '=', 'p2.type')
-                         ->whereNull('p2.deleted_at');
+                ->joinSub($subquery, 'type_counts', function($join) {
+                    $join->on('products.type', '=', 'type_counts.type');
                 })
-                ->groupBy('products.id', 'products.type')
-                ->havingRaw('product_count >= 1');
+                ->groupBy('type_counts.type')  // Group only by type, not by id
+                ->having('type_counts.type_count', '>', 0);
     }
 }
