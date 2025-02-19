@@ -64,18 +64,13 @@ class ComplexScopeWithGroupByAndHaving implements Scope
 {
     public function apply(Builder $builder, Model $model)
     {
-        // Create a subquery to get counts per type
-        $subquery = $model->newQuery()
-            ->select('type')
-            ->selectRaw('COUNT(*) as type_count')
-            ->groupBy('type');
-
-        // Join with the subquery and apply conditions
-        $builder->select('products.*')
-                ->joinSub($subquery, 'type_counts', function($join) {
-                    $join->on('products.type', '=', 'type_counts.type');
-                })
-                ->groupBy('type_counts.type')  // Group only by type, not by id
-                ->having('type_counts.type_count', '>', 0);
+        $builder
+            ->selectRaw('MIN(id) as id')
+            ->selectRaw('type')
+            ->selectRaw('MIN(title) as title')
+            ->selectRaw('MIN(price) as price')
+            ->selectRaw('COUNT(*) as product_count')
+            ->groupBy('type')
+            ->having('product_count', '>', 0);
     }
 }
