@@ -33,15 +33,16 @@ class DefaultImportSourceTest extends TestCase
         $dispatcher = Product::getEventDispatcher();
         Product::unsetEventDispatcher();
 
-        factory(Product::class, 3)->states(['iphone', 'promo', 'used'])->create();
-        factory(Product::class, 2)->states(['kindle', 'promo', 'used'])->create();
+        factory(Product::class, 2)->states(['iphone', 'promo', 'used'])->create();
+        factory(Product::class, 3)->states(['kindle', 'promo', 'new'])->create();
+        factory(Product::class, 2)->states(['iphone', 'promo', 'used'])->create();
 
         Product::setEventDispatcher($dispatcher);
 
         $source = new DefaultImportSource(Product::class, [new ComplexScopeWithGroupByAndHaving()]);
         $results = $source->chunked();
 
-        $this->assertEquals(5, $results->sum(fn ($chunk) => $chunk->get()->count()));
+        $this->assertEquals(7, $results->sum(fn ($chunk) => $chunk->get()->count()));
     }
 }
 
@@ -64,13 +65,15 @@ class ComplexScopeWithGroupByAndHaving implements Scope
 {
     public function apply(Builder $builder, Model $model)
     {
+        $subquery = $model->newQuery()
+            ->select('type')
+            ->selectRaw('MAX(id) as max_id')
+            ->groupBy('type');
+
         $builder
-            ->selectRaw('MIN(id) as id')
-            ->selectRaw('type')
-            ->selectRaw('MIN(title) as title')
-            ->selectRaw('MIN(price) as price')
-            ->selectRaw('COUNT(*) as product_count')
-            ->groupBy('type')
-            ->having('product_count', '>', 0);
+            ->joinSub($subquery, 'type_groups', function($join) {
+                $join->on('products.type', '=', 'type_groups.type')
+                     ->on('products.id', '=', 'type_groups.max_id');
+            });
     }
 }
