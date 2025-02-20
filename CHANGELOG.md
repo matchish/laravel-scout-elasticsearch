@@ -4,10 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
-## [Unreleased]
-- FIX: SearchFactory adds empty `query_string` query even if query string is empty when no `where` clauses are set.  
+## [7.11.0] - 2025-02-20
+### Fixed
+- SearchFactory adds empty `query_string` query even if query string is empty when no `where` clauses are set.
+- DefaultImportSource do not work properly with model that have complex scopes https://github.com/matchish/laravel-scout-elasticsearch/pull/298
 
-## [7.10.0] - 2024-12-128
+## [7.10.0] - 2024-12-12
 ### Added
 - Use [`source` in options](https://github.com/matchish/laravel-scout-elasticsearch/pull/293) to set returned fields
 
