@@ -39,7 +39,7 @@ class DefaultImportSourceTest extends TestCase
 
         Product::setEventDispatcher($dispatcher);
 
-        $source = new DefaultImportSource(Product::class, [new ComplexScopeWithGroupByAndHaving()]);
+        $source = new DefaultImportSource(Product::class, [new ComplexScopeWithGroupBy()]);
         $results = $source->chunked();
 
         $this->assertEquals(7, $results->sum(fn ($chunk) => $chunk->get()->count()));
@@ -61,19 +61,14 @@ class UsedScope implements Scope
     }
 }
 
-class ComplexScopeWithGroupByAndHaving implements Scope
+class ComplexScopeWithGroupBy implements Scope
 {
     public function apply(Builder $builder, Model $model)
     {
-        $subquery = $model->newQuery()
-            ->select('type')
-            ->selectRaw('MAX(id) as max_id')
-            ->groupBy('type');
-
+        // Just a simple example where we duplicate all products
+        // and de-duplicate them by grouping on the id.
         $builder
-            ->joinSub($subquery, 'type_groups', function ($join) {
-                $join->on('products.type', '=', 'type_groups.type')
-                     ->on('products.id', '=', 'type_groups.max_id');
-            });
+            ->leftJoin('products as products2', 'products.id', '=', 'products2.id')
+            ->groupBy('products.id');
     }
 }
