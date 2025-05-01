@@ -34,7 +34,7 @@ final class Index
      * @param  array  $settings
      * @param  array  $mappings
      */
-    public function __construct(string $name, array $settings = null, array $mappings = null)
+    public function __construct(string $name, ?array $settings = null, ?array $mappings = null)
     {
         $this->name = $name;
         $this->settings = $settings;
