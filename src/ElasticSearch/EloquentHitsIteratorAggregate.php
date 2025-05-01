@@ -25,7 +25,7 @@ final class EloquentHitsIteratorAggregate implements IteratorAggregate
      * @param  array  $results
      * @param  callable|null  $callback
      */
-    public function __construct(array $results, callable $callback = null)
+    public function __construct(array $results, ?callable $callback = null)
     {
         $this->results = $results;
         $this->callback = $callback;
