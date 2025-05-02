@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
+## [7.11.1] - 2025-05-02
+### Added
+- Support for legacy environment variables from `mailerlite/laravel-elasticsearch`, allowing smoother migration without requiring `.env` changes. [#XXX]([link-to-pr](https://github.com/matchish/laravel-scout-elasticsearch/pull/307))
+
 ## [7.11.0] - 2025-02-20
 ### Fixed
 - SearchFactory adds empty `query_string` query even if query string is empty when no `where` clauses are set.
