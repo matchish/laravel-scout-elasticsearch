@@ -2,7 +2,7 @@
 
 return [
     'host' => env('ELASTICSEARCH_PORT') && env('ELASTICSEARCH_SCHEME')
-        ? env('ELASTICSEARCH_SCHEME').'//'.env('ELASTICSEARCH_HOST').':'.env('ELASTICSEARCH_PORT')
+        ? env('ELASTICSEARCH_SCHEME').'://'.env('ELASTICSEARCH_HOST').':'.env('ELASTICSEARCH_PORT')
         : env('ELASTICSEARCH_HOST'),
     'user' => env('ELASTICSEARCH_USER'),
     'password' => env('ELASTICSEARCH_PASSWORD', env('ELASTICSEARCH_PASS')),
