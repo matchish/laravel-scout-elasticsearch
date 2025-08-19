@@ -135,13 +135,13 @@ final class SearchableListFactory
     {
         try {
             // Check if class can be reflected without loading
-            if (!$this->canAnalyzeClass($class)) {
+            if (! $this->canAnalyzeClass($class)) {
                 return false;
             }
 
             // Check traits used by this class (including inherited traits)
             $traits = class_uses_recursive($class);
-            
+
             if (in_array(Searchable::class, $traits)) {
                 return true;
             }
@@ -156,15 +156,16 @@ final class SearchableListFactory
             return false;
         } catch (\Throwable $e) {
             // Log error but don't fail completely - this matches original behavior
-            $this->errors[] = "Error analyzing class {$class}: " . $e->getMessage();
+            $this->errors[] = "Error analyzing class {$class}: ".$e->getMessage();
+
             return false;
         }
     }
 
     /**
-     * Check if a class can be safely analyzed
-     * 
-     * @param string $class
+     * Check if a class can be safely analyzed.
+     *
+     * @param  string  $class
      * @return bool
      */
     private function canAnalyzeClass(string $class): bool
@@ -174,7 +175,7 @@ final class SearchableListFactory
             if (class_exists($class, false)) {
                 return true;
             }
-            
+
             // Try to autoload, but catch any errors
             return class_exists($class, true);
         } catch (\Throwable $e) {
