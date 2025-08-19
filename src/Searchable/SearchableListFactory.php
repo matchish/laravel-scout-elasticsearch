@@ -133,18 +133,52 @@ final class SearchableListFactory
      */
     private function findSearchableTraitRecursively(string $class): bool
     {
-        $traits = class_uses_recursive($class);
+        try {
+            // Check if class can be reflected without loading
+            if (!$this->canAnalyzeClass($class)) {
+                return false;
+            }
 
-        foreach ($traits as $trait) {
-            if ($trait === Searchable::class) {
+            // Check traits used by this class (including inherited traits)
+            $traits = class_uses_recursive($class);
+            
+            if (in_array(Searchable::class, $traits)) {
                 return true;
             }
 
-            if ($this->findSearchableTraitRecursively($trait)) {
-                return true;
+            // Check parent class if it exists
+            $reflection = new \ReflectionClass($class);
+            $parent = $reflection->getParentClass();
+            if ($parent) {
+                return $this->findSearchableTraitRecursively($parent->getName());
             }
+
+            return false;
+        } catch (\Throwable $e) {
+            // Log error but don't fail completely - this matches original behavior
+            $this->errors[] = "Error analyzing class {$class}: " . $e->getMessage();
+            return false;
         }
+    }
 
-        return false;
+    /**
+     * Check if a class can be safely analyzed
+     * 
+     * @param string $class
+     * @return bool
+     */
+    private function canAnalyzeClass(string $class): bool
+    {
+        try {
+            // First check without autoloading
+            if (class_exists($class, false)) {
+                return true;
+            }
+            
+            // Try to autoload, but catch any errors
+            return class_exists($class, true);
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 }
