@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
+## [7.12.0] - 2025-08-26
+### Changed
+- Removed `roave/better-reflection` dependency and replaced usage with native PHP reflection in `SearchableListFactory`, reducing package size while maintaining behavior. [#314](https://github.com/matchish/laravel-scout-elasticsearch/pull/314)
+- Dockerfile updated to use `netcat-openbsd` instead of deprecated `netcat`. [#314](https://github.com/matchish/laravel-scout-elasticsearch/pull/314)
+- 
 ## [7.11.1] - 2025-05-02
 ### Added
 - Support for legacy environment variables from `mailerlite/laravel-elasticsearch`, allowing smoother migration without requiring `.env` changes. [#XXX]([link-to-pr](https://github.com/matchish/laravel-scout-elasticsearch/pull/307))
