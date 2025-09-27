@@ -56,7 +56,7 @@ jobs:
         run: unzip coverage-report.zip
 
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v5.3.1
+        uses: SonarSource/sonarqube-scan-action@v6.0.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
