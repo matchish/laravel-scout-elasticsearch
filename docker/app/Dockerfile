@@ -44,7 +44,7 @@ RUN echo "xdebug.remote_autostart=1" >> /usr/local/etc/php/conf.d/docker-php-ext
 RUN echo "xdebug.mode=debug,coverage" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 RUN apt-get update && apt-get install -y procps
-RUN apt-get update && apt-get install -y netcat-traditional
+RUN apt-get update && apt-get install -y netcat-openbsd
 RUN apt-get update && apt-get install -y net-tools
 
 FROM php as php-testing

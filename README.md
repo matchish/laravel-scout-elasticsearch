@@ -31,8 +31,6 @@ It’s built on top of the latest release of [Laravel Scout](https://laravel.com
 package. Using this package, you are free to take advantage of all of Laravel Scout’s
 great features, and at the same time leverage the complete set of ElasticSearch’s search experience.
 
-If you need any help, [stack overflow](https://stackoverflow.com/questions/tagged/laravel-scout%20laravel%20elasticsearch) is the preferred and recommended way to ask support questions.
-
 ## :two_hearts: Features  
 Don't forget to :star: the package if you like it. :pray:
 
@@ -60,15 +58,17 @@ Don't forget to :star: the package if you like it. :pray:
 
 Use composer to install the package:
 
-`composer require matchish/laravel-scout-elasticsearch`
+```
+composer require matchish/laravel-scout-elasticsearch
+```
 
 Set env variables
 ```
 SCOUT_DRIVER=Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine
 ```
 
-The package uses `\ElasticSearch\Client` from official package, but does not try to configure it, 
-so feel free do it in your app service provider. 
+The package uses `\ElasticSearch\Client` from official package, but does not try to configure it 
+beyond connection configuration, so feel free do it in your app service provider. 
 But if you don't want to do it right now, 
 you can use `Matchish\ElasticSearchServiceProvider` from the package.  
 Register the provider, adding to `config/app.php`
@@ -87,6 +87,12 @@ or use commas as separator for additional nodes
 ```
 ELASTICSEARCH_HOST=host:port,host:port
 ```
+
+You can disable SSL verification by setting the following in your env
+```
+ELASTICSEARCH_SSL_VERIFICATION=false
+```
+
 And publish config example for elasticsearch  
 `php artisan vendor:publish --tag config`
 
@@ -274,21 +280,44 @@ Product::search()
 
 Full list of ElasticSearch terms is in `vendor/handcraftedinthealps/elasticsearch-dsl/src/Query/TermLevel`.
 
+### Limiting returned fields
+Sometimes your indexed models have fields that should not appear in returned result.
+You can set returned fields in `source` option `->options(['source' => ['this', 'that', 'something', 'else']])` 
+
+### Pagination
+The engine supports [Elasticsearch pagination](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html)
+with [Scout Builder pagination](https://laravel.com/docs/11.x/scout#pagination) or by setting page sizes 
+and offsets using the `->take($size)` method and `->options(['from' => $from])`.
+
+> Caution : Builder pagination takes precedence over the `take()` and `options()` setting.
+
+For example:
+
+```php
+Product::search()
+    ->take(20)
+    ->options([
+        'from' => 20,
+    ])
+    ->paginate(50);
+```
+This will return the first 50 results, ignoring the specified offset.
+
 ### Search amongst multiple models
 You can do it with `MixedSearch` class, just pass indices names separated by commas to the `within` method.
 ```php
 MixedSearch::search('title:Barcelona or to:Barcelona')
-    within(implode(',', [
+    ->within(implode(',', [
         (new Ticket())->searchableAs(),
         (new Book())->searchableAs(),
     ]))
-->get();
+    ->get();
 ```
 In this example you will get collection of `Ticket` and `Book` models where ticket's arrival city or
 book title is `Barcelona`
 
 ### Working with results
-Often your response isn't collection of models but aggregations or models with higlights and so on.
+Often your response isn't collection of models but aggregations or models with higlights andd so on.
 In this case you can use the 'ElasticParams' trait within your model to acquire the returned model score and highlight.
 In case you need additional data witin your results you need to implement your own implementation of `HitsIteratorAggregate` and bind it in your service provider.
 

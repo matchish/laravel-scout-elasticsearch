@@ -10,7 +10,7 @@ class CustomHitsIteratorAggregate implements HitsIteratorAggregate
 
     private $callback;
 
-    public function __construct(array $results, callable $callback = null)
+    public function __construct(array $results, ?callable $callback = null)
     {
         $this->results = $results;
 

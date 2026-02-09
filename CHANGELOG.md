@@ -4,7 +4,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
-## [Unreleased]
+## [7.12.0] - 2025-08-26
+### Changed
+- Removed `roave/better-reflection` dependency and replaced usage with native PHP reflection in `SearchableListFactory`, reducing package size while maintaining behavior. [#314](https://github.com/matchish/laravel-scout-elasticsearch/pull/314)
+- Dockerfile updated to use `netcat-openbsd` instead of deprecated `netcat`. [#314](https://github.com/matchish/laravel-scout-elasticsearch/pull/314)
+- 
+## [7.11.1] - 2025-05-02
+### Added
+- Support for legacy environment variables from `mailerlite/laravel-elasticsearch`, allowing smoother migration without requiring `.env` changes. [#XXX]([link-to-pr](https://github.com/matchish/laravel-scout-elasticsearch/pull/307))
+
+## [7.11.0] - 2025-02-20
+### Fixed
+- SearchFactory adds empty `query_string` query even if query string is empty when no `where` clauses are set.
+- DefaultImportSource do not work properly with model that have complex scopes https://github.com/matchish/laravel-scout-elasticsearch/pull/298
+
+## [7.10.0] - 2024-12-12
+### Added
+- Use [`source` in options](https://github.com/matchish/laravel-scout-elasticsearch/pull/293) to set returned fields
+
+## [7.9.0] - 2024-11-14
+### Fixed
+- [Using pagination with custom query in Scout Builder](https://github.com/matchish/laravel-scout-elasticsearch/pull/290).
+### Added
+- [Using `options()` of a builder](https://github.com/matchish/laravel-scout-elasticsearch/issues/252) for set `from` parameter.
+- Supporting `take()` method of builder for setting response `size`.
+
+## [7.8.0] - 2024-06-24
+### Added
+- [Added supports of whereNotIn condition](https://github.com/matchish/laravel-scout-elasticsearch/pull/282).
+
+## [7.6.2] - 2024-06-24
+### Fixed
+- [Change if conditions order in soft deletes check for compatibility](https://github.com/matchish/laravel-scout-elasticsearch/pull/282).
 
 ## [8.0.0-alpha.2] - 2024-06-20
 ### Added
