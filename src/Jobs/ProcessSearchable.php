@@ -11,32 +11,36 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
-use Junges\TrackableJobs\Concerns\Trackable;
+use Junges\TrackableJobs\TrackableJob;
 use Laravel\Scout\Searchable;
 
-class ProcessSearchable implements ShouldQueue
+class ProcessSearchable extends TrackableJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, Trackable {
-        __construct as __baseConstruct;
-    }
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * @var Collection<int, Model|Searchable>
      */
-    private $data;
+    private Collection $data;
 
     /**
      * @param  Collection<int, Model|Searchable>  $data
      */
     public function __construct(Collection $data)
     {
-        $this->__baseConstruct($data->first());
-
-        $this->trackedJob->update([
-            'trackable_type' => $data->first()->searchableAs(),
-        ]);
-
         $this->data = $data;
+
+        parent::__construct();
+    }
+
+    public function trackableKey(): ?string
+    {
+        return \strval($this->data->first()->getKey());
+    }
+
+    public function trackableType(): ?string
+    {
+        return $this->data->first()->searchableAs();
     }
 
     /**

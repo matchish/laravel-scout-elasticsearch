@@ -6,6 +6,7 @@ use App\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
+use Matchish\ScoutElasticSearch\Database\Scopes\FromScope;
 use Matchish\ScoutElasticSearch\Searchable\DefaultImportSource;
 use Tests\TestCase;
 
@@ -57,9 +58,18 @@ class DefaultImportSourceTest extends TestCase
         Product::setEventDispatcher($dispatcher);
 
         $source = new DefaultImportSource(Product::class, [new ComplexScopeWithGroupBy()]);
-        $results = $source->chunked();
+        $source = $source->chunked();
 
-        $this->assertEquals(7, $results->sum(fn ($chunk) => $chunk->get()->count()));
+        $totalCount = 0;
+        $results = $source->get();
+        while (! $results->isEmpty()) {
+            $totalCount += $results->count();
+
+            $source->setChunkScope(new FromScope($results->last()->getKey(), $source->getChunkSize()));
+            $results = $source->get();
+        }
+
+        $this->assertEquals(7, $totalCount);
     }
 }
 

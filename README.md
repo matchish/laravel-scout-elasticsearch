@@ -201,6 +201,23 @@ The command creates new temporary index, imports all models to it, and then swit
 When importing massive ammounts of data, you can use the option `--parallel`, to speed up the import process.
 This however requires you to set-up the suggested trackable-jobs package and queue workers.
 
+To set-up the suggested trackable-jobs package run the following commands, or follow the installation guide on [laravel-trackable-jobs](https://github.com/mateusjunges/trackable-jobs-for-laravel):
+```bash
+composer require mateusjunges/laravel-trackable-jobs
+
+php artisan vendor:publish --tag=trackable-jobs-assets
+
+php artisan migrate
+```
+
+Afterwards you should define the queue names to be used for parallel import:
+
+`scout.chunk.handlers` defines how many parallel queues will be ran, default: `1`.
+
+`elasticsearch.queue.name` defines the parallel queue name, default: `'elasticsearch-parallel'`.
+
+The default configuration will use queue: `'elasticsearch-parallel-N'`, where `N` is handler index (1 -> `scout.chunk.hanlder`)
+
 ### Search
 
 To be fully compatible with original scout package, this package does not add new methods.  

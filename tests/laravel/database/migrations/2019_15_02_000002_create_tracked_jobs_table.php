@@ -6,8 +6,9 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    private string $table_name = '';
-    private bool $usingUuid = false;
+    private string $table_name;
+
+    private bool $usingUuid;
 
     public function __construct()
     {
@@ -19,13 +20,16 @@ return new class extends Migration
     {
         Schema::create($this->table_name, function (Blueprint $table) {
             $this->usingUuid
-                ? $table->uuid('uuid')->primary()
+                ? $table->uuid()->primary()
                 : $table->id();
-            $table->string('trackable_id')->index();
-            $table->string('trackable_type')->index();
+            $table->string('trackable_id')->index()->nullable();
+            $table->string('trackable_type')->index()->nullable();
             $table->string('name');
-            $table->string('status')->default('queued');
-            $table->longText('output')->nullable();
+            $table->string('job_id')->nullable();
+            $table->string('status')->nullable();
+            $table->integer('attempts')->default(1);
+            $table->json('output')->nullable();
+            $table->string('queue')->nullable()->index();
             $table->timestamp('started_at')->nullable();
             $table->timestamp('finished_at')->nullable();
             $table->timestamps();

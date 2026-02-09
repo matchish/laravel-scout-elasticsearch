@@ -4,6 +4,8 @@ services:
       context: ./docker/app
       dockerfile: Dockerfile
       target: php-${APP_ENV}
+      args:
+        TIMEZONE: ${TIMEZONE}
     user: "1000:1000"
     depends_on:
       - elasticsearch

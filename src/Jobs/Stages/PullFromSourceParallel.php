@@ -3,6 +3,7 @@
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elastic\Elasticsearch\Client;
+use Junges\TrackableJobs\Enums\TrackedJobStatus;
 use Junges\TrackableJobs\Models\TrackedJob;
 use Matchish\ScoutElasticSearch\Database\Scopes\FromScope;
 use Matchish\ScoutElasticSearch\Database\Scopes\PageScope;
@@ -82,7 +83,7 @@ final class PullFromSourceParallel implements StageInterface
         if (count($this->dispatchedJobIds) > 0) {
             $jobs = TrackedJob::findMany($this->dispatchedJobIds);
             $failedJobs = $jobs->filter(function ($job) {
-                return $job->status === TrackedJob::STATUS_FAILED;
+                return $job->status === TrackedJobStatus::Failed;
             });
             if ($failedJobs->isNotEmpty()) {
                 $jobs->each(function (TrackedJob $job) {
@@ -91,12 +92,12 @@ final class PullFromSourceParallel implements StageInterface
                 throw new \Exception('Failed to process jobs: '.implode(', ', $failedJobs->pluck('id')->toArray()));
             }
             $finishedJobs = $jobs->filter(function ($job) {
-                return $job->status === TrackedJob::STATUS_FINISHED;
+                return $job->status === TrackedJobStatus::Finished;
             });
             $this->handledJobs = array_merge($this->handledJobs, $finishedJobs->pluck('id')->toArray());
             $this->advanceBy += $finishedJobs->count();
             $this->dispatchedJobIds = $jobs->filter(function ($job) {
-                return $job->status !== TrackedJob::STATUS_FINISHED;
+                return $job->status !== TrackedJobStatus::Finished;
             })->pluck('id')->toArray();
         }
 

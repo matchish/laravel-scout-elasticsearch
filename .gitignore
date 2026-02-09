@@ -2,6 +2,6 @@
 .phpintel
 composer.lock
 .env
-.phpunit.result.cache
+.phpunit*
 /vendor/
 /build/

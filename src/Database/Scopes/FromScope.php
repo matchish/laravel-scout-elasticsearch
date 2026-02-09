@@ -39,6 +39,6 @@ class FromScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        $builder->forPageAfterId($this->perPage, $this->lastId);
+        $builder->forPageAfterId($this->perPage, $this->lastId, $model->getTable().'.'.$model->getKeyName());
     }
 }

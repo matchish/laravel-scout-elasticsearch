@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
+## [8.0.0-alpha.3] - 2026-02-09
+### Changed
+- The usage of mateusjunges/laravel-trackable-jobs package for parallel import
+- Small composer package updates to better fit Laravel 12
+- Dockerfile syntax
+- Dockerfile PHP 8.4
+- PHPUnit deprecation fixes
+
 ## [7.12.0] - 2025-08-26
 ### Changed
 - Removed `roave/better-reflection` dependency and replaced usage with native PHP reflection in `SearchableListFactory`, reducing package size while maintaining behavior. [#314](https://github.com/matchish/laravel-scout-elasticsearch/pull/314)
