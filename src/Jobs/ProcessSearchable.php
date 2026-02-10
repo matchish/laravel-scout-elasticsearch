@@ -12,7 +12,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Junges\TrackableJobs\TrackableJob;
-use Laravel\Scout\Searchable;
 use Matchish\ScoutElasticSearch\Contracts\SearchableContract;
 
 /**
@@ -55,6 +54,7 @@ class ProcessSearchable extends TrackableJob implements ShouldQueue
         if ($first === null) {
             return null;
         }
+
         /** @var SearchableModel $first */
         return $first->searchableAs();
     }
@@ -78,7 +78,6 @@ class ProcessSearchable extends TrackableJob implements ShouldQueue
         $model = $this->data->first();
 
         /** @var \Laravel\Scout\Engines\Engine $engine */
-
         $engine = $model->searchableUsing();
 
         /** @var \Illuminate\Database\Eloquent\Collection<int, Model> */

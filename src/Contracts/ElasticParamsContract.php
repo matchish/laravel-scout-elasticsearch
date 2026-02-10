@@ -22,7 +22,7 @@ interface ElasticParamsContract
     /**
      * Set elasticsearch highlighting.
      *
-     * @param array<string, array<mixed>|string> $highlight
+     * @param  array<string, array<mixed>|string>  $highlight
      * @return void
      */
     public function setElasticsearchHighlight(array $highlight): void;

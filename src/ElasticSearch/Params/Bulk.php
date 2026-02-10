@@ -3,11 +3,11 @@
 namespace Matchish\ScoutElasticSearch\ElasticSearch\Params;
 
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Scout\Searchable;
 use Matchish\ScoutElasticSearch\Contracts\SearchableContract;
 
 /**
  * @internal
+ *
  * @phpstan-import-type SearchableModel from SearchableContract
  */
 final class Bulk
@@ -33,7 +33,6 @@ final class Bulk
             }
         } else {
             /** @var SearchableModel $docs */
-
             $this->deleteDocs[$docs->getScoutKey()] = $docs;
         }
     }
@@ -109,7 +108,6 @@ final class Bulk
             }
         } else {
             /** @var SearchableModel $docs */
-
             $this->indexDocs[$docs->getScoutKey()] = $docs;
         }
     }

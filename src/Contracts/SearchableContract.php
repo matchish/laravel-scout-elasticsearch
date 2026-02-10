@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * \Laravel\Scout\Searchable trait contract.
- * 
+ *
  * @phpstan-type SearchableModel = Model&SearchableContract
  * @phpstan-type SearchableModelWithElasticParams = SearchableModel&ElasticParamsContract
  */

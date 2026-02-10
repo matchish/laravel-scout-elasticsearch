@@ -176,7 +176,7 @@ final class PullFromSourceParallel implements StageInterface
      * @param  ImportSource  $source
      * @return PullFromSourceParallel|null
      */
-    public static function chunked(ImportSource $source): PullFromSourceParallel|null
+    public static function chunked(ImportSource $source): ?PullFromSourceParallel
     {
         $source = $source->chunked();
 

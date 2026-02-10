@@ -57,6 +57,7 @@ final class ElasticSearchServiceProvider extends ServiceProvider
 
     /**
      * {@inheritdoc}
+     *
      * @return array<string>
      */
     public function provides(): array

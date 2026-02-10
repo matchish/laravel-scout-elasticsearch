@@ -8,10 +8,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
-use Laravel\Scout\Searchable;
+use Matchish\ScoutElasticSearch\Contracts\SearchableContract;
 use Matchish\ScoutElasticSearch\Database\Scopes\FromScope;
 use Matchish\ScoutElasticSearch\Database\Scopes\PageScope;
-use Matchish\ScoutElasticSearch\Contracts\SearchableContract;
 
 /**
  * @phpstan-import-type SearchableModel from SearchableContract
@@ -55,7 +54,7 @@ final class DefaultImportSource implements ImportSource
      * @param  array<Scope>  $scopes
      * @param  Scope|null  $chunkScope
      */
-    public function __construct(string $className, array $scopes = [], Scope|null $chunkScope = null)
+    public function __construct(string $className, array $scopes = [], ?Scope $chunkScope = null)
     {
         $this->className = $className;
         $this->scopes = $scopes;
@@ -71,6 +70,7 @@ final class DefaultImportSource implements ImportSource
     {
         /** @var SearchableModel $model */
         $model = $this->model();
+
         return $model->syncWithSearchUsingQueue();
     }
 
@@ -81,6 +81,7 @@ final class DefaultImportSource implements ImportSource
     {
         /** @var SearchableModel $model */
         $model = $this->model();
+
         return $model->syncWithSearchUsing();
     }
 
@@ -91,6 +92,7 @@ final class DefaultImportSource implements ImportSource
     {
         /** @var SearchableModel $model */
         $model = $this->model();
+
         return $model->searchableAs();
     }
 

@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\LazyCollection;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Engines\Engine;
-use Laravel\Scout\Searchable;
 use Matchish\ScoutElasticSearch\Contracts\SearchableContract;
 use Matchish\ScoutElasticSearch\ElasticSearch\HitsIteratorAggregate;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
@@ -95,7 +94,8 @@ final class ElasticSearchEngine extends Engine
 
     /**
      * {@inheritdoc}
-     * @param Builder<Model> $builder
+     *
+     * @param  Builder<Model>  $builder
      */
     public function search(Builder $builder)
     {
@@ -104,7 +104,8 @@ final class ElasticSearchEngine extends Engine
 
     /**
      * {@inheritdoc}
-     * @param Builder<Model> $builder
+     *
+     * @param  Builder<Model>  $builder
      */
     public function paginate(Builder $builder, $perPage, $page)
     {
@@ -117,16 +118,16 @@ final class ElasticSearchEngine extends Engine
     /**
      * {@inheritdoc}
      *
-     * @param mixed $results
+     * @param  mixed  $results
      * @return \Illuminate\Support\Collection<(int|string), mixed>
      */
     public function mapIds($results)
     {
-        if (!is_array($results) || !isset($results['hits'])) {
+        if (! is_array($results) || ! isset($results['hits'])) {
             return collect();
         }
         $hits = $results['hits'];
-        if (!is_array($hits) || !isset($hits['hits'])) {
+        if (! is_array($hits) || ! isset($hits['hits'])) {
             return collect();
         }
 
@@ -136,9 +137,10 @@ final class ElasticSearchEngine extends Engine
 
     /**
      * {@inheritdoc}
-     * @param Builder<Model> $builder
-     * @param mixed $results
-     * @param Model $model
+     *
+     * @param  Builder<Model>  $builder
+     * @param  mixed  $results
+     * @param  Model  $model
      * @return Collection<int, Model>
      */
     public function map(Builder $builder, $results, $model)
@@ -168,7 +170,7 @@ final class ElasticSearchEngine extends Engine
             throw new \Error('Not implemented for MixedSearch');
         }
 
-        if (!is_array($results) || !isset($results['hits']['hits']) || count($results['hits']['hits']) === 0) {
+        if (! is_array($results) || ! isset($results['hits']['hits']) || count($results['hits']['hits']) === 0) {
             return LazyCollection::make($model->newCollection());
         }
 
@@ -189,7 +191,7 @@ final class ElasticSearchEngine extends Engine
             /** @var SearchableModel $model */
             return $objectIdPositions[$model->getScoutKey()];
         })->values();
-        
+
         /** @var LazyCollection<int, Model> */
         return $result;
     }
@@ -219,13 +221,15 @@ final class ElasticSearchEngine extends Engine
 
     /**
      * {@inheritdoc}
-     * @param mixed $results
+     *
+     * @param  mixed  $results
      */
     public function getTotalCount($results)
     {
         if (is_array($results) && isset($results['hits']['total']['value'])) {
             return $results['hits']['total']['value'];
         }
+
         return 0;
     }
 
@@ -254,6 +258,7 @@ final class ElasticSearchEngine extends Engine
 
         /** @var Elasticsearch $response */
         $response = $this->elasticsearch->search($params->toArray());
+
         return $response->asArray();
     }
 }

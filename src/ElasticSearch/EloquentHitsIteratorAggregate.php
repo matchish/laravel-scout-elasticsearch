@@ -11,8 +11,9 @@ use Traversable;
 
 /**
  * @internal
+ *
  * @implements IteratorAggregate<int, Model>
- * 
+ *
  * @phpstan-import-type SearchableModel from SearchableContract
  * @phpstan-import-type SearchableModelWithElasticParams from SearchableContract
  */
@@ -43,21 +44,21 @@ final class EloquentHitsIteratorAggregate implements IteratorAggregate
      * @link https://php.net/manual/en/iteratoraggregate.getiterator.php
      *
      * @return Traversable<int, Model> An instance of an object implementing <b>Iterator</b> or
-     *                     <b>Traversable</b>
+     *                                 <b>Traversable</b>
      *
      * @since 5.0.0
      */
     public function getIterator(): Traversable
     {
         $hits = collect();
-        if (!\is_array($this->results) || !isset($this->results['hits']['total']) || !$this->results['hits']['total']) {
+        if (! \is_array($this->results) || ! isset($this->results['hits']['total']) || ! $this->results['hits']['total']) {
             return new \ArrayIterator([]);
         }
-        
-        if (!isset($this->results['hits']['hits'])) {
+
+        if (! isset($this->results['hits']['hits'])) {
             return new \ArrayIterator([]);
         }
-        
+
         /** @var array<int, array<string, mixed>> */
         $hits = $this->results['hits']['hits'];
 
@@ -81,6 +82,7 @@ final class EloquentHitsIteratorAggregate implements IteratorAggregate
 
                 /** @var array<int|string> $ids */
                 $ids = $results->pluck('_id')->all();
+
                 return $models = $model->getScoutModelsByIds(
                     $builder, $ids
                 );
