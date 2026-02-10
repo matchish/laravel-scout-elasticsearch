@@ -2,6 +2,10 @@ includes:
     - vendor/larastan/larastan/extension.neon
 parameters:
     level: max
+    bootstrapFiles:
+        - stubs/Trackable.php
+        - stubs/TrackableJob.php
+        - stubs/TrackedJobStatus.php
     paths:
         - src
     reportUnmatchedIgnoredErrors: false

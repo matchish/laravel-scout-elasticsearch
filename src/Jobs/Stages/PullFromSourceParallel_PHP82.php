@@ -13,7 +13,7 @@ use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 /**
  * @internal
  */
-final class PullFromSourceParallel implements StageInterface
+final class PullFromSourceParallel_PHP82 implements StageInterface
 {
     /**
      * @var int
@@ -174,9 +174,9 @@ final class PullFromSourceParallel implements StageInterface
 
     /**
      * @param  ImportSource  $source
-     * @return PullFromSourceParallel|null
+     * @return PullFromSourceParallel_PHP82|null
      */
-    public static function chunked(ImportSource $source): ?PullFromSourceParallel
+    public static function chunked(ImportSource $source): ?PullFromSourceParallel_PHP82
     {
         $source = $source->chunked();
 

@@ -39,7 +39,10 @@
     "autoload": {
         "psr-4": {
             "Matchish\\ScoutElasticSearch\\": "src/"
-        }
+        },
+        "files": [
+            "src/Compatability/compat.php"
+        ]
     },
     "extra": {
         "laravel": {

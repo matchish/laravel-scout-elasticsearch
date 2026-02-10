@@ -17,7 +17,7 @@ use Matchish\ScoutElasticSearch\Contracts\SearchableContract;
 /**
  * @phpstan-type SearchableModel = Model&SearchableContract
  */
-class ProcessSearchable extends TrackableJob implements ShouldQueue
+class ProcessSearchable_PHP82 extends TrackableJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
