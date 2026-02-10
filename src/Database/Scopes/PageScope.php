@@ -33,7 +33,7 @@ class PageScope implements Scope
     /**
      * Apply the scope to a given Eloquent query builder.
      *
-     * @param  Builder<Model|Searchable>  $builder
+     * @param  Builder<Model>  $builder
      * @param  Model  $model
      * @return void
      */

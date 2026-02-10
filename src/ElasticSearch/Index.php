@@ -10,7 +10,7 @@ use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 final class Index
 {
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     private $aliases = [];
 
@@ -19,11 +19,11 @@ final class Index
      */
     private $name;
     /**
-     * @var array|null
+     * @var array<mixed>|null
      */
     private $settings;
     /**
-     * @var array|null
+     * @var array<mixed>|null
      */
     private $mappings;
 
@@ -31,8 +31,8 @@ final class Index
      * Index constructor.
      *
      * @param  string  $name
-     * @param  array  $settings
-     * @param  array  $mappings
+     * @param  array<mixed>  $settings
+     * @param  array<mixed>  $mappings
      */
     public function __construct(string $name, ?array $settings = null, ?array $mappings = null)
     {
@@ -42,7 +42,7 @@ final class Index
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
     public function aliases(): array
     {
@@ -66,7 +66,7 @@ final class Index
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function config(): array
     {

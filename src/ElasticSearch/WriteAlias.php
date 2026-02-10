@@ -25,6 +25,9 @@ final class WriteAlias implements Alias
         return $this->origin->name();
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function config(): array
     {
         return array_merge($this->origin->config(), ['is_write_index' => true]);

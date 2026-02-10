@@ -23,14 +23,15 @@ class ImportStages extends Collection
     /**
      * @param  ImportSource  $source
      * @param  bool  $parallel
-     * @return Collection<int, StageInterface>
+     * @return self
      */
     public static function fromSource(ImportSource $source, bool $parallel = false)
     {
         $index = Index::fromSource($source);
 
         if ($parallel && class_exists(\Junges\TrackableJobs\Providers\TrackableJobsServiceProvider::class)) {
-            return (new self([
+            /** @var array<StageInterface> $stages */
+            $stages = [
                 new StopTrackedJobs($source),
                 new CleanUp($source),
                 new CreateWriteIndex($source, $index),
@@ -38,15 +39,18 @@ class ImportStages extends Collection
                 new CleanUpTrackedJobs($source),
                 new RefreshIndex($index),
                 new SwitchToNewAndRemoveOldIndex($source, $index),
-            ]))->flatten()->filter();
+            ];
+        } else {
+            /** @var array<StageInterface> $stages */
+            $stages = [
+                new CleanUp($source),
+                new CreateWriteIndex($source, $index),
+                PullFromSource::chunked($source),
+                new RefreshIndex($index),
+                new SwitchToNewAndRemoveOldIndex($source, $index),
+            ];
         }
 
-        return (new self([
-            new CleanUp($source),
-            new CreateWriteIndex($source, $index),
-            PullFromSource::chunked($source),
-            new RefreshIndex($index),
-            new SwitchToNewAndRemoveOldIndex($source, $index),
-        ]))->flatten()->filter();
+        return (new self($stages))->flatten()->filter();
     }
 }

@@ -15,8 +15,8 @@ use ONGR\ElasticsearchDSL\Sort\FieldSort;
 final class SearchFactory
 {
     /**
-     * @param  Builder  $builder
-     * @param  array  $enforceOptions
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $builder
+     * @param  array<mixed>  $enforceOptions
      * @return Search
      */
     public static function create(Builder $builder, array $enforceOptions = []): Search
@@ -54,7 +54,7 @@ final class SearchFactory
     }
 
     /**
-     * @param  Builder  $builder
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $builder
      * @return bool
      */
     private static function hasWhereFilters($builder): bool
@@ -63,7 +63,7 @@ final class SearchFactory
     }
 
     /**
-     * @param  Builder  $builder
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $builder
      * @param  BoolQuery  $boolQuery
      * @return BoolQuery
      */
@@ -82,7 +82,7 @@ final class SearchFactory
     }
 
     /**
-     * @param  Builder  $builder
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $builder
      * @param  BoolQuery  $boolQuery
      * @return BoolQuery
      */
@@ -98,7 +98,7 @@ final class SearchFactory
     }
 
     /**
-     * @param  Builder  $builder
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $builder
      * @param  BoolQuery  $boolQuery
      * @return BoolQuery
      */
@@ -114,7 +114,7 @@ final class SearchFactory
     }
 
     /**
-     * @param  Builder  $builder
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $builder
      * @return bool
      */
     private static function hasWheres($builder): bool
@@ -123,7 +123,7 @@ final class SearchFactory
     }
 
     /**
-     * @param  Builder  $builder
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $builder
      * @return bool
      */
     private static function hasWhereIns($builder): bool
@@ -132,14 +132,19 @@ final class SearchFactory
     }
 
     /**
-     * @param  Builder  $builder
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $builder
      * @return bool
      */
     private static function hasWhereNotIns($builder): bool
     {
-        return isset($builder->whereNotIns) && ! empty($builder->whereNotIns);
+        return property_exists($builder, 'whereNotIns') && ! empty($builder->whereNotIns);
     }
 
+    /**
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $builder
+     * @param  array<mixed>  $enforceOptions
+     * @return array<mixed>
+     */
     private static function prepareOptions(Builder $builder, array $enforceOptions = []): array
     {
         $options = [];
@@ -151,6 +156,10 @@ final class SearchFactory
         return array_merge($options, self::supportedOptions($builder), $enforceOptions);
     }
 
+    /**
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $builder
+     * @return array<mixed>
+     */
     private static function supportedOptions(Builder $builder): array
     {
         return Arr::only($builder->options, [

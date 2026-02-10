@@ -17,6 +17,7 @@ final class MixedSearch
      */
     public static function search(string $query = '', $callback = null): Builder
     {
+        // @phpstan-ignore-next-line - This method is not actually called, so the class string is not validated
         return new Builder(new class extends Model
         {
             use Searchable;

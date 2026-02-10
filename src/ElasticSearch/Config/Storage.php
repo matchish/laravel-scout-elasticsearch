@@ -24,7 +24,7 @@ class Storage
     }
 
     /**
-     * @return array
+     * @return array<string>
      */
     public function hosts(): array
     {

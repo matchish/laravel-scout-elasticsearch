@@ -29,7 +29,7 @@ final class DefaultAlias implements Alias
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function config(): array
     {

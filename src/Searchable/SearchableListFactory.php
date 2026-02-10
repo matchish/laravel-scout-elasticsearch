@@ -20,7 +20,7 @@ use Symfony\Component\Finder\Finder;
 final class SearchableListFactory
 {
     /**
-     * @var array|null
+     * @var array<string>|null
      */
     private static ?array $searchableClasses = null;
     /**
@@ -32,7 +32,7 @@ final class SearchableListFactory
      */
     private string $appPath;
     /**
-     * @var array
+     * @var array<string>
      */
     private array $errors = [];
 
@@ -47,7 +47,7 @@ final class SearchableListFactory
     }
 
     /**
-     * @return array
+     * @return array<string>
      */
     public function getErrors(): array
     {
@@ -82,9 +82,12 @@ final class SearchableListFactory
     private function getSearchableClasses(): array
     {
         if (self::$searchableClasses === null) {
-            self::$searchableClasses = $this->getProjectClasses()->filter(function (string $class) {
+            /** @var array<class-string> */
+            $classes = $this->getProjectClasses()->filter(function (string $class) {
+                /** @var class-string $class */
                 return $this->findSearchableTraitRecursively($class);
             })->toArray();
+            self::$searchableClasses = $classes;
         }
 
         return self::$searchableClasses;
@@ -109,7 +112,7 @@ final class SearchableListFactory
     }
 
     /**
-     * @return array
+     * @return array<\PhpParser\Node>
      */
     private function getStmts(): array
     {
@@ -133,7 +136,7 @@ final class SearchableListFactory
     }
 
     /**
-     * @param  string  $class
+     * @param  class-string  $class
      * @return bool
      */
     private function findSearchableTraitRecursively(string $class): bool

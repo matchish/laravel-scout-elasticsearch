@@ -13,18 +13,22 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Junges\TrackableJobs\TrackableJob;
 use Laravel\Scout\Searchable;
+use Matchish\ScoutElasticSearch\Contracts\SearchableContract;
 
+/**
+ * @phpstan-type SearchableModel = Model&SearchableContract
+ */
 class ProcessSearchable extends TrackableJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var Collection<int, Model|Searchable>
+     * @var Collection<int, Model>
      */
     private Collection $data;
 
     /**
-     * @param  Collection<int, Model|Searchable>  $data
+     * @param  Collection<int, Model>  $data
      */
     public function __construct(Collection $data)
     {
@@ -35,12 +39,24 @@ class ProcessSearchable extends TrackableJob implements ShouldQueue
 
     public function trackableKey(): ?string
     {
-        return \strval($this->data->first()->getKey());
+        $first = $this->data->first();
+        if ($first === null) {
+            return null;
+        }
+        /** @var int|string $key */
+        $key = $first->getKey();
+
+        return \strval($key);
     }
 
     public function trackableType(): ?string
     {
-        return $this->data->first()->searchableAs();
+        $first = $this->data->first();
+        if ($first === null) {
+            return null;
+        }
+        /** @var SearchableModel $first */
+        return $first->searchableAs();
     }
 
     /**
@@ -50,17 +66,23 @@ class ProcessSearchable extends TrackableJob implements ShouldQueue
      */
     public function handle(): void
     {
+        if ($this->trackedJob === null) {
+            return;
+        }
         $this->trackedJob = $this->trackedJob->fresh();
         if ($this->trackedJob == null || $this->trackedJob->finished_at !== null) {
             return;
         }
 
-        /** @var Model|Searchable $model */
+        /** @var SearchableModel $model */
         $model = $this->data->first();
 
         /** @var \Laravel\Scout\Engines\Engine $engine */
+
         $engine = $model->searchableUsing();
 
-        $engine->update($this->data);
+        /** @var \Illuminate\Database\Eloquent\Collection<int, Model> */
+        $collection = $this->data;
+        $engine->update($collection);
     }
 }
