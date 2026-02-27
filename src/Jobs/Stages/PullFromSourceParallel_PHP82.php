@@ -3,6 +3,7 @@
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elastic\Elasticsearch\Client;
+use Junges\TrackableJobs\Enums\TrackedJobStatus;
 use Junges\TrackableJobs\Models\TrackedJob;
 use Matchish\ScoutElasticSearch\Database\Scopes\FromScope;
 use Matchish\ScoutElasticSearch\Database\Scopes\PageScope;
@@ -12,7 +13,7 @@ use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 /**
  * @internal
  */
-final class PullFromSourceParallel implements StageInterface
+final class PullFromSourceParallel_PHP82 implements StageInterface
 {
     /**
      * @var int
@@ -30,12 +31,12 @@ final class PullFromSourceParallel implements StageInterface
     private $source;
 
     /**
-     * @var array
+     * @var array<int>
      */
     private $handledJobs = [];
 
     /**
-     * @var array
+     * @var array<int>
      */
     private $dispatchedJobIds = [];
 
@@ -57,7 +58,9 @@ final class PullFromSourceParallel implements StageInterface
         $this->source = $source;
         $this->queues = [];
 
-        foreach (range(1, config('scout.chunk.handlers', self::DEFAULT_HANDLER_COUNT)) as $i) {
+        $handlerCount = config('scout.chunk.handlers', self::DEFAULT_HANDLER_COUNT);
+        $handlerCountInt = is_int($handlerCount) ? $handlerCount : self::DEFAULT_HANDLER_COUNT;
+        foreach (range(1, $handlerCountInt) as $i) {
             $this->queues[] = config('elasticsearch.queue.name', self::DEFAULT_QUEUE_NAME).'-'.$i;
         }
     }
@@ -77,27 +80,33 @@ final class PullFromSourceParallel implements StageInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(Client $elasticsearch = null): void
+    public function handle(?Client $elasticsearch = null): void
     {
         if (count($this->dispatchedJobIds) > 0) {
             $jobs = TrackedJob::findMany($this->dispatchedJobIds);
             $failedJobs = $jobs->filter(function ($job) {
-                return $job->status === TrackedJob::STATUS_FAILED;
+                return $job->status === TrackedJobStatus::Failed;
             });
             if ($failedJobs->isNotEmpty()) {
                 $jobs->each(function (TrackedJob $job) {
                     $job->markAsFailed();
                 });
-                throw new \Exception('Failed to process jobs: '.implode(', ', $failedJobs->pluck('id')->toArray()));
+                /** @var array<int> */
+                $failedIds = $failedJobs->pluck('id')->toArray();
+                throw new \Exception('Failed to process jobs: '.implode(', ', $failedIds));
             }
             $finishedJobs = $jobs->filter(function ($job) {
-                return $job->status === TrackedJob::STATUS_FINISHED;
+                return $job->status === TrackedJobStatus::Finished;
             });
-            $this->handledJobs = array_merge($this->handledJobs, $finishedJobs->pluck('id')->toArray());
+            /** @var array<int> */
+            $finishedIds = $finishedJobs->pluck('id')->toArray();
+            $this->handledJobs = array_merge($this->handledJobs, $finishedIds);
             $this->advanceBy += $finishedJobs->count();
-            $this->dispatchedJobIds = $jobs->filter(function ($job) {
-                return $job->status !== TrackedJob::STATUS_FINISHED;
+            /** @var array<int> */
+            $pendingIds = $jobs->filter(function ($job) {
+                return $job->status !== TrackedJobStatus::Finished;
             })->pluck('id')->toArray();
+            $this->dispatchedJobIds = $pendingIds;
         }
 
         if (count($this->handledJobs) + count($this->dispatchedJobIds) > $this->source->getTotalChunks()) {
@@ -109,7 +118,13 @@ final class PullFromSourceParallel implements StageInterface
         if (! $results->isEmpty()) {
             $job = new ProcessSearchable($results);
             dispatch($job)->onQueue($this->getNextQueue())->onConnection($this->source->syncWithSearchUsing());
-            $this->dispatchedJobIds[] = $job->trackedJob->getKey();
+            $trackedJob = $job->trackedJob;
+            if ($trackedJob !== null) {
+                $key = $trackedJob->getKey();
+                if (is_int($key)) {
+                    $this->dispatchedJobIds[] = $key;
+                }
+            }
             if ($results->first()->getKeyType() !== 'int') {
                 $this->source->setChunkScope(
                     new PageScope(
@@ -159,9 +174,9 @@ final class PullFromSourceParallel implements StageInterface
 
     /**
      * @param  ImportSource  $source
-     * @return PullFromSourceParallel|null
+     * @return PullFromSourceParallel_PHP82|null
      */
-    public static function chunked(ImportSource $source): PullFromSourceParallel|null
+    public static function chunked(ImportSource $source): ?PullFromSourceParallel_PHP82
     {
         $source = $source->chunked();
 

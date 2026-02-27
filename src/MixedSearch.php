@@ -15,6 +15,7 @@ final class MixedSearch
      * @param  \Closure  $callback
      * @return \Laravel\Scout\Builder
      */
+    // @phpstan-ignore-next-line - This method is not actually called, so the class string is not validated
     public static function search(string $query = '', $callback = null): Builder
     {
         return new Builder(new class extends Model

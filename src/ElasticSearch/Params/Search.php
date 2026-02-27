@@ -12,13 +12,13 @@ final class Search
      */
     private $index;
     /**
-     * @var array
+     * @var array<mixed>
      */
     private $body;
 
     /**
      * @param  string  $index
-     * @param  array  $body
+     * @param  array<mixed>  $body
      */
     public function __construct(string $index, array $body)
     {
@@ -26,6 +26,9 @@ final class Search
         $this->body = $body;
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function toArray(): array
     {
         return [

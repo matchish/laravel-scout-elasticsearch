@@ -8,12 +8,12 @@ namespace Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias;
 final class Update
 {
     /**
-     * @var array
+     * @var array<mixed>
      */
     private $actions = [];
 
     /**
-     * @param  array  $actions
+     * @param  array<mixed>  $actions
      */
     public function __construct(array $actions = [])
     {
@@ -21,7 +21,7 @@ final class Update
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function toArray(): array
     {

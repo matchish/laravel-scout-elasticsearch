@@ -12,7 +12,7 @@ final class Create
      */
     private $index;
     /**
-     * @var array
+     * @var array<mixed>
      */
     private $config;
 
@@ -20,7 +20,7 @@ final class Create
      * Create constructor.
      *
      * @param  string  $index
-     * @param  array  $config
+     * @param  array<mixed>  $config
      */
     public function __construct(string $index, array $config)
     {
@@ -29,7 +29,7 @@ final class Create
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function toArray(): array
     {

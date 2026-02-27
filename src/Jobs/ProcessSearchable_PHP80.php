@@ -12,28 +12,31 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Junges\TrackableJobs\Concerns\Trackable;
-use Laravel\Scout\Searchable;
+use Matchish\ScoutElasticSearch\Contracts\SearchableContract;
 
-class ProcessSearchable implements ShouldQueue
+/**
+ * @phpstan-type SearchableModel = Model&SearchableContract
+ */
+class ProcessSearchable_PHP80 implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, Trackable {
         __construct as __baseConstruct;
     }
 
     /**
-     * @var Collection<int, Model|Searchable>
+     * @var Collection<int, SearchableModel>
      */
-    private $data;
+    private Collection $data;
 
     /**
-     * @param  Collection<int, Model|Searchable>  $data
+     * @param  Collection<int, SearchableModel>  $data
      */
     public function __construct(Collection $data)
     {
         $this->__baseConstruct($data->first());
 
         $this->trackedJob->update([
-            'trackable_type' => $data->first()->searchableAs(),
+            'trackable_type' => $data->first()?->searchableAs(),
         ]);
 
         $this->data = $data;
@@ -46,17 +49,20 @@ class ProcessSearchable implements ShouldQueue
      */
     public function handle(): void
     {
-        $this->trackedJob = $this->trackedJob->fresh();
-        if ($this->trackedJob == null || $this->trackedJob->finished_at !== null) {
+        $freshTrackedJob = $this->trackedJob->fresh();
+        if ($freshTrackedJob == null || $freshTrackedJob->finished_at !== null) {
             return;
         }
+        $this->trackedJob = $freshTrackedJob;
 
-        /** @var Model|Searchable $model */
+        /** @var SearchableModel $model */
         $model = $this->data->first();
 
         /** @var \Laravel\Scout\Engines\Engine $engine */
         $engine = $model->searchableUsing();
 
-        $engine->update($this->data);
+        /** @var \Illuminate\Database\Eloquent\Collection<int, SearchableModel> */
+        $collection = $this->data;
+        $engine->update($collection);
     }
 }

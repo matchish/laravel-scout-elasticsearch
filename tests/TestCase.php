@@ -26,7 +26,7 @@ abstract class TestCase extends BaseTestCase
             ]);
         }
 
-        \Artisan::call('migrate:fresh', ['--database' => 'mysql']);
+        \Artisan::call('migrate:fresh', ['--database' => env('DB_CONNECTION', 'mysql')]);
     }
 
     /**

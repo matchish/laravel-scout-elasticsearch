@@ -64,8 +64,9 @@ final class ImportCommand extends Command
         $sourceFactory = app(ImportSourceFactory::class);
         $source = $sourceFactory::from($searchable);
         $job = new Import($source);
+        $config = (new Config())->parse();
         /** @var int|null $queueTimeout */
-        $queueTimeout = Config::queueTimeout();
+        $queueTimeout = $config->queueTimeout();
         if ($queueTimeout !== null) {
             $job->timeout = (int) $queueTimeout;
         }
@@ -74,7 +75,7 @@ final class ImportCommand extends Command
         if (config('scout.queue')) {
             $job = (new QueueableJob())->chain([$job]);
             /** @var int|null $queueTimeout */
-            $queueTimeout = Config::queueTimeout();
+            $queueTimeout = $config->queueTimeout();
             if ($queueTimeout !== null) {
                 $job->timeout = (int) $queueTimeout;
             }

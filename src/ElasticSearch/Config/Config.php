@@ -3,18 +3,19 @@
 namespace Matchish\ScoutElasticSearch\ElasticSearch\Config;
 
 /**
- * @method static array hosts()
+ * @method static array<string> hosts()
  * @method static user()
  * @method static password()
  * @method static elasticCloudId()
  * @method static apiKey()
+ * @method static sslVerification()
  * @method static queueTimeout()
  */
 class Config
 {
     /**
      * @param  string  $method
-     * @param  array  $parameters
+     * @param  array<mixed>  $parameters
      * @return mixed
      */
     public function __call(string $method, array $parameters)
@@ -24,7 +25,7 @@ class Config
 
     /**
      * @param  string  $method
-     * @param  array  $parameters
+     * @param  array<mixed>  $parameters
      * @return mixed
      */
     public static function __callStatic(string $method, array $parameters)

@@ -5,7 +5,6 @@ namespace Matchish\ScoutElasticSearch\Database\Scopes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
-use Laravel\Scout\Searchable;
 
 class PageScope implements Scope
 {
@@ -33,7 +32,7 @@ class PageScope implements Scope
     /**
      * Apply the scope to a given Eloquent query builder.
      *
-     * @param  Builder<Model|Searchable>  $builder
+     * @param  Builder<Model>  $builder
      * @param  Model  $model
      * @return void
      */

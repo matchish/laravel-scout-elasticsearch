@@ -24,7 +24,7 @@ class Storage
     }
 
     /**
-     * @return array
+     * @return array<string>
      */
     public function hosts(): array
     {
@@ -81,6 +81,14 @@ class Storage
         $apiConfig = $this->loadConfig('api_key');
 
         return $apiConfig;
+    }
+
+    /**
+     * @return bool
+     */
+    public function sslVerification(): bool
+    {
+        return (bool) ($this->loadConfig('ssl_verification') ?? true);
     }
 
     /**

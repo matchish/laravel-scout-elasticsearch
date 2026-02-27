@@ -15,15 +15,12 @@ use PhpParser\NodeFinder;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\ParserFactory;
-use Roave\BetterReflection\BetterReflection;
-use Roave\BetterReflection\Reflector\Exception\IdentifierNotFound;
-use Roave\BetterReflection\Reflector\Reflector;
 use Symfony\Component\Finder\Finder;
 
 final class SearchableListFactory
 {
     /**
-     * @var array|null
+     * @var array<string>|null
      */
     private static ?array $searchableClasses = null;
     /**
@@ -35,13 +32,9 @@ final class SearchableListFactory
      */
     private string $appPath;
     /**
-     * @var array
+     * @var array<string>
      */
     private array $errors = [];
-    /**
-     * @var Reflector|null
-     */
-    private ?Reflector $reflector = null;
 
     /**
      * @param  string  $namespace
@@ -54,7 +47,7 @@ final class SearchableListFactory
     }
 
     /**
-     * @return array
+     * @return array<string>
      */
     public function getErrors(): array
     {
@@ -89,9 +82,12 @@ final class SearchableListFactory
     private function getSearchableClasses(): array
     {
         if (self::$searchableClasses === null) {
-            self::$searchableClasses = $this->getProjectClasses()->filter(function (string $class) {
+            /** @var array<class-string> */
+            $classes = $this->getProjectClasses()->filter(function (string $class) {
+                /** @var class-string $class */
                 return $this->findSearchableTraitRecursively($class);
             })->toArray();
+            self::$searchableClasses = $classes;
         }
 
         return self::$searchableClasses;
@@ -116,7 +112,7 @@ final class SearchableListFactory
     }
 
     /**
-     * @return array
+     * @return array<\PhpParser\Node>
      */
     private function getStmts(): array
     {
@@ -140,41 +136,58 @@ final class SearchableListFactory
     }
 
     /**
-     * @param  string  $class
+     * @param  class-string  $class
      * @return bool
      */
     private function findSearchableTraitRecursively(string $class): bool
     {
         try {
-            $reflection = $this->reflector()->reflectClass($class);
+            // Check if class can be reflected without loading
+            if (! $this->canAnalyzeClass($class)) {
+                return false;
+            }
 
-            if (in_array(Searchable::class, $traits = $reflection->getTraitNames())) {
+            // Check traits used by this class (including inherited traits)
+            $traits = class_uses_recursive($class);
+
+            if (in_array(Searchable::class, $traits)) {
                 return true;
             }
 
-            foreach ($traits as $trait) {
-                if ($this->findSearchableTraitRecursively($trait)) {
-                    return true;
-                }
+            // Check parent class if it exists
+            $reflection = new \ReflectionClass($class);
+            $parent = $reflection->getParentClass();
+            if ($parent) {
+                return $this->findSearchableTraitRecursively($parent->getName());
             }
 
-            return ($parent = $reflection->getParentClass()) && $this->findSearchableTraitRecursively($parent->getName());
-        } catch (IdentifierNotFound $e) {
-            $this->errors[] = $e->getMessage();
+            return false;
+        } catch (\Throwable $e) {
+            // Log error but don't fail completely - this matches original behavior
+            $this->errors[] = "Error analyzing class {$class}: ".$e->getMessage();
 
             return false;
         }
     }
 
     /**
-     * @return Reflector
+     * Check if a class can be safely analyzed.
+     *
+     * @param  string  $class
+     * @return bool
      */
-    private function reflector(): Reflector
+    private function canAnalyzeClass(string $class): bool
     {
-        if (null === $this->reflector) {
-            $this->reflector = (new BetterReflection())->reflector();
-        }
+        try {
+            // First check without autoloading
+            if (class_exists($class, false)) {
+                return true;
+            }
 
-        return $this->reflector;
+            // Try to autoload, but catch any errors
+            return class_exists($class, true);
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 }

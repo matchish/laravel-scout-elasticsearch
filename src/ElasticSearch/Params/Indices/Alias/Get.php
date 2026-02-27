@@ -29,7 +29,7 @@ final class Get
     }
 
     /**
-     * @return array
+     * @return array<string, string>
      */
     public function toArray()
     {

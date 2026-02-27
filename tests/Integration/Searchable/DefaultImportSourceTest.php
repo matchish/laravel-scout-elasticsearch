@@ -6,6 +6,7 @@ use App\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
+use Matchish\ScoutElasticSearch\Database\Scopes\FromScope;
 use Matchish\ScoutElasticSearch\Searchable\DefaultImportSource;
 use Tests\TestCase;
 
@@ -44,6 +45,32 @@ class DefaultImportSourceTest extends TestCase
         $products = $source->get();
         $this->assertEquals($iphonePromoUsedAmount, $products->count());
     }
+
+    public function test_chunked_with_complex_scope()
+    {
+        $dispatcher = Product::getEventDispatcher();
+        Product::unsetEventDispatcher();
+
+        factory(Product::class, 2)->states(['iphone', 'promo', 'used'])->create();
+        factory(Product::class, 3)->states(['kindle', 'promo', 'new'])->create();
+        factory(Product::class, 2)->states(['iphone', 'promo', 'used'])->create();
+
+        Product::setEventDispatcher($dispatcher);
+
+        $source = new DefaultImportSource(Product::class, [new ComplexScopeWithGroupBy()]);
+        $source = $source->chunked();
+
+        $totalCount = 0;
+        $results = $source->get();
+        while (! $results->isEmpty()) {
+            $totalCount += $results->count();
+
+            $source->setChunkScope(new FromScope($results->last()->getKey(), $source->getChunkSize()));
+            $results = $source->get();
+        }
+
+        $this->assertEquals(7, $totalCount);
+    }
 }
 
 class UsedScope implements Scope
@@ -58,5 +85,17 @@ class UsedScope implements Scope
     public function apply(Builder $builder, Model $model)
     {
         $builder->where('type', 'used');
+    }
+}
+
+class ComplexScopeWithGroupBy implements Scope
+{
+    public function apply(Builder $builder, Model $model)
+    {
+        // Just a simple example where we duplicate all products
+        // and de-duplicate them by grouping on the id.
+        $builder
+            ->leftJoin('products as products2', 'products.id', '=', 'products2.id')
+            ->groupBy('products.id');
     }
 }

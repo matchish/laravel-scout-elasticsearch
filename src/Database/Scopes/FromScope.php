@@ -5,7 +5,6 @@ namespace Matchish\ScoutElasticSearch\Database\Scopes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
-use Laravel\Scout\Searchable;
 
 class FromScope implements Scope
 {
@@ -33,12 +32,12 @@ class FromScope implements Scope
     /**
      * Apply the scope to a given Eloquent query builder.
      *
-     * @param  Builder<Model|Searchable>  $builder
+     * @param  Builder<Model>  $builder
      * @param  Model  $model
      * @return void
      */
     public function apply(Builder $builder, Model $model)
     {
-        $builder->forPageAfterId($this->perPage, $this->lastId);
+        $builder->forPageAfterId($this->perPage, $this->lastId, $model->getTable().'.'.$model->getKeyName());
     }
 }

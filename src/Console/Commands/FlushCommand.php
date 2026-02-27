@@ -25,7 +25,7 @@ final class FlushCommand extends Command
     public function handle(): void
     {
         $command = $this;
-        $searchableList = collect($command->argument('searchable'))->whenEmpty(function () {
+        $searchableList = collect((array) $command->argument('searchable'))->whenEmpty(function () {
             $factory = new SearchableListFactory(app()->getNamespace(), app()->path());
 
             return $factory->make();

@@ -30,7 +30,7 @@ final class PullFromSource implements StageInterface
         $this->source = $source;
     }
 
-    public function handle(Client $elasticsearch = null): void
+    public function handle(?Client $elasticsearch = null): void
     {
         $this->handledChunks++;
         $results = $this->source->get()->filter->shouldBeSearchable();

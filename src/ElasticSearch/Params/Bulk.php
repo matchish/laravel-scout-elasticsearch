@@ -3,25 +3,27 @@
 namespace Matchish\ScoutElasticSearch\ElasticSearch\Params;
 
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Scout\Searchable;
+use Matchish\ScoutElasticSearch\Contracts\SearchableContract;
 
 /**
  * @internal
+ *
+ * @phpstan-import-type SearchableModel from SearchableContract
  */
 final class Bulk
 {
     /**
-     * @var array
+     * @var array<string|int, Model>
      */
     private $indexDocs = [];
 
     /**
-     * @var array
+     * @var array<string|int, Model>
      */
     private $deleteDocs = [];
 
     /**
-     * @param  array|object  $docs
+     * @param  array<Model>|object  $docs
      */
     public function delete($docs): void
     {
@@ -30,7 +32,7 @@ final class Bulk
                 $this->delete($doc);
             }
         } else {
-            /** @var Model|Searchable $docs */
+            /** @var SearchableModel $docs */
             $this->deleteDocs[$docs->getScoutKey()] = $docs;
         }
     }
@@ -38,19 +40,20 @@ final class Bulk
     /**
      * TODO: Add ability to extend payload without modifying the class.
      *
-     * @return array
+     * @return array<mixed>
      */
     public function toArray(): array
     {
         $payload = ['body' => []];
         $payload = collect($this->indexDocs)->reduce(
             function ($payload, $model) {
-                if ($model::usesSoftDelete() && config('scout.soft_delete', false)) {
+                /** @var SearchableModel $model */
+                if (config('scout.soft_delete', false) && $model::usesSoftDelete()) {
                     $model->pushSoftDeleteMetadata();
                 }
 
                 $attributes = $model->getAttributes();
-                $routing = array_key_exists('routing', $attributes) ? $model->routing : null;
+                $routing = $attributes['routing'] ?? null;
                 $scoutKey = $model->getScoutKey();
 
                 $payload['body'][] = [
@@ -74,8 +77,9 @@ final class Bulk
 
         $payload = collect($this->deleteDocs)->reduce(
             function ($payload, $model) {
+                /** @var SearchableModel $model */
                 $attributes = $model->getAttributes();
-                $routing = array_key_exists('routing', $attributes) ? $model->routing : null;
+                $routing = $attributes['routing'] ?? null;
                 $scoutKey = $model->getScoutKey();
 
                 $payload['body'][] = [
@@ -89,11 +93,12 @@ final class Bulk
                 return $payload;
             }, $payload);
 
+        /** @var array<mixed> */
         return $payload;
     }
 
     /**
-     * @param  array|object  $docs
+     * @param  array<Model>|object  $docs
      */
     public function index($docs): void
     {
@@ -102,7 +107,7 @@ final class Bulk
                 $this->index($doc);
             }
         } else {
-            /** @var Model|Searchable $docs */
+            /** @var SearchableModel $docs */
             $this->indexDocs[$docs->getScoutKey()] = $docs;
         }
     }

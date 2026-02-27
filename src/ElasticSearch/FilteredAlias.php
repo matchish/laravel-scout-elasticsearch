@@ -25,6 +25,9 @@ final class FilteredAlias implements Alias
         return $this->origin->name();
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function config(): array
     {
         return array_merge($this->origin->config(), [

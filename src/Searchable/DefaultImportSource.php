@@ -8,10 +8,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
-use Laravel\Scout\Searchable;
+use Matchish\ScoutElasticSearch\Contracts\SearchableContract;
 use Matchish\ScoutElasticSearch\Database\Scopes\FromScope;
 use Matchish\ScoutElasticSearch\Database\Scopes\PageScope;
 
+/**
+ * @phpstan-import-type SearchableModel from SearchableContract
+ */
 final class DefaultImportSource implements ImportSource
 {
     /**
@@ -51,7 +54,7 @@ final class DefaultImportSource implements ImportSource
      * @param  array<Scope>  $scopes
      * @param  Scope|null  $chunkScope
      */
-    public function __construct(string $className, array $scopes = [], Scope|null $chunkScope = null)
+    public function __construct(string $className, array $scopes = [], ?Scope $chunkScope = null)
     {
         $this->className = $className;
         $this->scopes = $scopes;
@@ -65,7 +68,10 @@ final class DefaultImportSource implements ImportSource
      */
     public function syncWithSearchUsingQueue(): ?string
     {
-        return $this->model()->syncWithSearchUsingQueue();
+        /** @var SearchableModel $model */
+        $model = $this->model();
+
+        return $model->syncWithSearchUsingQueue();
     }
 
     /**
@@ -73,7 +79,10 @@ final class DefaultImportSource implements ImportSource
      */
     public function syncWithSearchUsing(): ?string
     {
-        return $this->model()->syncWithSearchUsing();
+        /** @var SearchableModel $model */
+        $model = $this->model();
+
+        return $model->syncWithSearchUsing();
     }
 
     /**
@@ -81,7 +90,10 @@ final class DefaultImportSource implements ImportSource
      */
     public function searchableAs(): string
     {
-        return $this->model()->searchableAs();
+        /** @var SearchableModel $model */
+        $model = $this->model();
+
+        return $model->searchableAs();
     }
 
     /**
@@ -114,7 +126,7 @@ final class DefaultImportSource implements ImportSource
     public function chunked(): ?ImportSource
     {
         $query = $this->newQuery();
-        $totalSearchables = $query->count();
+        $totalSearchables = $query->toBase()->getCountForPagination();
         if ($totalSearchables) {
             $configChunkSize = config('scout.chunk.searchable', self::DEFAULT_CHUNK_SIZE);
             $this->chunkSize = is_numeric($configChunkSize) ? intval($configChunkSize) : self::DEFAULT_CHUNK_SIZE;
@@ -132,11 +144,11 @@ final class DefaultImportSource implements ImportSource
     }
 
     /**
-     * @return Model|Searchable
+     * @return Model
      */
     private function model()
     {
-        /** @var Model|Searchable */
+        /** @var Model */
         return new $this->className;
     }
 
@@ -159,11 +171,11 @@ final class DefaultImportSource implements ImportSource
             $scopes = array_merge($scopes, [$this->chunkScope]);
         }
 
-        return collect($scopes)->reduce(function ($instance, $scope) {
-            $instance->withGlobalScope(get_class($scope), $scope);
+        foreach ($scopes as $scope) {
+            $query->withGlobalScope(\get_class($scope), $scope);
+        }
 
-            return $instance;
-        }, $query);
+        return $query;
     }
 
     /**
