@@ -39,7 +39,7 @@ Don't forget to :star: the package if you like it. :pray:
 - [Search amongst multiple models](#search-amongst-multiple-models)
 - [**Zero downtime** reimport](#zero-downtime-reimport) - it’s a breeze to import data in production.
 - [Eager load relations](#eager-load) - speed up your import.
-- Parallel import to make your import as fast as possible (in [alpha version](https://github.com/matchish/laravel-scout-elasticsearch/releases/tag/8.0.0-alpha.1) for now)
+- Parallel import to make your import as fast as possible (in [alpha version](https://github.com/matchish/laravel-scout-elasticsearch/releases/tag/8.0.0-alpha.3) for now)
 - Import all searchable models at once.
 - A fully configurable mapping for each model.
 - Full power of ElasticSearch in your queries.
