@@ -26,7 +26,7 @@ jobs:
                       port: 9200
         services:
             elasticsearch:
-                image: docker.elastic.co/elasticsearch/elasticsearch:7.17.1
+                image: docker.elastic.co/elasticsearch/elasticsearch:7.17.28
                 ports:
                     - 9200:9200
                 env:
