@@ -89,10 +89,10 @@ final class SearchFactory
                     }
 
                     $where = match ($operator) {
-                        '=', '!='  => new TermQuery((string) $field, $where['value']),
-                        '>'  => new RangeQuery((string) $field, [RangeQuery::GT => $where['value']]),
+                        '=', '!=' => new TermQuery((string) $field, $where['value']),
+                        '>' => new RangeQuery((string) $field, [RangeQuery::GT => $where['value']]),
                         '>=' => new RangeQuery((string) $field, [RangeQuery::GTE => $where['value']]),
-                        '<'  => new RangeQuery((string) $field, [RangeQuery::LT => $where['value']]),
+                        '<' => new RangeQuery((string) $field, [RangeQuery::LT => $where['value']]),
                         '<=' => new RangeQuery((string) $field, [RangeQuery::LTE => $where['value']]),
                         default => $where
                     };
