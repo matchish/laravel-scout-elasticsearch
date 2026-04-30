@@ -77,16 +77,16 @@ final class SearchFactory
                 }
 
                 if (isset($where['value']) && $where['value'] instanceof BuilderInterface) {
+                    if ($where['operator'] === '!=') {
+                        $boolQuery->add($where['value'], BoolQuery::MUST_NOT);
+                        continue;
+                    }
                     $where = $where['value'];
                 }
 
                 if (! ($where instanceof BuilderInterface) && isset($where['field'])) {
                     // Post v11.1.0 scout
                     $operator = $where['operator'];
-                    if ($where['operator'] === '!=') {
-                        $boolQuery->add(new TermQuery((string) $field, $where['value']), BoolQuery::MUST_NOT);
-                        continue;
-                    }
 
                     $where = match ($operator) {
                         '=', '!=' => new TermQuery((string) $field, $where['value']),
