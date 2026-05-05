@@ -72,11 +72,11 @@ final class SearchFactory
     {
         if (static::hasWheres($builder)) {
             foreach ($builder->wheres as $field => $where) {
-                if (isset($where['field'])) {
+                if (is_array($where) && isset($where['field'])) {
                     $field = $where['field'];
                 }
 
-                if (isset($where['value']) && $where['value'] instanceof BuilderInterface) {
+                if (is_array($where) && isset($where['value']) && $where['value'] instanceof BuilderInterface) {
                     if ($where['operator'] === '!=') {
                         $boolQuery->add($where['value'], BoolQuery::MUST_NOT);
                         continue;
@@ -84,7 +84,7 @@ final class SearchFactory
                     $where = $where['value'];
                 }
 
-                if (! ($where instanceof BuilderInterface) && isset($where['field'])) {
+                if (is_array($where) && isset($where['field'])) {
                     // Post v11.1.0 scout
                     $operator = $where['operator'];
 
