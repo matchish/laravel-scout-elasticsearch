@@ -15,6 +15,7 @@ use Matchish\ScoutElasticSearch\Jobs\Stages\StopTrackedJobs;
 use Matchish\ScoutElasticSearch\Jobs\Stages\SwitchToNewAndRemoveOldIndex;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
+
 /**
  * @extends Collection<int, StageInterface>
  */
@@ -29,7 +30,7 @@ class ImportStages extends Collection
     {
         $index = Index::fromSource($source);
 
-        if ($parallel && class_exists(\Junges\TrackableJobs\Providers\TrackableJobsServiceProvider::class)) {
+        if ($parallel) {
             /** @var array<StageInterface> $stages */
             $stages = [
                 new StopTrackedJobs($source),

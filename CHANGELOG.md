@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
+## [Unreleased]
+### Added
+- Built-in job tracking for parallel import — no longer requires `mateusjunges/laravel-trackable-jobs`. Publish the migration with `php artisan vendor:publish --tag=scout-elasticsearch-migrations`.
+- New config keys under `elasticsearch.tracked_jobs`: `table` (default `tracked_jobs`), `model` (swappable Eloquent model class), `using_uuid` (default `false`).
+
+### Changed
+- Unified `ProcessSearchable` and `PullFromSourceParallel` into single classes (removed `_PHP80`/`_PHP82` variants and `src/Compatability/compat.php`).
+- `--parallel` import no longer requires an external package; it is always available when queue workers are running.
+
+### Removed
+- `suggest` dependency on `mateusjunges/laravel-trackable-jobs` from `composer.json`.
+- `stubs/` directory (fallback no-op implementations are no longer needed).
+
 ## [8.0.0-alpha.3] - 2026-02-09
 ### Changed
 - The usage of mateusjunges/laravel-trackable-jobs package for parallel import

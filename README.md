@@ -198,25 +198,37 @@ While working in production, to keep your existing search experience available w
 The command creates new temporary index, imports all models to it, and then switches to the index and remove old index.
 
 ### Parallel import
-When importing massive ammounts of data, you can use the option `--parallel`, to speed up the import process.
-This however requires you to set-up the suggested trackable-jobs package and queue workers.
+When importing massive amounts of data, you can use the option `--parallel` to speed up the import process.
+Parallel import uses a built-in job tracking system — no extra packages required.
 
-To set-up the suggested trackable-jobs package run the following commands, or follow the installation guide on [laravel-trackable-jobs](https://github.com/mateusjunges/trackable-jobs-for-laravel):
+First, publish and run the migration to create the `tracked_jobs` table:
 ```bash
-composer require mateusjunges/laravel-trackable-jobs
-
-php artisan vendor:publish --tag=trackable-jobs-assets
+php artisan vendor:publish --tag=scout-elasticsearch-migrations
 
 php artisan migrate
 ```
 
-Afterwards you should define the queue names to be used for parallel import:
+Then define the queue names to be used for parallel import:
 
 `scout.chunk.handlers` defines how many parallel queues will be ran, default: `1`.
 
-`elasticsearch.queue.name` defines the parallel queue name, default: `'elasticsearch-parallel'`.
+`elasticsearch.queue.name` defines the parallel queue name prefix, default: `'elasticsearch-parallel'`.
 
-The default configuration will use queue: `'elasticsearch-parallel-N'`, where `N` is handler index (1 -> `scout.chunk.hanlder`)
+The default configuration will use queues: `'elasticsearch-parallel-N'`, where `N` is the handler index (1 → `scout.chunk.handlers`).
+
+#### Customising tracked jobs
+
+The `tracked_jobs` table name and the model class used for tracking are configurable in `config/elasticsearch.php`:
+
+```php
+'tracked_jobs' => [
+    'table'      => env('ELASTICSEARCH_TRACKED_JOBS_TABLE', 'tracked_jobs'),
+    'model'      => \Matchish\ScoutElasticSearch\Jobs\TrackableJobs\TrackedJob::class,
+    'using_uuid' => false,
+],
+```
+
+Set `model` to your own Eloquent model class if you need custom tracking behaviour. The custom model must implement `\Matchish\ScoutElasticSearch\Jobs\TrackableJobs\TrackedJobContract`.
 
 ### Search
 

@@ -39,10 +39,7 @@
     "autoload": {
         "psr-4": {
             "Matchish\\ScoutElasticSearch\\": "src/"
-        },
-        "files": [
-            "src/Compatability/compat.php"
-        ]
+        }
     },
     "extra": {
         "laravel": {
@@ -50,9 +47,6 @@
                 "Matchish\\ScoutElasticSearch\\ScoutElasticSearchServiceProvider"
             ]
         }
-    },
-    "suggest": {
-        "mateusjunges/laravel-trackable-jobs": "Required when using --parallel option in ImportCommand."
     },
     "config": {
         "sort-packages": true,
