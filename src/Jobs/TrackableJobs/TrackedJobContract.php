@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property CarbonInterface|null $finished_at
  * @property CarbonInterface $created_at
  * @property CarbonInterface $updated_at
- * 
+ *
  * @phpstan-type TrackedJobModelType TrackedJobContract&Model
  */
 interface TrackedJobContract

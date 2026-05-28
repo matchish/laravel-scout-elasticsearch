@@ -15,7 +15,6 @@ use Matchish\ScoutElasticSearch\Jobs\Stages\StopTrackedJobs;
 use Matchish\ScoutElasticSearch\Jobs\Stages\SwitchToNewAndRemoveOldIndex;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
-
 /**
  * @extends Collection<int, StageInterface>
  */

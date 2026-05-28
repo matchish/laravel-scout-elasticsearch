@@ -14,6 +14,7 @@ use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
 /**
  * @internal
+ *
  * @phpstan-import-type TrackedJobModelType from TrackedJobContract
  */
 final class PullFromSourceParallel implements StageInterface

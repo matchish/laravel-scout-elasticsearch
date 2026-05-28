@@ -10,7 +10,7 @@ namespace Matchish\ScoutElasticSearch\Jobs\TrackableJobs;
 abstract class TrackableJob
 {
     /**
-     * @var TrackedJobModelType|null $trackedJob
+     * @var TrackedJobModelType|null
      */
     public ?TrackedJobContract $trackedJob = null;
 

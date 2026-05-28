@@ -21,7 +21,7 @@ class TrackedJob extends Model implements TrackedJobContract
     {
         $table = config('elasticsearch.tracked_jobs.table', 'tracked_jobs');
 
-        if (!\is_string($table) || $table === '') {
+        if (! \is_string($table) || $table === '') {
             throw new \InvalidArgumentException('The tracked jobs table name must be a non-empty string.');
         }
 
