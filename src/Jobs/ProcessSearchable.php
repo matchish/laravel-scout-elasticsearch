@@ -11,13 +11,13 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
-use Junges\TrackableJobs\TrackableJob;
 use Matchish\ScoutElasticSearch\Contracts\SearchableContract;
+use Matchish\ScoutElasticSearch\Jobs\TrackableJobs\TrackableJob;
 
 /**
  * @phpstan-type SearchableModel = Model&SearchableContract
  */
-class ProcessSearchable_PHP82 extends TrackableJob implements ShouldQueue
+class ProcessSearchable extends TrackableJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -59,18 +59,13 @@ class ProcessSearchable_PHP82 extends TrackableJob implements ShouldQueue
         return $first->searchableAs();
     }
 
-    /**
-     * Handles the job execution.
-     *
-     * @return void
-     */
     public function handle(): void
     {
         if ($this->trackedJob === null) {
             return;
         }
         $this->trackedJob = $this->trackedJob->fresh();
-        if ($this->trackedJob == null || $this->trackedJob->finished_at !== null) {
+        if ($this->trackedJob === null || $this->trackedJob->finished_at !== null) {
             return;
         }
 

@@ -6,19 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    private string $table_name;
+    private string $tableName;
 
     private bool $usingUuid;
 
     public function __construct()
     {
-        $this->table_name = config('trackable-jobs.tables.tracked_jobs', 'tracked_jobs');
-        $this->usingUuid = config('trackable-jobs.using_uuid', false);
+        $this->tableName = config('elasticsearch.tracked_jobs.table', 'tracked_jobs');
+        $this->usingUuid = config('elasticsearch.tracked_jobs.using_uuid', false);
     }
 
     public function up(): void
     {
-        Schema::create($this->table_name, function (Blueprint $table) {
+        Schema::create($this->tableName, function (Blueprint $table) {
             $this->usingUuid
                 ? $table->uuid()->primary()
                 : $table->id();
@@ -38,6 +38,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists($this->table_name);
+        Schema::dropIfExists($this->tableName);
     }
 };

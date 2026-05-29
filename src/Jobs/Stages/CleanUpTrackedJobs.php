@@ -3,7 +3,7 @@
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elastic\Elasticsearch\Client;
-use Junges\TrackableJobs\Models\TrackedJob;
+use Matchish\ScoutElasticSearch\Jobs\TrackableJobs\TrackedJob;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
 /**

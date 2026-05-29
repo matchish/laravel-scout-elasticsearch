@@ -3,7 +3,8 @@
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elastic\Elasticsearch\Client;
-use Junges\TrackableJobs\Models\TrackedJob;
+use Matchish\ScoutElasticSearch\Jobs\TrackableJobs\TrackedJob;
+use Matchish\ScoutElasticSearch\Jobs\TrackableJobs\TrackedJobContract;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
 /**
@@ -24,11 +25,11 @@ final class StopTrackedJobs implements StageInterface
         $this->source = $source;
     }
 
-    public function handle(Client $elasticsearch): void
+    public function handle(?Client $elasticsearch = null): void
     {
         TrackedJob::query()
             ->where('trackable_type', $this->source->searchableAs())
-            ->each(function (TrackedJob $job) {
+            ->each(function (TrackedJobContract $job) {
                 $job->markAsFailed('New import started on the same index.');
             });
     }

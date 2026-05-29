@@ -20,12 +20,6 @@ abstract class TestCase extends BaseTestCase
 
         $this->withFactories(database_path('factories'));
 
-        if (class_exists(\Junges\TrackableJobs\Providers\TrackableJobsServiceProvider::class)) {
-            \Artisan::call('vendor:publish', [
-                '--tag' => 'trackable-jobs-config',
-            ]);
-        }
-
         \Artisan::call('migrate:fresh', ['--database' => env('DB_CONNECTION', 'mysql')]);
     }
 
@@ -47,17 +41,10 @@ abstract class TestCase extends BaseTestCase
 
     protected function getPackageProviders($app)
     {
-        /** @var array<class-string> $providers */
-        $providers = [
+        return [
             ScoutServiceProvider::class,
             ScoutElasticSearchServiceProvider::class,
             ElasticSearchServiceProvider::class,
         ];
-
-        if (class_exists(\Junges\TrackableJobs\Providers\TrackableJobsServiceProvider::class)) {
-            $providers[] = \Junges\TrackableJobs\Providers\TrackableJobsServiceProvider::class;
-        }
-
-        return $providers;
     }
 }

@@ -1,28 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elastic\Elasticsearch\Client;
-use Junges\TrackableJobs\Enums\TrackedJobStatus;
-use Junges\TrackableJobs\Models\TrackedJob;
 use Matchish\ScoutElasticSearch\Database\Scopes\FromScope;
 use Matchish\ScoutElasticSearch\Database\Scopes\PageScope;
 use Matchish\ScoutElasticSearch\Jobs\ProcessSearchable;
+use Matchish\ScoutElasticSearch\Jobs\TrackableJobs\TrackedJob;
+use Matchish\ScoutElasticSearch\Jobs\TrackableJobs\TrackedJobContract;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
 /**
  * @internal
+ *
+ * @phpstan-import-type TrackedJobModelType from TrackedJobContract
  */
-final class PullFromSourceParallel_PHP82 implements StageInterface
+final class PullFromSourceParallel implements StageInterface
 {
-    /**
-     * @var int
-     */
     const DEFAULT_HANDLER_COUNT = 1;
 
-    /**
-     * @var string
-     */
     const DEFAULT_QUEUE_NAME = 'elasticsearch-parallel';
 
     /**
@@ -50,9 +48,6 @@ final class PullFromSourceParallel_PHP82 implements StageInterface
      */
     private $queues = [];
 
-    /**
-     * @param  ImportSource  $source
-     */
     public function __construct(ImportSource $source)
     {
         $this->source = $source;
@@ -65,9 +60,6 @@ final class PullFromSourceParallel_PHP82 implements StageInterface
         }
     }
 
-    /**
-     * @return string
-     */
     private function getNextQueue(): string
     {
         /** @var string $queue */
@@ -83,12 +75,13 @@ final class PullFromSourceParallel_PHP82 implements StageInterface
     public function handle(?Client $elasticsearch = null): void
     {
         if (count($this->dispatchedJobIds) > 0) {
+            /** @var \Illuminate\Database\Eloquent\Collection<int, TrackedJobModelType> $jobs */
             $jobs = TrackedJob::findMany($this->dispatchedJobIds);
             $failedJobs = $jobs->filter(function ($job) {
-                return $job->status === TrackedJobStatus::Failed;
+                return $job->status === TrackedJobContract::STATUS_FAILED;
             });
             if ($failedJobs->isNotEmpty()) {
-                $jobs->each(function (TrackedJob $job) {
+                $jobs->each(function (TrackedJobContract $job) {
                     $job->markAsFailed();
                 });
                 /** @var array<int> */
@@ -96,7 +89,7 @@ final class PullFromSourceParallel_PHP82 implements StageInterface
                 throw new \Exception('Failed to process jobs: '.implode(', ', $failedIds));
             }
             $finishedJobs = $jobs->filter(function ($job) {
-                return $job->status === TrackedJobStatus::Finished;
+                return $job->status === TrackedJobContract::STATUS_FINISHED;
             });
             /** @var array<int> */
             $finishedIds = $finishedJobs->pluck('id')->toArray();
@@ -104,7 +97,7 @@ final class PullFromSourceParallel_PHP82 implements StageInterface
             $this->advanceBy += $finishedJobs->count();
             /** @var array<int> */
             $pendingIds = $jobs->filter(function ($job) {
-                return $job->status !== TrackedJobStatus::Finished;
+                return $job->status !== TrackedJobContract::STATUS_FINISHED;
             })->pluck('id')->toArray();
             $this->dispatchedJobIds = $pendingIds;
         }
@@ -172,11 +165,7 @@ final class PullFromSourceParallel_PHP82 implements StageInterface
         return count($this->handledJobs) >= $this->source->getTotalChunks();
     }
 
-    /**
-     * @param  ImportSource  $source
-     * @return PullFromSourceParallel_PHP82|null
-     */
-    public static function chunked(ImportSource $source): ?PullFromSourceParallel_PHP82
+    public static function chunked(ImportSource $source): ?self
     {
         $source = $source->chunked();
 
