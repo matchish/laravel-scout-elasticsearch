@@ -25,6 +25,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 - Dockerfile PHP 8.4
 - PHPUnit deprecation fixes
 
+## [7.13.0] - 2026-05-09
+### Added
+- Support for Laravel Scout v11.1.0+ by updating query where handling for the new Scout where structure and operators. [#322](https://github.com/matchish/laravel-scout-elasticsearch/pull/322)
+
 ## [7.12.0] - 2025-08-26
 ### Changed
 - Removed `roave/better-reflection` dependency and replaced usage with native PHP reflection in `SearchableListFactory`, reducing package size while maintaining behavior. [#314](https://github.com/matchish/laravel-scout-elasticsearch/pull/314)
