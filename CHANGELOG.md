@@ -5,17 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
-### Added
-- Built-in job tracking for parallel import — no longer requires `mateusjunges/laravel-trackable-jobs`. Publish the migration with `php artisan vendor:publish --tag=scout-elasticsearch-migrations`.
-- New config keys under `elasticsearch.tracked_jobs`: `table` (default `tracked_jobs`), `model` (swappable Eloquent model class), `using_uuid` (default `false`).
-
 ### Changed
-- Unified `ProcessSearchable` and `PullFromSourceParallel` into single classes (removed `_PHP80`/`_PHP82` variants and `src/Compatability/compat.php`).
-- `--parallel` import no longer requires an external package; it is always available when queue workers are running.
+- Parallel import is being rebuilt on top of Laravel job batching (`Bus::batch()`): key ranges are computed up front and imported by independent queued jobs on a single queue.
 
 ### Removed
-- `suggest` dependency on `mateusjunges/laravel-trackable-jobs` from `composer.json`.
-- `stubs/` directory (fallback no-op implementations are no longer needed).
+- The custom job tracking subsystem used by parallel import (`TrackedJob` model, `tracked_jobs` table and migration, `elasticsearch.tracked_jobs` config) — superseded by Laravel job batching.
+- Round-robin parallel queues (`elasticsearch-parallel-N`, `scout.chunk.handlers`) — the new design uses one queue with any number of workers.
 
 ## [8.0.0-alpha.3] - 2026-02-09
 ### Changed

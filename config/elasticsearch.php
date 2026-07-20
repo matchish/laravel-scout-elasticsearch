@@ -13,11 +13,6 @@ return [
         'timeout' => env('SCOUT_QUEUE_TIMEOUT'),
         'name' => env('SCOUT_QUEUE_NAME'),
     ],
-    'tracked_jobs' => [
-        'table' => env('ELASTICSEARCH_TRACKED_JOBS_TABLE', 'tracked_jobs'),
-        'model' => \Matchish\ScoutElasticSearch\Jobs\TrackableJobs\TrackedJob::class,
-        'using_uuid' => false,
-    ],
     'indices' => [
         'mappings' => [
             'default' => [

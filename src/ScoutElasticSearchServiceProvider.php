@@ -22,11 +22,6 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'scout');
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-        $this->publishes(
-            [__DIR__.'/../database/migrations' => database_path('migrations')],
-            'scout-elasticsearch-migrations'
-        );
 
         $this->app->make(EngineManager::class)->extend(ElasticSearchEngine::class, function () {
             $elasticsearch = app(Client::class);
