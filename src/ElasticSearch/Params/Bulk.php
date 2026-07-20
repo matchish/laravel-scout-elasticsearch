@@ -23,6 +23,19 @@ final class Bulk
     private $deleteDocs = [];
 
     /**
+     * @var string|null
+     */
+    private $index;
+
+    /**
+     * @param  string|null  $index  concrete index name; defaults to the model's searchableAs() alias
+     */
+    public function __construct(?string $index = null)
+    {
+        $this->index = $index;
+    }
+
+    /**
      * @param  array<Model>|object  $docs
      */
     public function delete($docs): void
@@ -58,7 +71,7 @@ final class Bulk
 
                 $payload['body'][] = [
                     'index' => [
-                        '_index' => $model->searchableAs(),
+                        '_index' => $this->index ?? $model->searchableAs(),
                         '_id' => $scoutKey,
                         'routing' => false === empty($routing) ? $routing : $scoutKey,
                     ],
@@ -84,7 +97,7 @@ final class Bulk
 
                 $payload['body'][] = [
                     'delete' => [
-                        '_index' => $model->searchableAs(),
+                        '_index' => $this->index ?? $model->searchableAs(),
                         '_id' => $scoutKey,
                         'routing' => false === empty($routing) ? $routing : $scoutKey,
                     ],
