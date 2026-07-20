@@ -13,6 +13,9 @@ return [
         'timeout' => env('SCOUT_QUEUE_TIMEOUT'),
         'name' => env('SCOUT_QUEUE_NAME'),
     ],
+    'parallel' => [
+        'chunks_per_range' => env('ELASTICSEARCH_PARALLEL_CHUNKS_PER_RANGE', 8),
+    ],
     'indices' => [
         'mappings' => [
             'default' => [

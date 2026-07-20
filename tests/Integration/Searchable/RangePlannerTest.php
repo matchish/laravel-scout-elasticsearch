@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Searchable;
 
-use App\BookWithCustomKey;
 use App\Product;
 use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
 use Matchish\ScoutElasticSearch\Searchable\Partitionable;
 use Matchish\ScoutElasticSearch\Searchable\Range;
 use Matchish\ScoutElasticSearch\Searchable\RangePlan;
 use Matchish\ScoutElasticSearch\Searchable\RangePlanner;
+use Tests\Fixtures\BookWithoutPartitionKey;
 use Tests\Fixtures\ProductWithPartitionKey;
 use Tests\Fixtures\ProductWithStringPartitionKey;
 use Tests\IntegrationTestCase;
@@ -52,9 +52,9 @@ final class RangePlannerTest extends IntegrationTestCase
     public function test_non_integer_primary_key_without_partition_key_aborts(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/BookWithCustomKey.*searchablePartitionKey/s');
+        $this->expectExceptionMessageMatches('/BookWithoutPartitionKey.*searchablePartitionKey/s');
 
-        RangePlanner::plan($this->source(BookWithCustomKey::class), 3, 2);
+        RangePlanner::plan($this->source(BookWithoutPartitionKey::class), 3, 2);
     }
 
     public function test_declared_partition_key_wins_and_null_values_get_a_bucket(): void

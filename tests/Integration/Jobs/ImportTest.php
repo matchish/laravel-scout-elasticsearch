@@ -66,14 +66,10 @@ class ImportTest extends IntegrationTestCase
         dispatch($job);
 
         $this->assertEquals([
-            'Clean up 1/8',
-            'Create write index 2/8',
-            'Indexing... 3/8',
-            'Indexing... 4/8',
-            'Indexing... 5/8',
-            'Indexing... 6/8',
-            'Refreshing index 7/8',
-            'Switching to the new index 8/8',
+            'Stop previous import 1/4',
+            'Clean up 2/4',
+            'Create write index 3/4',
+            'Indexing... 4/4',
         ], $output->getLogs());
     }
 }
