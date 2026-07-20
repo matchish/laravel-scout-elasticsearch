@@ -7,6 +7,7 @@ use Laravel\Scout\Builder;
 use ONGR\ElasticsearchDSL\BuilderInterface;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\FullText\QueryStringQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\RangeQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermsQuery;
 use ONGR\ElasticsearchDSL\Search;
@@ -70,11 +71,42 @@ final class SearchFactory
     private static function addWheres($builder, $boolQuery): BoolQuery
     {
         if (static::hasWheres($builder)) {
-            foreach ($builder->wheres as $field => $value) {
-                if (! ($value instanceof BuilderInterface)) {
-                    $value = new TermQuery((string) $field, $value);
+            foreach ($builder->wheres as $field => $where) {
+                if (is_array($where) && isset($where['field'])) {
+                    $field = $where['field'];
                 }
-                $boolQuery->add($value, BoolQuery::FILTER);
+
+                if (is_array($where) && isset($where['value']) && $where['value'] instanceof BuilderInterface) {
+                    if ($where['operator'] === '!=') {
+                        $boolQuery->add($where['value'], BoolQuery::MUST_NOT);
+                        continue;
+                    }
+                    $where = $where['value'];
+                }
+
+                if (is_array($where) && isset($where['field'])) {
+                    // Post v11.1.0 scout
+                    $operator = $where['operator'];
+
+                    if ($operator === '!=') {
+                        $boolQuery->add(new TermQuery((string) $field, $where['value']), BoolQuery::MUST_NOT);
+                        continue;
+                    }
+
+                    $where = match ($operator) {
+                        '=' => new TermQuery((string) $field, $where['value']),
+                        '>' => new RangeQuery((string) $field, [RangeQuery::GT => $where['value']]),
+                        '>=' => new RangeQuery((string) $field, [RangeQuery::GTE => $where['value']]),
+                        '<' => new RangeQuery((string) $field, [RangeQuery::LT => $where['value']]),
+                        '<=' => new RangeQuery((string) $field, [RangeQuery::LTE => $where['value']]),
+                        default => $where
+                    };
+                }
+
+                if (! ($where instanceof BuilderInterface)) {
+                    $where = new TermQuery((string) $field, $where);
+                }
+                $boolQuery->add($where, BoolQuery::FILTER);
             }
         }
 
