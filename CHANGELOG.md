@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 - The custom job tracking subsystem used by parallel import (`TrackedJob` model, `tracked_jobs` table and migration, `elasticsearch.tracked_jobs` config) — superseded by Laravel job batching.
 - Round-robin parallel queues (`elasticsearch-parallel-N`, `scout.chunk.handlers`) — the new design uses one queue with any number of workers.
 
+### Upgrading from 8.0.0-alpha.4
+- The `tracked_jobs` table is no longer used. If you ran the alpha's migration, you may drop the table with a migration of your own (`Schema::dropIfExists('tracked_jobs')`). Do **not** drop it if you also use the `mateusjunges/laravel-trackable-jobs` package — it stores its own data in a table with the same name.
+- Parallel import now needs the standard `job_batches` table instead (shipped by default since Laravel 11; on older versions run `php artisan queue:batches-table && php artisan migrate`).
+
 ## [8.0.0-alpha.3] - 2026-02-09
 ### Changed
 - The usage of mateusjunges/laravel-trackable-jobs package for parallel import
