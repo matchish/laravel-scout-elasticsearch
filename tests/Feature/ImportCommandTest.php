@@ -99,6 +99,34 @@ final class ImportCommandTest extends IntegrationTestCase
         $this->assertEquals($productsAmount, $response['hits']['total']['value']);
     }
 
+    public function test_import_entites_in_parallel_with_catch_up(): void
+    {
+        $this->app['config']->set('scout.queue', ['connection' => 'sync', 'queue' => 'scout']);
+
+        $dispatcher = Product::getEventDispatcher();
+        Product::unsetEventDispatcher();
+
+        $productsAmount = random_int(1, 5);
+        factory(Product::class, $productsAmount)->create();
+
+        Product::setEventDispatcher($dispatcher);
+
+        Artisan::call('scout:import', [
+            '--parallel' => true,
+            '--catch-up' => true,
+        ]);
+        $params = [
+            'index' => 'products',
+            'body' => [
+                'query' => [
+                    'match_all' => new stdClass(),
+                ],
+            ],
+        ];
+        $response = $this->elasticsearch->search($params);
+        $this->assertEquals($productsAmount, $response['hits']['total']['value']);
+    }
+
     public function test_import_all_pages(): void
     {
         $dispatcher = Product::getEventDispatcher();

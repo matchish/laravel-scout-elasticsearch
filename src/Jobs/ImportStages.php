@@ -22,9 +22,10 @@ class ImportStages extends Collection
     /**
      * @param  ImportSource  $source
      * @param  bool  $parallel
+     * @param  bool  $catchUp
      * @return self
      */
-    public static function fromSource(ImportSource $source, bool $parallel = false)
+    public static function fromSource(ImportSource $source, bool $parallel = false, bool $catchUp = false)
     {
         $index = Index::fromSource($source);
 
@@ -34,7 +35,7 @@ class ImportStages extends Collection
                 new CancelPreviousImport($source),
                 new CleanUp($source),
                 new CreateWriteIndex($source, $index),
-                new DispatchImportRanges($source, $index),
+                new DispatchImportRanges($source, $index, $catchUp),
             ];
         } else {
             /** @var array<StageInterface> $stages */

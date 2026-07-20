@@ -37,10 +37,16 @@ final class DispatchImportRanges implements StageInterface
      */
     private $index;
 
-    public function __construct(ImportSource $source, Index $index)
+    /**
+     * @var bool
+     */
+    private $catchUp;
+
+    public function __construct(ImportSource $source, Index $index, bool $catchUp = false)
     {
         $this->source = $source;
         $this->index = $index;
+        $this->catchUp = $catchUp;
     }
 
     public function handle(Client $elasticsearch): void
@@ -59,6 +65,7 @@ final class DispatchImportRanges implements StageInterface
         $configChunksPerRange = config('elasticsearch.parallel.chunks_per_range', self::DEFAULT_CHUNKS_PER_RANGE);
         $chunksPerRange = is_numeric($configChunksPerRange) ? (int) $configChunksPerRange : self::DEFAULT_CHUNKS_PER_RANGE;
 
+        $since = $this->catchUp ? new \DateTimeImmutable('now') : null;
         $plan = RangePlanner::plan($source, $chunkSize, $chunksPerRange);
 
         $index = $this->index;
@@ -66,7 +73,7 @@ final class DispatchImportRanges implements StageInterface
         $queue = $this->source->syncWithSearchUsingQueue();
 
         if ($plan->isEmpty()) {
-            self::dispatchFinish($this->source, $index, $connection, $queue);
+            self::dispatchFinish($this->source, $index, $connection, $queue, $since);
 
             return;
         }
@@ -80,8 +87,8 @@ final class DispatchImportRanges implements StageInterface
         $importSource = $source;
         $batch = Bus::batch($jobs)
             ->name('scout-import:'.$importSource->searchableAs())
-            ->then(function (Batch $batch) use ($importSource, $index, $connection, $queue) {
-                self::dispatchFinish($importSource, $index, $connection, $queue);
+            ->then(function (Batch $batch) use ($importSource, $index, $connection, $queue, $since) {
+                self::dispatchFinish($importSource, $index, $connection, $queue, $since);
             });
 
         if ($connection !== null) {
@@ -94,9 +101,9 @@ final class DispatchImportRanges implements StageInterface
         $batch->dispatch();
     }
 
-    private static function dispatchFinish(ImportSource $source, Index $index, ?string $connection, ?string $queue): void
+    private static function dispatchFinish(ImportSource $source, Index $index, ?string $connection, ?string $queue, ?\DateTimeInterface $catchUpSince = null): void
     {
-        $finish = FinishImport::dispatch($source, $index);
+        $finish = FinishImport::dispatch($source, $index, $catchUpSince);
         if ($connection !== null) {
             $finish->onConnection($connection);
         }
