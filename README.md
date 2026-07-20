@@ -200,7 +200,40 @@ The command creates new temporary index, imports all models to it, and then swit
 ### Parallel import
 When importing massive amounts of data, you can use the option `--parallel` to speed up the import process.
 
-The parallel import is being rebuilt on top of Laravel job batching. Documentation for the new setup will land together with the implementation.
+```bash
+php artisan scout:import --parallel
+```
+
+How it works:
+
+1. The import reads `MIN` and `MAX` of the partition key and splits the data into many small key ranges. It needs only one cheap query — no scan of the whole table.
+2. Every range becomes one queued job in a [job batch](https://laravel.com/docs/queues#job-batching). The jobs run on your queue workers, so parallelism equals the number of workers you run.
+3. When the batch finishes, the new index is refreshed and the alias switches atomically — zero downtime, same as a normal import.
+
+#### Requirements
+
+- **The `job_batches` table.** Laravel 11+ ships this migration by default. On older versions run `php artisan queue:batches-table && php artisan migrate`.
+- **Queue workers.** Start any amount of workers on your Scout queue; more workers means a faster import:
+
+  ```bash
+  php artisan queue:work --queue=scout
+  ```
+- **A numeric partition key.** Models with an integer primary key work with zero configuration. Any other model (for example with UUID keys) must declare a numeric, indexed, immutable column:
+
+  ```php
+  public function searchablePartitionKey(): string
+  {
+      return 'legacy_id';
+  }
+  ```
+
+  Rows where the column is `NULL` are imported by a dedicated job, but a non-null column is faster. Do **not** use a mutable column such as `updated_at`: if the value changes during the import, rows can be imported twice or skipped.
+
+#### Behaviour notes
+
+- Starting a new `--parallel` import for an index cancels a still-running one — the new import supersedes it safely.
+- Live model changes during the import are indexed through Scout observers as usual. If your application also writes to the database without Eloquent events, add `--catch-up`: right before the alias switch, rows with `updated_at` newer than the import start are re-imported.
+- `elasticsearch.parallel.chunks_per_range` (default `8`) controls the range size: each range job processes about `chunks_per_range × scout.chunk.searchable` rows.
 
 ### Search
 

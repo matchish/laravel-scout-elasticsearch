@@ -82,6 +82,39 @@ final class ImportRangeTest extends IntegrationTestCase
         $this->assertCount(3, $this->indexedIds());
     }
 
+    public function test_rows_deleted_after_planning_do_not_block_completion(): void
+    {
+        $ids = $this->createProducts(10);
+        \Illuminate\Support\Facades\DB::table('products')
+            ->whereIn('id', array_slice($ids, 5))
+            ->delete();
+
+        $this->runJob(Product::class, Range::between($ids[0], null), 'id', 3);
+
+        $this->assertCount(5, $this->indexedIds());
+    }
+
+    public function test_cancelled_batch_stops_the_job_before_importing(): void
+    {
+        $this->createProducts(5);
+        /** @var \Illuminate\Bus\BatchRepository $repository */
+        $repository = app(\Illuminate\Bus\BatchRepository::class);
+        $batch = $repository->store(\Illuminate\Support\Facades\Bus::batch([])->name('scout-import:products'));
+        $repository->cancel($batch->id);
+
+        try {
+            $this->elasticsearch->indices()->create(['index' => self::INDEX]);
+        } catch (\Exception $e) {
+            // index exists
+        }
+        $source = DefaultImportSourceFactory::from(Product::class);
+        $job = new ImportRange($source, Range::between(1, null), 'id', self::INDEX, 500);
+        $job->withBatchId($batch->id);
+        $job->handle($this->elasticsearch);
+
+        $this->assertCount(0, $this->indexedIds());
+    }
+
     public function test_writes_to_the_concrete_index_not_the_alias(): void
     {
         $this->elasticsearch->indices()->create([
