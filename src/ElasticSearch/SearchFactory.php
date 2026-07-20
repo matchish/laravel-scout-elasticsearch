@@ -88,19 +88,19 @@ final class SearchFactory
                     // Post v11.1.0 scout
                     $operator = $where['operator'];
 
+                    if ($operator === '!=') {
+                        $boolQuery->add(new TermQuery((string) $field, $where['value']), BoolQuery::MUST_NOT);
+                        continue;
+                    }
+
                     $where = match ($operator) {
-                        '=', '!=' => new TermQuery((string) $field, $where['value']),
+                        '=' => new TermQuery((string) $field, $where['value']),
                         '>' => new RangeQuery((string) $field, [RangeQuery::GT => $where['value']]),
                         '>=' => new RangeQuery((string) $field, [RangeQuery::GTE => $where['value']]),
                         '<' => new RangeQuery((string) $field, [RangeQuery::LT => $where['value']]),
                         '<=' => new RangeQuery((string) $field, [RangeQuery::LTE => $where['value']]),
                         default => $where
                     };
-
-                    if ($operator === '!=') {
-                        $boolQuery->add($where, BoolQuery::MUST_NOT);
-                        continue;
-                    }
                 }
 
                 if (! ($where instanceof BuilderInterface)) {
