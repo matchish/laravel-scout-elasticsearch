@@ -31,6 +31,14 @@ final class Import
      */
     public $catchUp = false;
 
+    /**
+     * Follow the range jobs and report their progress. Safe only when
+     * the import itself does not occupy a queue worker.
+     *
+     * @var bool
+     */
+    public $watchProgress = false;
+
     public ?int $timeout = null;
 
     /**
@@ -74,6 +82,11 @@ final class Import
      */
     private function stages(): Collection
     {
-        return ImportStages::fromSource($this->source, $this->parallel, $this->catchUp);
+        return ImportStages::fromSource(
+            $this->source,
+            parallel: $this->parallel,
+            catchUp: $this->catchUp,
+            watch: $this->watchProgress,
+        );
     }
 }

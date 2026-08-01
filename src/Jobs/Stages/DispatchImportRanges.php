@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elastic\Elasticsearch\Client;
-use Illuminate\Bus\Batch;
 use Illuminate\Support\Facades\Bus;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Jobs\FinishImport;
@@ -13,13 +12,15 @@ use Matchish\ScoutElasticSearch\Jobs\ImportRange;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 use Matchish\ScoutElasticSearch\Searchable\Partitionable;
 use Matchish\ScoutElasticSearch\Searchable\Range;
+use Matchish\ScoutElasticSearch\Searchable\RangePlan;
 use Matchish\ScoutElasticSearch\Searchable\RangePlanner;
 
 /**
  * Plans the key ranges and dispatches one ImportRange job per range
  * as a named batch. When the batch finishes, FinishImport refreshes
  * the new index and switches the aliases. The stage never waits for
- * the batch, so a worker running the import cannot deadlock itself.
+ * the batch, so a worker running the import cannot deadlock itself;
+ * WaitForImportRanges does the waiting when it is safe.
  *
  * @internal
  */
@@ -42,6 +43,16 @@ final class DispatchImportRanges implements StageInterface
      */
     private $finish;
 
+    /**
+     * @var RangePlan|null
+     */
+    private $plan;
+
+    /**
+     * @var string|null
+     */
+    private $batchId;
+
     public function __construct(ImportSource $source, Index $index, FinishImport $finish)
     {
         $this->source = $source;
@@ -49,8 +60,18 @@ final class DispatchImportRanges implements StageInterface
         $this->finish = $finish;
     }
 
-    public function handle(Client $elasticsearch): void
+    /**
+     * The plan is computed once and reused. Asking for it early — the
+     * progress bar needs the range count before the import starts —
+     * also surfaces an unusable partition key before any index is
+     * created.
+     */
+    public function plan(): RangePlan
     {
+        if ($this->plan !== null) {
+            return $this->plan;
+        }
+
         $source = $this->source;
         if (! $source instanceof Partitionable) {
             throw new \InvalidArgumentException(sprintf(
@@ -60,12 +81,26 @@ final class DispatchImportRanges implements StageInterface
             ));
         }
 
-        $configChunkSize = config('scout.chunk.searchable', 500);
-        $chunkSize = is_numeric($configChunkSize) ? (int) $configChunkSize : 500;
         $configChunksPerRange = config('elasticsearch.parallel.chunks_per_range', self::DEFAULT_CHUNKS_PER_RANGE);
         $chunksPerRange = is_numeric($configChunksPerRange) ? (int) $configChunksPerRange : self::DEFAULT_CHUNKS_PER_RANGE;
 
-        $plan = RangePlanner::plan($source, $chunkSize, $chunksPerRange);
+        return $this->plan = RangePlanner::plan($source, $this->chunkSize(), $chunksPerRange);
+    }
+
+    /**
+     * The id of the dispatched batch, or null when nothing was
+     * dispatched because the source held no rows.
+     */
+    public function batchId(): ?string
+    {
+        return $this->batchId;
+    }
+
+    public function handle(?Client $elasticsearch = null): void
+    {
+        $plan = $this->plan();
+        /** @var Partitionable $source */
+        $source = $this->source;
 
         $index = $this->index;
         $connection = $this->source->syncWithSearchUsing();
@@ -79,13 +114,14 @@ final class DispatchImportRanges implements StageInterface
         }
 
         $column = $plan->column();
+        $chunkSize = $this->chunkSize();
         $jobs = array_map(function (Range $range) use ($source, $column, $index, $chunkSize) {
             return new ImportRange($source, $range, $column, $index->name(), $chunkSize);
         }, $plan->ranges());
 
         $batch = Bus::batch($jobs)
             ->name('scout-import:'.$this->source->searchableAs())
-            ->then(function (Batch $batch) use ($finish, $connection, $queue) {
+            ->then(function () use ($finish, $connection, $queue) {
                 self::dispatchFinish($finish, $connection, $queue);
             });
 
@@ -96,7 +132,14 @@ final class DispatchImportRanges implements StageInterface
             $batch->onQueue($queue);
         }
 
-        $batch->dispatch();
+        $this->batchId = $batch->dispatch()->id;
+    }
+
+    private function chunkSize(): int
+    {
+        $configChunkSize = config('scout.chunk.searchable', 500);
+
+        return is_numeric($configChunkSize) ? (int) $configChunkSize : 500;
     }
 
     private static function dispatchFinish(FinishImport $finish, ?string $connection, ?string $queue): void
@@ -112,7 +155,7 @@ final class DispatchImportRanges implements StageInterface
 
     public function title(): string
     {
-        return 'Indexing...';
+        return 'Planning ranges';
     }
 
     public function estimate(): int

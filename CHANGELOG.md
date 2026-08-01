@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 - `searchablePartitionKey()`: models without an integer primary key declare a numeric column to enable parallel import. `NULL` values are covered by a dedicated null-bucket job.
 - `--catch-up` option for `scout:import --parallel`: re-imports rows changed during the import (by `updated_at`) right before the alias switch, for applications that write to the database without Eloquent events.
 - `elasticsearch.parallel.chunks_per_range` config (default `8`) controlling how much work one range job carries.
+- Live progress for `--parallel`: the console follows the batch and advances the bar as range jobs finish, and reports an error without switching the alias when any of them fail. Set `scout.queue` to keep the old fire-and-forget behaviour.
 
 ### Changed
 - Parallel import was rebuilt on Laravel job batching (`Bus::batch()`): key ranges are computed up front with one aggregate query and imported by independent queued jobs on a single shared queue. Range jobs write to the concrete index name instead of the write alias, so jobs of a superseded import can never pollute a newer index. A new `--parallel` import cancels a still-running one for the same index. Requires the `job_batches` table (shipped by default since Laravel 11).

@@ -70,6 +70,10 @@ final class ImportCommand extends Command
         }
         $job->parallel = $parallel;
         $job->catchUp = $catchUp;
+        // Without scout.queue the import runs here, in the console, so it
+        // can follow the range jobs. Queued, it would run on a worker and
+        // waiting there could block the very worker the range jobs need.
+        $job->watchProgress = $parallel && ! config('scout.queue');
 
         if (config('scout.queue')) {
             $job = (new QueueableJob())->chain([$job]);

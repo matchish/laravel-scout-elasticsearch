@@ -233,6 +233,8 @@ How it works:
 
 #### Behaviour notes
 
+- The command follows the range jobs and shows how many have finished, so you can watch the import progress. It exits when the last range is done. If you would rather start the import and return to the shell immediately, set `scout.queue` — the whole import then runs on a worker.
+- If range jobs fail, the command stops with an error and the alias is **not** switched, so searches keep using the old index.
 - Starting a new `--parallel` import for an index cancels a still-running one — the new import supersedes it safely.
 - Live model changes during the import are indexed through Scout observers as usual. If your application also writes to the database without Eloquent events, add `--catch-up`: right before the alias switch, rows with `updated_at` newer than the import start are re-imported.
 - `elasticsearch.parallel.chunks_per_range` (default `8`) controls the range size: each range job processes about `chunks_per_range × scout.chunk.searchable` rows.
