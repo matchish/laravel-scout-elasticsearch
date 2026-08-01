@@ -62,6 +62,8 @@ Use composer to install the package:
 composer require matchish/laravel-scout-elasticsearch
 ```
 
+Already using version 7? See the [upgrade guide](UPGRADE.md) — for most projects 8.0 is a drop-in upgrade.
+
 Set env variables
 ```
 SCOUT_DRIVER=Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine

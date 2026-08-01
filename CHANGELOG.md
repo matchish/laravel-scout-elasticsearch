@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
+> Upgrading from 7.x or from an 8.0 alpha? See [UPGRADE.md](UPGRADE.md).
+
 ### Added
 - `searchablePartitionKey()`: models without an integer primary key declare a numeric column to enable parallel import. `NULL` values are covered by a dedicated null-bucket job.
 - `--catch-up` option for `scout:import --parallel`: re-imports rows changed during the import (by `updated_at`) right before the alias switch, for applications that write to the database without Eloquent events.
@@ -17,9 +19,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 - The custom job tracking subsystem used by parallel import (`TrackedJob` model, `tracked_jobs` table and migration, `elasticsearch.tracked_jobs` config) — superseded by Laravel job batching.
 - Round-robin parallel queues (`elasticsearch-parallel-N`, `scout.chunk.handlers`) — the new design uses one queue with any number of workers.
 
-### Upgrading from 8.0.0-alpha.4
-- The `tracked_jobs` table is no longer used. If you ran the alpha's migration, you may drop the table with a migration of your own (`Schema::dropIfExists('tracked_jobs')`). Do **not** drop it if you also use the `mateusjunges/laravel-trackable-jobs` package — it stores its own data in a table with the same name.
-- Parallel import now needs the standard `job_batches` table instead (shipped by default since Laravel 11; on older versions run `php artisan queue:batches-table && php artisan migrate`).
+### Upgrading
+- Full instructions, including the two interface changes that affect custom `HitsIteratorAggregate` and `ImportSource` implementations, are in [UPGRADE.md](UPGRADE.md).
+- Alpha testers: the `tracked_jobs` table is no longer used, and parallel import now needs the standard `job_batches` table instead.
 
 ## [8.0.0-alpha.3] - 2026-02-09
 ### Changed
