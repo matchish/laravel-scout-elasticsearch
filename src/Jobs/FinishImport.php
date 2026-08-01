@@ -9,16 +9,12 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Matchish\ScoutElasticSearch\ElasticSearch\Index;
-use Matchish\ScoutElasticSearch\Jobs\Stages\CatchUp;
-use Matchish\ScoutElasticSearch\Jobs\Stages\RefreshIndex;
-use Matchish\ScoutElasticSearch\Jobs\Stages\SwitchToNewAndRemoveOldIndex;
-use Matchish\ScoutElasticSearch\Searchable\ImportSource;
+use Matchish\ScoutElasticSearch\Jobs\Stages\StageInterface;
 
 /**
- * Runs after every ImportRange job of a parallel import has finished:
- * optionally catches up rows changed during the import, refreshes
- * the new index, and atomically switches the aliases to it.
+ * Runs the tail of a parallel import after every ImportRange job of
+ * the batch has finished. The stages it runs are composed in
+ * ImportStages, next to the rest of the pipeline.
  *
  * @internal
  */
@@ -27,33 +23,22 @@ final class FinishImport implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable;
 
     /**
-     * @var ImportSource
+     * @var array<StageInterface>
      */
-    private $source;
+    private $stages;
 
     /**
-     * @var Index
+     * @param  array<StageInterface>  $stages
      */
-    private $index;
-
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $catchUpSince;
-
-    public function __construct(ImportSource $source, Index $index, ?\DateTimeInterface $catchUpSince = null)
+    public function __construct(array $stages)
     {
-        $this->source = $source;
-        $this->index = $index;
-        $this->catchUpSince = $catchUpSince;
+        $this->stages = $stages;
     }
 
     public function handle(Client $elasticsearch): void
     {
-        if ($this->catchUpSince !== null) {
-            (new CatchUp($this->source, $this->index, $this->catchUpSince))->handle($elasticsearch);
+        foreach ($this->stages as $stage) {
+            $stage->handle($elasticsearch);
         }
-        (new RefreshIndex($this->index))->handle($elasticsearch);
-        (new SwitchToNewAndRemoveOldIndex($this->source, $this->index))->handle($elasticsearch);
     }
 }

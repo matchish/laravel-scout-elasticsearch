@@ -38,15 +38,15 @@ final class DispatchImportRanges implements StageInterface
     private $index;
 
     /**
-     * @var bool
+     * @var FinishImport
      */
-    private $catchUp;
+    private $finish;
 
-    public function __construct(ImportSource $source, Index $index, bool $catchUp = false)
+    public function __construct(ImportSource $source, Index $index, FinishImport $finish)
     {
         $this->source = $source;
         $this->index = $index;
-        $this->catchUp = $catchUp;
+        $this->finish = $finish;
     }
 
     public function handle(Client $elasticsearch): void
@@ -65,15 +65,15 @@ final class DispatchImportRanges implements StageInterface
         $configChunksPerRange = config('elasticsearch.parallel.chunks_per_range', self::DEFAULT_CHUNKS_PER_RANGE);
         $chunksPerRange = is_numeric($configChunksPerRange) ? (int) $configChunksPerRange : self::DEFAULT_CHUNKS_PER_RANGE;
 
-        $since = $this->catchUp ? new \DateTimeImmutable('now') : null;
         $plan = RangePlanner::plan($source, $chunkSize, $chunksPerRange);
 
         $index = $this->index;
         $connection = $this->source->syncWithSearchUsing();
         $queue = $this->source->syncWithSearchUsingQueue();
+        $finish = $this->finish;
 
         if ($plan->isEmpty()) {
-            self::dispatchFinish($this->source, $index, $connection, $queue, $since);
+            self::dispatchFinish($finish, $connection, $queue);
 
             return;
         }
@@ -83,12 +83,10 @@ final class DispatchImportRanges implements StageInterface
             return new ImportRange($source, $range, $column, $index->name(), $chunkSize);
         }, $plan->ranges());
 
-        /** @var ImportSource $importSource */
-        $importSource = $source;
         $batch = Bus::batch($jobs)
-            ->name('scout-import:'.$importSource->searchableAs())
-            ->then(function (Batch $batch) use ($importSource, $index, $connection, $queue, $since) {
-                self::dispatchFinish($importSource, $index, $connection, $queue, $since);
+            ->name('scout-import:'.$this->source->searchableAs())
+            ->then(function (Batch $batch) use ($finish, $connection, $queue) {
+                self::dispatchFinish($finish, $connection, $queue);
             });
 
         if ($connection !== null) {
@@ -101,14 +99,14 @@ final class DispatchImportRanges implements StageInterface
         $batch->dispatch();
     }
 
-    private static function dispatchFinish(ImportSource $source, Index $index, ?string $connection, ?string $queue, ?\DateTimeInterface $catchUpSince = null): void
+    private static function dispatchFinish(FinishImport $finish, ?string $connection, ?string $queue): void
     {
-        $finish = FinishImport::dispatch($source, $index, $catchUpSince);
+        $pending = dispatch($finish);
         if ($connection !== null) {
-            $finish->onConnection($connection);
+            $pending->onConnection($connection);
         }
         if ($queue !== null) {
-            $finish->onQueue($queue);
+            $pending->onQueue($queue);
         }
     }
 

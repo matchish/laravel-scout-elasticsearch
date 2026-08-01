@@ -36,11 +36,16 @@ final class CatchUp implements StageInterface
      */
     private $since;
 
-    public function __construct(ImportSource $source, Index $index, \DateTimeInterface $since)
+    /**
+     * The catch-up window opens when the stage is composed, which
+     * happens right before the import starts running. An earlier
+     * timestamp only widens the window — the safe direction.
+     */
+    public function __construct(ImportSource $source, Index $index, ?\DateTimeInterface $since = null)
     {
         $this->source = $source;
         $this->index = $index;
-        $this->since = $since;
+        $this->since = $since ?? new \DateTimeImmutable('now');
     }
 
     public function handle(Client $elasticsearch): void
