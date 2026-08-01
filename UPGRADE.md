@@ -54,6 +54,7 @@ The alpha versions had a different parallel import. It was rebuilt before the st
 - The `tracked_jobs` table is no longer used. You may drop it with your own migration (`Schema::dropIfExists('tracked_jobs')`). **Do not drop it** if you also use the `mateusjunges/laravel-trackable-jobs` package — that package stores its own data in a table with the same name.
 - Remove the `elasticsearch.tracked_jobs` section from `config/elasticsearch.php`.
 - Remove the `scout.chunk.handlers` setting and stop running one worker per `elasticsearch-parallel-N` queue. The new import uses a single queue, so run several workers on that one queue instead.
+- Remove the `elasticsearch.queue.name` setting and the `SCOUT_QUEUE_NAME` variable from your `.env` file. They named the prefix of those per-worker queues. Range jobs now run on the queue the model already uses for Scout, which you set with `scout.queue`.
 - Parallel import now needs Laravel's standard `job_batches` table. Laravel 11 and newer ship it by default. On older versions run:
 
   ```bash

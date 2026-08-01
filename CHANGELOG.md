@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ### Removed
 - The custom job tracking subsystem used by parallel import (`TrackedJob` model, `tracked_jobs` table and migration, `elasticsearch.tracked_jobs` config) — superseded by Laravel job batching.
 - Round-robin parallel queues (`elasticsearch-parallel-N`, `scout.chunk.handlers`) — the new design uses one queue with any number of workers.
+- `elasticsearch.queue.name` (`SCOUT_QUEUE_NAME`) config parameter, added in `8.0.0-alpha.2` — it named the round-robin queue prefix, which no longer exists. Range jobs use the model's Scout queue.
 
 ### Upgrading
 - Full instructions, including the two interface changes that affect custom `HitsIteratorAggregate` and `ImportSource` implementations, are in [UPGRADE.md](UPGRADE.md).
