@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elastic\Elasticsearch\Client;
+use Illuminate\Bus\Batch;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Bus;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Jobs\FinishImport;
@@ -122,8 +124,13 @@ final class DispatchImportRanges implements StageInterface
 
         $batch = Bus::batch($jobs)
             ->name(ImportBatches::name($this->source->searchableAs()))
-            ->then(function () use ($finish, $connection, $queue) {
-                self::dispatchFinish($finish, $connection, $queue);
+            ->then(function (Batch $batch) use ($finish, $connection, $queue) {
+                // A cancelled batch still reaches this callback, because
+                // Laravel counts its skipped jobs as successful.
+                if ($batch->cancelled()) {
+                    return;
+                }
+                self::dispatchFinish($finish->forBatch($batch->id), $connection, $queue);
             });
 
         if ($connection !== null) {
@@ -133,7 +140,15 @@ final class DispatchImportRanges implements StageInterface
             $batch->onQueue($queue);
         }
 
-        $this->batchId = $batch->dispatch()->id;
+        try {
+            $this->batchId = $batch->dispatch()->id;
+        } catch (QueryException $e) {
+            throw new \RuntimeException(
+                'Parallel import stores its progress in Laravel\'s job batching table, which is missing. Create it with "php artisan queue:batches-table", run "php artisan migrate", and start the import again.',
+                0,
+                $e
+            );
+        }
     }
 
     private function chunkSize(): int

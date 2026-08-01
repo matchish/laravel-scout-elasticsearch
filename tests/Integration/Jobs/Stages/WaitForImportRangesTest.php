@@ -6,6 +6,7 @@ namespace Tests\Integration\Jobs\Stages;
 
 use App\Product;
 use Illuminate\Bus\BatchRepository;
+use Illuminate\Support\Facades\Schema;
 use Matchish\ScoutElasticSearch\Jobs\ImportStages;
 use Matchish\ScoutElasticSearch\Jobs\Stages\DispatchImportRanges;
 use Matchish\ScoutElasticSearch\Jobs\Stages\WaitForImportRanges;
@@ -67,6 +68,43 @@ final class WaitForImportRangesTest extends IntegrationTestCase
         $this->expectExceptionMessageMatches('/1 of 3 range jobs failed.*alias was not switched/s');
 
         $wait->handle();
+    }
+
+    public function test_superseded_import_stops_instead_of_reporting_success(): void
+    {
+        [$dispatch, $wait] = $this->dispatchedStages(9);
+        $batchId = $dispatch->batchId();
+        $this->assertNotNull($batchId);
+
+        app(BatchRepository::class)->cancel($batchId);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessageMatches('/cancelled.*newer import.*alias was not changed/s');
+
+        $wait->handle();
+    }
+
+    public function test_missing_batches_table_explains_how_to_create_it(): void
+    {
+        Schema::drop('job_batches');
+
+        $dispatcher = Product::getEventDispatcher();
+        Product::unsetEventDispatcher();
+        factory(Product::class, 3)->create();
+        Product::setEventDispatcher($dispatcher);
+
+        $stages = ImportStages::fromSource(
+            DefaultImportSourceFactory::from(Product::class),
+            parallel: true,
+        );
+        $dispatch = $stages->first(function ($stage) {
+            return $stage instanceof DispatchImportRanges;
+        });
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessageMatches('/queue:batches-table/');
+
+        $dispatch->handle($this->elasticsearch);
     }
 
     public function test_completes_immediately_when_the_source_is_empty(): void

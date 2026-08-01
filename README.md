@@ -235,7 +235,7 @@ How it works:
 
 - The command follows the range jobs and shows how many have finished, so you can watch the import progress. It exits when the last range is done. If you would rather start the import and return to the shell immediately, set `scout.queue` — the whole import then runs on a worker.
 - If range jobs fail, the command stops with an error and the alias is **not** switched, so searches keep using the old index.
-- Starting a new `--parallel` import for an index cancels a still-running one — the new import supersedes it safely.
+- Starting a new `--parallel` import for an index cancels a still-running one. The superseded import stops with a message and never switches the alias, so only the newest import can publish its index.
 
 #### Checking an import you are not watching
 

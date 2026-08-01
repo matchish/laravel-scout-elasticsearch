@@ -18,7 +18,7 @@ use Tests\IntegrationTestCase;
 
 final class ImportCommandTest extends IntegrationTestCase
 {
-    public function test_import_entites(): void
+    public function test_import_entities(): void
     {
         $dispatcher = Product::getEventDispatcher();
         Product::unsetEventDispatcher();
@@ -47,7 +47,7 @@ final class ImportCommandTest extends IntegrationTestCase
         $this->assertEquals($productsAmount, $response['hits']['total']['value']);
     }
 
-    public function test_import_entites_in_queue(): void
+    public function test_import_entities_in_queue(): void
     {
         $this->app['config']->set('scout.queue', ['connection' => 'sync', 'queue' => 'scout']);
 
@@ -72,7 +72,7 @@ final class ImportCommandTest extends IntegrationTestCase
         $this->assertEquals($productsAmount, $response['hits']['total']['value']);
     }
 
-    public function test_import_entites_in_parallel(): void
+    public function test_import_entities_in_parallel(): void
     {
         $this->app['config']->set('scout.queue', ['connection' => 'sync', 'queue' => 'scout']);
 
@@ -99,7 +99,7 @@ final class ImportCommandTest extends IntegrationTestCase
         $this->assertEquals($productsAmount, $response['hits']['total']['value']);
     }
 
-    public function test_import_entites_in_parallel_with_catch_up(): void
+    public function test_import_entities_in_parallel_with_catch_up(): void
     {
         $this->app['config']->set('scout.queue', ['connection' => 'sync', 'queue' => 'scout']);
 

@@ -78,6 +78,12 @@ final class WaitForImportRanges implements StageInterface
                 ));
             }
 
+            if ($batch->cancelled()) {
+                throw new \Exception(
+                    'This import was cancelled before it finished, most likely because a newer import for the same index started. The search alias was not changed.'
+                );
+            }
+
             return;
         }
 

@@ -12,7 +12,7 @@ use Tests\IntegrationTestCase;
 
 final class PullFromSourceTest extends IntegrationTestCase
 {
-    public function test_put_all_entites_to_index(): void
+    public function test_put_all_entities_to_index(): void
     {
         $dispatcher = Product::getEventDispatcher();
         Product::unsetEventDispatcher();
