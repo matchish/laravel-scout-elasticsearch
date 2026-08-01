@@ -236,6 +236,28 @@ How it works:
 - The command follows the range jobs and shows how many have finished, so you can watch the import progress. It exits when the last range is done. If you would rather start the import and return to the shell immediately, set `scout.queue` — the whole import then runs on a worker.
 - If range jobs fail, the command stops with an error and the alias is **not** switched, so searches keep using the old index.
 - Starting a new `--parallel` import for an index cancels a still-running one — the new import supersedes it safely.
+
+#### Checking an import you are not watching
+
+Whenever you cannot see the progress bar — the import runs on a worker, or you closed the terminal — ask for its status:
+
+```bash
+php artisan scout:import:status
+```
+
+```
++----------+---------+----------+--------+--------+----------------+
+| Index    | Status  | Progress | Ranges | Failed | Started        |
++----------+---------+----------+--------+--------+----------------+
+| products | running | 45%      | 9/20   | 0      | 2 minutes ago  |
++----------+---------+----------+--------+--------+----------------+
+```
+
+Pass a model name to check one index, for example `php artisan scout:import:status "App\Models\Product"`.
+
+Closing the terminal never stops an import. The range jobs are already on the queue, and the alias switch runs on a worker when the last one finishes.
+
+If you use [Laravel Horizon](https://laravel.com/docs/horizon), the same import appears on its Batches screen, named `scout-import:{index}`.
 - Live model changes during the import are indexed through Scout observers as usual. If your application also writes to the database without Eloquent events, add `--catch-up`: right before the alias switch, rows with `updated_at` newer than the import start are re-imported.
 - `elasticsearch.parallel.chunks_per_range` (default `8`) controls the range size: each range job processes about `chunks_per_range × scout.chunk.searchable` rows.
 

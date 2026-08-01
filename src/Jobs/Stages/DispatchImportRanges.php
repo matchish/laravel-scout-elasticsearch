@@ -8,6 +8,7 @@ use Elastic\Elasticsearch\Client;
 use Illuminate\Support\Facades\Bus;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Jobs\FinishImport;
+use Matchish\ScoutElasticSearch\Jobs\ImportBatches;
 use Matchish\ScoutElasticSearch\Jobs\ImportRange;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 use Matchish\ScoutElasticSearch\Searchable\Partitionable;
@@ -120,7 +121,7 @@ final class DispatchImportRanges implements StageInterface
         }, $plan->ranges());
 
         $batch = Bus::batch($jobs)
-            ->name('scout-import:'.$this->source->searchableAs())
+            ->name(ImportBatches::name($this->source->searchableAs()))
             ->then(function () use ($finish, $connection, $queue) {
                 self::dispatchFinish($finish, $connection, $queue);
             });

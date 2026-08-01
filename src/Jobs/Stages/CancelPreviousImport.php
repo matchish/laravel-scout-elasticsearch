@@ -5,11 +5,7 @@ declare(strict_types=1);
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elastic\Elasticsearch\Client;
-use Illuminate\Bus\BatchRepository;
-use Illuminate\Bus\DatabaseBatchRepository;
-use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\DB;
+use Matchish\ScoutElasticSearch\Jobs\ImportBatches;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 
 /**
@@ -32,36 +28,10 @@ final class CancelPreviousImport implements StageInterface
         $this->source = $source;
     }
 
-    public function handle(Client $elasticsearch): void
+    public function handle(?Client $elasticsearch = null): void
     {
-        if (! app(BatchRepository::class) instanceof DatabaseBatchRepository) {
-            return;
-        }
-
-        /** @var string $table */
-        $table = config('queue.batching.table', 'job_batches');
-        /** @var string|null $connection */
-        $connection = config('queue.batching.database');
-
-        try {
-            $ids = DB::connection($connection)
-                ->table($table)
-                ->where('name', 'scout-import:'.$this->source->searchableAs())
-                ->whereNull('cancelled_at')
-                ->whereNull('finished_at')
-                ->pluck('id');
-        } catch (QueryException $e) {
-            return; // the batches table does not exist yet — nothing to cancel
-        }
-
-        foreach ($ids as $id) {
-            if (! is_string($id) && ! is_int($id)) {
-                continue;
-            }
-            $batch = Bus::findBatch((string) $id);
-            if ($batch !== null) {
-                $batch->cancel();
-            }
+        foreach (ImportBatches::unfinished($this->source->searchableAs()) as $batch) {
+            $batch->cancel();
         }
     }
 

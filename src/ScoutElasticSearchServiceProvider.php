@@ -10,6 +10,7 @@ use Laravel\Scout\EngineManager;
 use Laravel\Scout\ScoutServiceProvider;
 use Matchish\ScoutElasticSearch\Console\Commands\FlushCommand;
 use Matchish\ScoutElasticSearch\Console\Commands\ImportCommand;
+use Matchish\ScoutElasticSearch\Console\Commands\ImportStatusCommand;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
 use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
 use Matchish\ScoutElasticSearch\Searchable\ImportSourceFactory;
@@ -50,6 +51,7 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 ImportCommand::class,
+                ImportStatusCommand::class,
                 FlushCommand::class,
             ]);
         }
