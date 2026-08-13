@@ -7,15 +7,8 @@ namespace Matchish\ScoutElasticSearch\Searchable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Laravel\Scout\Searchable;
-use PhpParser\Error;
-use PhpParser\Node;
-use PhpParser\Node\Name;
-use PhpParser\Node\Stmt\Class_;
-use PhpParser\NodeFinder;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor\NameResolver;
-use PhpParser\ParserFactory;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 final class SearchableListFactory
 {
@@ -94,45 +87,33 @@ final class SearchableListFactory
     }
 
     /**
+     * List every class that may be declared under the app path.
+     *
+     * The class name is derived from the file path with the PSR-4 convention,
+     * the same way Laravel resolves models in its own `model:prune` command.
+     * Names that do not resolve are dropped later by `canAnalyzeClass()`.
+     *
      * @return Collection<int, string>
      */
     private function getProjectClasses(): Collection
     {
-        /** @var Class_[] $nodes */
-        $nodes = (new NodeFinder())->find($this->getStmts(), function (Node $node) {
-            return $node instanceof Class_;
-        });
+        $files = Finder::create()->files()->name('*.php')->in($this->appPath);
 
-        return Collection::make($nodes)->map(function (Class_ $node) {
-            $namespace = $node->namespacedName;
-            if ($namespace instanceof Name) {
-                return $namespace->toCodeString();
-            }
-        });
+        return Collection::make($files)
+            ->map(function (SplFileInfo $file): string {
+                return $this->classFromFile($file);
+            })
+            ->values();
     }
 
     /**
-     * @return array<\PhpParser\Node>
+     * Build the fully qualified class name a PSR-4 autoloader would map the file to.
      */
-    private function getStmts(): array
+    private function classFromFile(SplFileInfo $file): string
     {
-        $parser = (new ParserFactory())->createForHostVersion();
-        $nameResolverVisitor = new NameResolver();
-        $nodeTraverser = new NodeTraverser();
-        $nodeTraverser->addVisitor($nameResolverVisitor);
-        $stmts = [];
-        foreach (Finder::create()->files()->name('*.php')->in($this->appPath) as $file) {
-            try {
-                $stmts[] = $parser->parse($file->getContents());
-            } catch (Error $e) {
-                $this->errors[] = $e->getMessage();
-            }
-        }
+        $relativePath = Str::replaceLast('.php', '', $file->getRelativePathname());
 
-        $stmts = Collection::make($stmts)->flatten(1)->toArray();
-
-        /** @var \PhpParser\Node[] $stmts */
-        return $nodeTraverser->traverse($stmts);
+        return $this->namespace.str_replace(['/', DIRECTORY_SEPARATOR], '\\', $relativePath);
     }
 
     /**
