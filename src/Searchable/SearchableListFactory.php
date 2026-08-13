@@ -98,8 +98,21 @@ final class SearchableListFactory
     private function getProjectClasses(): Collection
     {
         $files = Finder::create()->files()->name('*.php')->in($this->appPath);
+        $included = array_flip(get_included_files());
 
         return Collection::make($files)
+            ->reject(function (SplFileInfo $file) use ($included): bool {
+                // A file that is already loaded but declares no class under its
+                // conventional name (a helpers file, or a class that does not
+                // match its path) must not be probed. The autoloader would
+                // include it a second time, and a redeclared function or class
+                // is a fatal error that cannot be caught.
+                $path = $file->getRealPath();
+
+                return $path !== false
+                    && isset($included[$path])
+                    && ! class_exists($this->classFromFile($file), false);
+            })
             ->map(function (SplFileInfo $file): string {
                 return $this->classFromFile($file);
             })
