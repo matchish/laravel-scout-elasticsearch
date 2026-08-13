@@ -113,7 +113,7 @@ final class SearchableListFactory
     {
         $relativePath = Str::replaceLast('.php', '', $file->getRelativePathname());
 
-        return $this->namespace.str_replace(['/', DIRECTORY_SEPARATOR], '\\', $relativePath);
+        return rtrim($this->namespace, '\\').'\\'.str_replace(['/', DIRECTORY_SEPARATOR], '\\', $relativePath);
     }
 
     /**
@@ -168,6 +168,10 @@ final class SearchableListFactory
             // Try to autoload, but catch any errors
             return class_exists($class, true);
         } catch (\Throwable $e) {
+            // A file that fails to load is worth reporting. A name that maps to
+            // no file at all, or to a trait, does not throw and stays quiet.
+            $this->errors[] = "Error loading class {$class}: ".$e->getMessage();
+
             return false;
         }
     }
