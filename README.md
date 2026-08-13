@@ -377,11 +377,164 @@ In this example you will get collection of `Ticket` and `Book` models where tick
 book title is `Barcelona`
 
 ### Working with results
-Often your response isn't collection of models but aggregations or models with higlights andd so on.
-In this case you can use the 'ElasticParams' trait within your model to acquire the returned model score and highlight.
-In case you need additional data witin your results you need to implement your own implementation of `HitsIteratorAggregate` and bind it in your service provider.
 
-[Here is a case](https://github.com/matchish/laravel-scout-elasticsearch/issues/28)
+Sometimes you need more than models in the result. For example, the highlighted text or the score of each hit.
+
+#### Score and highlights
+
+Add the `ElasticParams` trait to your model:
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
+use Matchish\ScoutElasticSearch\Traits\ElasticParams;
+
+class Product extends Model
+{
+    use Searchable, ElasticParams;
+}
+```
+
+Elasticsearch does not send highlights by default. Add a `Highlight` object to the search body in a callback:
+
+```php
+use ONGR\ElasticsearchDSL\Highlight\Highlight;
+
+$products = Product::search('zonga', function (\Elastic\Elasticsearch\Client $client, $body) {
+    $highlight = new Highlight();
+    $highlight->addField('title');
+    $highlight->addField('description');
+
+    $body->addHighlight($highlight);
+
+    return $client->search([
+        'index' => (new Product)->searchableAs(),
+        'body' => $body->toArray(),
+    ])->asArray();
+})->get();
+```
+
+Now you can read both values from every model:
+
+```php
+foreach ($products as $product) {
+    $product->getElasticsearchScore();     // 1.4508327
+    $product->getElasticsearchHighlight(); // ['title' => ['<em>zonga</em> sneakers']]
+}
+```
+
+The score is always there. The highlighted text is there only when you ask Elasticsearch for it.
+
+#### Other data from the response
+
+The trait gives you the score and the highlighted text. For anything else, build the result yourself.
+
+The engine builds the result collection with a `HitsIteratorAggregate` taken from the container. You can bind your own class there and put anything you want into the result.
+
+The example below keeps the whole hit on every model:
+
+```php
+namespace App\Search;
+
+use ArrayIterator;
+use Illuminate\Support\Collection;
+use Laravel\Scout\Builder;
+use Matchish\ScoutElasticSearch\ElasticSearch\HitsIteratorAggregate;
+
+final class HitsWithRawDataIteratorAggregate implements HitsIteratorAggregate
+{
+    /** @var array<mixed> */
+    private array $results;
+
+    /** @var callable|null */
+    private $callback;
+
+    /**
+     * @param  array<mixed>  $results
+     */
+    public function __construct(array $results, ?callable $callback = null)
+    {
+        $this->results = $results;
+        $this->callback = $callback;
+    }
+
+    public function getIterator(): ArrayIterator
+    {
+        $hits = $this->results['hits']['hits'] ?? [];
+
+        // MixedSearch can return hits of different classes.
+        // Group them by class and load each group with one query.
+        $models = collect($hits)
+            ->groupBy('_source.__class_name')
+            ->flatMap(function (Collection $classHits, string $class) {
+                $model = new $class;
+                $model->setKeyType('string');
+
+                $builder = new Builder($model, '');
+
+                // Keep the ->query() callback so eager loading still works.
+                if ($this->callback) {
+                    $builder->query($this->callback);
+                }
+
+                return $model->getScoutModelsByIds($builder, $classHits->pluck('_id')->all())
+                    ->keyBy(function ($model) use ($class) {
+                        return $class.'::'.$model->getScoutKey();
+                    });
+            });
+
+        // Sort the models in the same order as the hits.
+        $result = collect($hits)->map(function (array $hit) use ($models) {
+            $model = $models->get(($hit['_source']['__class_name'] ?? '').'::'.$hit['_id']);
+
+            // The document is in the index, but the model is not in the database.
+            if ($model === null) {
+                return null;
+            }
+
+            // Your class replaces EloquentHitsIteratorAggregate,
+            // so fill the ElasticParams trait here as well.
+            $model->setElasticsearchScore((float) ($hit['_score'] ?? 0));
+            $model->setElasticsearchHighlight($hit['highlight'] ?? []);
+
+            $model->hit = $hit;
+
+            return $model;
+        })->filter()->values()->all();
+
+        return new ArrayIterator($result);
+    }
+}
+```
+
+Bind the class in a service provider:
+
+```php
+use Matchish\ScoutElasticSearch\ElasticSearch\HitsIteratorAggregate;
+use App\Search\HitsWithRawDataIteratorAggregate;
+...
+public function register(): void
+{
+    $this->app->bind(HitsIteratorAggregate::class, HitsWithRawDataIteratorAggregate::class);
+}
+```
+
+Now every model carries its hit:
+
+```php
+foreach ($products as $product) {
+    $product->hit['_index'];
+    $product->hit['sort'] ?? null;
+}
+```
+
+#### Good to know
+
+- The engine creates your class with `makeWith(['results' => ..., 'callback' => ...])`. Do not change the constructor signature.
+- `$callback` is the callback from the Scout `->query()` method. Give it to the `Builder`. If you skip this, eager loading with `->query()` no longer works.
+- Your class replaces `EloquentHitsIteratorAggregate`. The `ElasticParams` trait is filled there, so the score and the highlighted text stay empty until you set them yourself. Remove those two lines if your model does not use the trait.
+- `$model->hit = ...` creates a normal model attribute. It appears in `toArray()`, and `save()` tries to write a `hit` column. To avoid this, declare `public array $hit = [];` in your model. Then PHP sets a real property, and Eloquent does not see an attribute.
+- Aggregations are in `$this->results['aggregations']`. You can read them in the same class. If you need only the raw response, call `->raw()` instead.
 
 ## :free: License
 Scout ElasticSearch is an open-sourced software licensed under the [MIT license](LICENSE.md).
