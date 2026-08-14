@@ -96,8 +96,17 @@ final class Index
         ];
         /** @var array<string> $settings */
         $settings = config($settingsConfigKey, config('elasticsearch.indices.settings.default', $defaultSettings));
-        /** @var array<string> $mappings */
-        $mappings = config($mappingsConfigKey, config('elasticsearch.indices.mappings.default'));
+        /** @var array<string, mixed> $mappings */
+        $mappings = config($mappingsConfigKey, config('elasticsearch.indices.mappings.default')) ?: [];
+
+        // Provenance marker: proves the index was created by this
+        // package, so cleanup may reclaim it once nothing routes to
+        // it. Cleanup never touches unmarked indices.
+        $meta = [];
+        if (isset($mappings['_meta']) && is_array($mappings['_meta'])) {
+            $meta = $mappings['_meta'];
+        }
+        $mappings['_meta'] = array_merge($meta, ['scout_import' => true]);
 
         return new static($name, $settings, $mappings);
     }

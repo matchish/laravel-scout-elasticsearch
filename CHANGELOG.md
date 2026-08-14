@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 - Live progress for `--parallel`: the console follows the batch and advances the bar as range jobs finish, and reports an error without switching the alias when any of them fail. Set `scout.queue` to keep the old fire-and-forget behaviour.
 - `scout:import:status` command showing the progress, range counts and failures of parallel imports — for imports running on workers, or after you closed the terminal.
 
+### Fixed
+- A range job of a superseded import could re-create its deleted index through Elasticsearch auto-creation, leaving a stranded index behind. Range and catch-up jobs now write through a per-import alias with `require_alias`: once the import is superseded or published, the alias is gone and a late write is rejected instead of resurrecting the index.
+- Indices leaked by a crashed import (created, then never finished or cleaned) are now reclaimed on the next import. New indices carry a `_meta.scout_import` provenance marker; cleanup deletes only marked indices that no alias routes to, so it can never touch an index the package did not create.
+
 ### Changed
 - Parallel import was rebuilt on Laravel job batching (`Bus::batch()`): key ranges are computed up front with one aggregate query and imported by independent queued jobs on a single shared queue. Range jobs write to the concrete index name instead of the write alias, so jobs of a superseded import can never pollute a newer index. A new `--parallel` import cancels a still-running one for the same index. Requires the `job_batches` table (shipped by default since Laravel 11).
 
