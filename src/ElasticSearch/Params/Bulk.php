@@ -28,11 +28,19 @@ final class Bulk
     private $index;
 
     /**
-     * @param  string|null  $index  concrete index name; defaults to the model's searchableAs() alias
+     * @var bool
      */
-    public function __construct(?string $index = null)
+    private $requireAlias;
+
+    /**
+     * @param  string|null  $index  write target; defaults to the model's searchableAs() alias
+     * @param  bool  $requireAlias  reject the write unless the target is an alias, so a
+     *                              revoked import can never auto-create its old index
+     */
+    public function __construct(?string $index = null, bool $requireAlias = false)
     {
         $this->index = $index;
+        $this->requireAlias = $requireAlias;
     }
 
     /**
@@ -58,6 +66,9 @@ final class Bulk
     public function toArray(): array
     {
         $payload = ['body' => []];
+        if ($this->requireAlias) {
+            $payload['require_alias'] = true;
+        }
         $payload = collect($this->indexDocs)->reduce(
             function ($payload, $model) {
                 /** @var SearchableModel $model */

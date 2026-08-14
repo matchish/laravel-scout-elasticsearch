@@ -115,6 +115,22 @@ final class ImportRangeTest extends IntegrationTestCase
         $this->assertCount(0, $this->indexedIds());
     }
 
+    public function test_revoked_write_target_stops_the_job_and_creates_nothing(): void
+    {
+        $ids = $this->createProducts(5);
+        // No index and no alias exist: the import was superseded and its
+        // index deleted. Without require_alias this write would silently
+        // auto-create the index again.
+        $source = DefaultImportSourceFactory::from(Product::class);
+        $job = new ImportRange($source, Range::between($ids[0], null), 'id', self::INDEX, 500);
+        $job->handle($this->elasticsearch);
+
+        $this->assertFalse(
+            $this->elasticsearch->indices()->exists(['index' => self::INDEX])->asBool(),
+            'a rejected write must not resurrect the index'
+        );
+    }
+
     public function test_writes_to_the_concrete_index_not_the_alias(): void
     {
         $this->elasticsearch->indices()->create([
@@ -150,10 +166,18 @@ final class ImportRangeTest extends IntegrationTestCase
         })->values()->all();
     }
 
+    /**
+     * The job writes through an import alias with require_alias, the
+     * way DispatchImportRanges wires it, so the tests create the
+     * backing index with that alias attached.
+     */
     private function runJob(string $class, Range $range, string $column, int $chunkSize = 500): void
     {
         try {
-            $this->elasticsearch->indices()->create(['index' => self::INDEX]);
+            $this->elasticsearch->indices()->create([
+                'index' => self::INDEX.'_index',
+                'body' => ['aliases' => [self::INDEX => new stdClass()]],
+            ]);
         } catch (\Exception $e) {
             // index exists from an earlier call in the same test
         }

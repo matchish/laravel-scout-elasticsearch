@@ -7,6 +7,7 @@ namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\Response\Elasticsearch;
 use Illuminate\Support\Facades\Log;
+use Matchish\ScoutElasticSearch\ElasticSearch\ImportAlias;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
@@ -89,7 +90,7 @@ final class CatchUp implements StageInterface
 
             $searchable = $models->filter->shouldBeSearchable();
             if ($searchable->isNotEmpty()) {
-                $params = new Bulk($this->index->name());
+                $params = new Bulk(ImportAlias::of($this->index->name()), true);
                 $params->index($searchable->all());
                 /** @var Elasticsearch $elasticResponse */
                 $elasticResponse = $elasticsearch->bulk($params->toArray());

@@ -8,6 +8,7 @@ use Elastic\Elasticsearch\Client;
 use Illuminate\Bus\Batch;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Bus;
+use Matchish\ScoutElasticSearch\ElasticSearch\ImportAlias;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Jobs\FinishImport;
 use Matchish\ScoutElasticSearch\Jobs\ImportBatches;
@@ -118,8 +119,9 @@ final class DispatchImportRanges implements StageInterface
 
         $column = $plan->column();
         $chunkSize = $this->chunkSize();
-        $jobs = array_map(function (Range $range) use ($source, $column, $index, $chunkSize) {
-            return new ImportRange($source, $range, $column, $index->name(), $chunkSize);
+        $writeTarget = ImportAlias::of($index->name());
+        $jobs = array_map(function (Range $range) use ($source, $column, $writeTarget, $chunkSize) {
+            return new ImportRange($source, $range, $column, $writeTarget, $chunkSize);
         }, $plan->ranges());
 
         $batch = Bus::batch($jobs)

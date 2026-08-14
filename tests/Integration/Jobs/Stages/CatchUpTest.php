@@ -6,6 +6,7 @@ namespace Tests\Integration\Jobs\Stages;
 
 use App\Product;
 use Illuminate\Support\Facades\DB;
+use Matchish\ScoutElasticSearch\ElasticSearch\ImportAlias;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Jobs\Stages\CatchUp;
 use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
@@ -29,7 +30,10 @@ final class CatchUpTest extends IntegrationTestCase
             ->whereIn('id', $stale->pluck('id'))
             ->update(['updated_at' => '2000-01-01 00:00:00']);
 
-        $this->elasticsearch->indices()->create(['index' => self::INDEX]);
+        $this->elasticsearch->indices()->create([
+            'index' => self::INDEX,
+            'body' => ['aliases' => [ImportAlias::of(self::INDEX) => new stdClass()]],
+        ]);
         $stage = new CatchUp(
             DefaultImportSourceFactory::from(Product::class),
             new Index(self::INDEX),
@@ -47,7 +51,10 @@ final class CatchUpTest extends IntegrationTestCase
         factory(Product::class, 10)->create();
         Product::setEventDispatcher($dispatcher);
 
-        $this->elasticsearch->indices()->create(['index' => self::INDEX]);
+        $this->elasticsearch->indices()->create([
+            'index' => self::INDEX,
+            'body' => ['aliases' => [ImportAlias::of(self::INDEX) => new stdClass()]],
+        ]);
         $stage = new CatchUp(
             DefaultImportSourceFactory::from(Product::class),
             new Index(self::INDEX),
@@ -65,7 +72,10 @@ final class CatchUpTest extends IntegrationTestCase
         factory(Product::class, 3)->create();
         Product::setEventDispatcher($dispatcher);
 
-        $this->elasticsearch->indices()->create(['index' => self::INDEX]);
+        $this->elasticsearch->indices()->create([
+            'index' => self::INDEX,
+            'body' => ['aliases' => [ImportAlias::of(self::INDEX) => new stdClass()]],
+        ]);
         $stage = new CatchUp(
             DefaultImportSourceFactory::from(ProductWithoutTimestamps::class),
             new Index(self::INDEX),

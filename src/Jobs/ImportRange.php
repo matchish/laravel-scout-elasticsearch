@@ -93,8 +93,8 @@ final class ImportRange implements ShouldQueue
             $lastPartition = $last->getAttribute($this->column);
 
             $searchable = $models->filter->shouldBeSearchable();
-            if ($searchable->isNotEmpty()) {
-                $this->flush($elasticsearch, $searchable);
+            if ($searchable->isNotEmpty() && ! $this->flush($elasticsearch, $searchable)) {
+                return;
             }
         } while ($models->count() === $this->chunkSize);
     }
@@ -149,18 +149,47 @@ final class ImportRange implements ShouldQueue
     }
 
     /**
+     * Returns false when the import alias is gone: the import was
+     * revoked, so the job should stop instead of failing. Thanks to
+     * require_alias the rejected write cannot auto-create the index
+     * it targets.
+     *
      * @param  EloquentCollection<int, \Illuminate\Database\Eloquent\Model>  $models
      */
-    private function flush(Client $elasticsearch, EloquentCollection $models): void
+    private function flush(Client $elasticsearch, EloquentCollection $models): bool
     {
-        $params = new Bulk($this->indexName);
+        $params = new Bulk($this->indexName, true);
         $params->index($models->all());
         /** @var Elasticsearch $elasticResponse */
         $elasticResponse = $elasticsearch->bulk($params->toArray());
         $response = $elasticResponse->asArray();
         if (array_key_exists('errors', $response) && $response['errors']) {
+            if ($this->targetIsGone($response)) {
+                return false;
+            }
             $json = json_encode($response, JSON_PRETTY_PRINT);
             throw new \Exception('Bulk import error: '.($json === false ? 'unknown' : $json));
         }
+
+        return true;
+    }
+
+    /**
+     * @param  array<mixed>  $response
+     */
+    private function targetIsGone(array $response): bool
+    {
+        $items = $response['items'] ?? [];
+        if (! is_array($items) || $items === []) {
+            return false;
+        }
+        foreach ($items as $item) {
+            $error = $item['index']['error'] ?? null;
+            if (($error['type'] ?? null) !== 'index_not_found_exception') {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
