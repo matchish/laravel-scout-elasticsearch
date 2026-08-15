@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 - `scout:import:status` command showing the progress, range counts and failures of parallel imports — for imports running on workers, or after you closed the terminal.
 
 ### Fixed
+- A row changed while an import was running could be overwritten by the import's older copy of it: a deleted product reappeared in search, and an edit made mid-import was rolled back. Writes now carry a version taken from the row's `updated_at`, and Elasticsearch keeps the newer one — imports write with `version_type=external`, live changes from Scout's observers with `external_gte` and a rank above a snapshot from the same second, so a live change wins regardless of the order the two writes arrive in. Models without an `updated_at` column are unversioned, as before.
 - A range job of a superseded import could re-create its deleted index through Elasticsearch auto-creation, leaving a stranded index behind. Range and catch-up jobs now write through a per-import alias with `require_alias`: once the import is superseded or published, the alias is gone and a late write is rejected instead of resurrecting the index.
 - Indices leaked by a crashed import (created, then never finished or cleaned) are now reclaimed on the next import. New indices carry a `_meta.scout_import` provenance marker; cleanup deletes only marked indices that no alias routes to, so it can never touch an index the package did not create.
 

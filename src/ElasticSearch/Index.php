@@ -94,8 +94,15 @@ final class Index
             'number_of_replicas' => 0,
 
         ];
-        /** @var array<string> $settings */
+        // A delete leaves a versioned tombstone that keeps rejecting
+        // older writes, but only while Elasticsearch retains it. The
+        // default is 60s, which a slow import job can outlive.
+        $gcDeletes = config('elasticsearch.indices.gc_deletes', '12h');
+        /** @var array<string, mixed> $settings */
         $settings = config($settingsConfigKey, config('elasticsearch.indices.settings.default', $defaultSettings));
+        if ($gcDeletes !== null && ! isset($settings['index.gc_deletes'], $settings['gc_deletes'])) {
+            $settings['index.gc_deletes'] = $gcDeletes;
+        }
         /** @var array<string, mixed> $mappings */
         $mappings = config($mappingsConfigKey, config('elasticsearch.indices.mappings.default')) ?: [];
 

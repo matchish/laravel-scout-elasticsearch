@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Matchish\ScoutElasticSearch\ElasticSearch\BulkResult;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
 use Matchish\ScoutElasticSearch\Searchable\Partitionable;
 use Matchish\ScoutElasticSearch\Searchable\Range;
@@ -158,36 +159,20 @@ final class ImportRange implements ShouldQueue
      */
     private function flush(Client $elasticsearch, EloquentCollection $models): bool
     {
-        $params = new Bulk($this->indexName, true);
+        // A snapshot write: it must lose to any live change that
+        // already reached this document, however the two writes
+        // happened to be ordered on the way in.
+        $params = new Bulk($this->indexName, true, Bulk::WRITER_SNAPSHOT);
         $params->index($models->all());
         /** @var Elasticsearch $elasticResponse */
         $elasticResponse = $elasticsearch->bulk($params->toArray());
-        $response = $elasticResponse->asArray();
-        if (array_key_exists('errors', $response) && $response['errors']) {
-            if ($this->targetIsGone($response)) {
-                return false;
-            }
-            $json = json_encode($response, JSON_PRETTY_PRINT);
-            throw new \Exception('Bulk import error: '.($json === false ? 'unknown' : $json));
-        }
+        $result = new BulkResult($elasticResponse->asArray());
 
-        return true;
-    }
-
-    /**
-     * @param  array<mixed>  $response
-     */
-    private function targetIsGone(array $response): bool
-    {
-        $items = $response['items'] ?? [];
-        if (! is_array($items) || $items === []) {
+        if ($result->allTargetsMissing()) {
             return false;
         }
-        foreach ($items as $item) {
-            $error = $item['index']['error'] ?? null;
-            if (($error['type'] ?? null) !== 'index_not_found_exception') {
-                return false;
-            }
+        if ($result->hasFatalErrors()) {
+            throw new \Exception('Bulk import error: '.$result->toJson());
         }
 
         return true;

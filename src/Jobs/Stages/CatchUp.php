@@ -7,6 +7,7 @@ namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\Response\Elasticsearch;
 use Illuminate\Support\Facades\Log;
+use Matchish\ScoutElasticSearch\ElasticSearch\BulkResult;
 use Matchish\ScoutElasticSearch\ElasticSearch\ImportAlias;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
@@ -90,14 +91,15 @@ final class CatchUp implements StageInterface
 
             $searchable = $models->filter->shouldBeSearchable();
             if ($searchable->isNotEmpty()) {
-                $params = new Bulk(ImportAlias::of($this->index->name()), true);
+                // Catch-up re-reads rows as they are now, so it carries
+                // live changes rather than a snapshot.
+                $params = new Bulk(ImportAlias::of($this->index->name()), true, Bulk::WRITER_LIVE);
                 $params->index($searchable->all());
                 /** @var Elasticsearch $elasticResponse */
                 $elasticResponse = $elasticsearch->bulk($params->toArray());
-                $response = $elasticResponse->asArray();
-                if (array_key_exists('errors', $response) && $response['errors']) {
-                    $json = json_encode($response, JSON_PRETTY_PRINT);
-                    throw new \Exception('Bulk catch-up error: '.($json === false ? 'unknown' : $json));
+                $result = new BulkResult($elasticResponse->asArray());
+                if ($result->hasFatalErrors()) {
+                    throw new \Exception('Bulk catch-up error: '.$result->toJson());
                 }
             }
         } while ($models->count() === $chunkSize);
