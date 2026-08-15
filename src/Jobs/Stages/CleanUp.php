@@ -47,6 +47,37 @@ final class CleanUp implements StageInterface
                 }
             }
         }
+
+        $this->reclaimLeakedIndices($elasticsearch);
+    }
+
+    /**
+     * An import that dies between creating its index and finishing —
+     * a crashed worker, a lost process — leaks that index: no alias
+     * routes to it, so nothing else will ever delete it. Reclaim such
+     * indices here, but only ones carrying this package's provenance
+     * marker; an unmarked index is not ours to delete.
+     */
+    private function reclaimLeakedIndices(Client $elasticsearch): void
+    {
+        try {
+            /** @var Elasticsearch $elasticResponse */
+            $elasticResponse = $elasticsearch->indices()->get([
+                'index' => $this->source->searchableAs().'_*',
+            ]);
+            $indices = $elasticResponse->asArray();
+        } catch (ClientResponseException $e) {
+            return;
+        }
+
+        foreach ($indices as $indexName => $info) {
+            $marked = (bool) ($info['mappings']['_meta']['scout_import'] ?? false);
+            $aliases = $info['aliases'] ?? [];
+            if ($marked && $aliases === []) {
+                $params = new DeleteIndexParams((string) $indexName);
+                $elasticsearch->indices()->delete($params->toArray());
+            }
+        }
     }
 
     public function title(): string

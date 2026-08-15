@@ -11,12 +11,9 @@ return [
     'ssl_verification' => env('ELASTICSEARCH_SSL_VERIFICATION', true),
     'queue' => [
         'timeout' => env('SCOUT_QUEUE_TIMEOUT'),
-        'name' => env('SCOUT_QUEUE_NAME'),
     ],
-    'tracked_jobs' => [
-        'table' => env('ELASTICSEARCH_TRACKED_JOBS_TABLE', 'tracked_jobs'),
-        'model' => \Matchish\ScoutElasticSearch\Jobs\TrackableJobs\TrackedJob::class,
-        'using_uuid' => false,
+    'parallel' => [
+        'chunks_per_range' => env('ELASTICSEARCH_PARALLEL_CHUNKS_PER_RANGE', 8),
     ],
     'indices' => [
         'mappings' => [

@@ -12,7 +12,7 @@ use Tests\IntegrationTestCase;
 
 final class PullFromSourceTest extends IntegrationTestCase
 {
-    public function test_put_all_entites_to_index(): void
+    public function test_put_all_entities_to_index(): void
     {
         $dispatcher = Product::getEventDispatcher();
         Product::unsetEventDispatcher();
@@ -41,7 +41,6 @@ final class PullFromSourceTest extends IntegrationTestCase
         ];
         $response = $this->elasticsearch->search($params);
         $this->assertEquals($productsAmount, $response['hits']['total']['value']);
-        $this->assertDatabaseEmpty('tracked_jobs');
     }
 
     public function test_dont_put_entities_if_no_entities_in_collection(): void

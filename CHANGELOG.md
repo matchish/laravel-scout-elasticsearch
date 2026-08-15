@@ -5,17 +5,31 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
+> Upgrading from 7.x or from an 8.0 alpha? See [UPGRADE.md](UPGRADE.md).
+
 ### Added
-- Built-in job tracking for parallel import — no longer requires `mateusjunges/laravel-trackable-jobs`. Publish the migration with `php artisan vendor:publish --tag=scout-elasticsearch-migrations`.
-- New config keys under `elasticsearch.tracked_jobs`: `table` (default `tracked_jobs`), `model` (swappable Eloquent model class), `using_uuid` (default `false`).
+- `searchablePartitionKey()`: models without an integer primary key declare a numeric column to enable parallel import. `NULL` values are covered by a dedicated null-bucket job.
+- `--catch-up` option for `scout:import --parallel`: re-imports rows changed during the import (by `updated_at`) right before the alias switch, for applications that write to the database without Eloquent events.
+- `elasticsearch.parallel.chunks_per_range` config (default `8`) controlling how much work one range job carries.
+- Live progress for `--parallel`: the console follows the batch and advances the bar as range jobs finish, and reports an error without switching the alias when any of them fail. Set `scout.queue` to keep the old fire-and-forget behaviour.
+- `scout:import:status` command showing the progress, range counts and failures of parallel imports — for imports running on workers, or after you closed the terminal.
+
+### Fixed
+- A row changed while an import was running could be overwritten by the import's older copy of it: a deleted product reappeared in search, and an edit made mid-import was rolled back. Writes now carry a version taken from the row's `updated_at`, and Elasticsearch keeps the newer one — imports write with `version_type=external`, live changes from Scout's observers with `external_gte` and a rank above a snapshot from the same second, so a live change wins regardless of the order the two writes arrive in. Models without an `updated_at` column are unversioned, as before.
+- A range job of a superseded import could re-create its deleted index through Elasticsearch auto-creation, leaving a stranded index behind. Range and catch-up jobs now write through a per-import alias with `require_alias`: once the import is superseded or published, the alias is gone and a late write is rejected instead of resurrecting the index.
+- Indices leaked by a crashed import (created, then never finished or cleaned) are now reclaimed on the next import. New indices carry a `_meta.scout_import` provenance marker; cleanup deletes only marked indices that no alias routes to, so it can never touch an index the package did not create.
 
 ### Changed
-- Unified `ProcessSearchable` and `PullFromSourceParallel` into single classes (removed `_PHP80`/`_PHP82` variants and `src/Compatability/compat.php`).
-- `--parallel` import no longer requires an external package; it is always available when queue workers are running.
+- Parallel import was rebuilt on Laravel job batching (`Bus::batch()`): key ranges are computed up front with one aggregate query and imported by independent queued jobs on a single shared queue. Range jobs write to the concrete index name instead of the write alias, so jobs of a superseded import can never pollute a newer index. A new `--parallel` import cancels a still-running one for the same index. Requires the `job_batches` table (shipped by default since Laravel 11).
 
 ### Removed
-- `suggest` dependency on `mateusjunges/laravel-trackable-jobs` from `composer.json`.
-- `stubs/` directory (fallback no-op implementations are no longer needed).
+- The custom job tracking subsystem used by parallel import (`TrackedJob` model, `tracked_jobs` table and migration, `elasticsearch.tracked_jobs` config) — superseded by Laravel job batching.
+- Round-robin parallel queues (`elasticsearch-parallel-N`, `scout.chunk.handlers`) — the new design uses one queue with any number of workers.
+- `elasticsearch.queue.name` (`SCOUT_QUEUE_NAME`) config parameter, added in `8.0.0-alpha.2` — it named the round-robin queue prefix, which no longer exists. Range jobs use the model's Scout queue.
+
+### Upgrading
+- Full instructions, including the two interface changes that affect custom `HitsIteratorAggregate` and `ImportSource` implementations, are in [UPGRADE.md](UPGRADE.md).
+- Alpha testers: the `tracked_jobs` table is no longer used, and parallel import now needs the standard `job_batches` table instead.
 
 ## [8.0.0-alpha.3] - 2026-02-09
 ### Changed

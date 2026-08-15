@@ -62,6 +62,8 @@ Use composer to install the package:
 composer require matchish/laravel-scout-elasticsearch
 ```
 
+Already using version 7? See the [upgrade guide](UPGRADE.md) — for most projects 8.0 is a drop-in upgrade.
+
 Set env variables
 ```
 SCOUT_DRIVER=Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine
@@ -199,36 +201,65 @@ The command creates new temporary index, imports all models to it, and then swit
 
 ### Parallel import
 When importing massive amounts of data, you can use the option `--parallel` to speed up the import process.
-Parallel import uses a built-in job tracking system — no extra packages required.
 
-First, publish and run the migration to create the `tracked_jobs` table:
 ```bash
-php artisan vendor:publish --tag=scout-elasticsearch-migrations
-
-php artisan migrate
+php artisan scout:import --parallel
 ```
 
-Then define the queue names to be used for parallel import:
+How it works:
 
-`scout.chunk.handlers` defines how many parallel queues will be ran, default: `1`.
+1. The import reads `MIN` and `MAX` of the partition key and splits the data into many small key ranges. It needs only one cheap query — no scan of the whole table.
+2. Every range becomes one queued job in a [job batch](https://laravel.com/docs/queues#job-batching). The jobs run on your queue workers, so parallelism equals the number of workers you run.
+3. When the batch finishes, the new index is refreshed and the alias switches atomically — zero downtime, same as a normal import.
 
-`elasticsearch.queue.name` defines the parallel queue name prefix, default: `'elasticsearch-parallel'`.
+#### Requirements
 
-The default configuration will use queues: `'elasticsearch-parallel-N'`, where `N` is the handler index (1 → `scout.chunk.handlers`).
+- **The `job_batches` table.** Laravel 11+ ships this migration by default. On older versions run `php artisan queue:batches-table && php artisan migrate`.
+- **Queue workers.** Start any amount of workers on your Scout queue; more workers means a faster import:
 
-#### Customising tracked jobs
+  ```bash
+  php artisan queue:work --queue=scout
+  ```
+- **A numeric partition key.** Models with an integer primary key work with zero configuration. Any other model (for example with UUID keys) must declare a numeric, indexed, immutable column:
 
-The `tracked_jobs` table name and the model class used for tracking are configurable in `config/elasticsearch.php`:
+  ```php
+  public function searchablePartitionKey(): string
+  {
+      return 'legacy_id';
+  }
+  ```
 
-```php
-'tracked_jobs' => [
-    'table'      => env('ELASTICSEARCH_TRACKED_JOBS_TABLE', 'tracked_jobs'),
-    'model'      => \Matchish\ScoutElasticSearch\Jobs\TrackableJobs\TrackedJob::class,
-    'using_uuid' => false,
-],
+  Rows where the column is `NULL` are imported by a dedicated job, but a non-null column is faster. Do **not** use a mutable column such as `updated_at`: if the value changes during the import, rows can be imported twice or skipped.
+
+#### Behaviour notes
+
+- The command follows the range jobs and shows how many have finished, so you can watch the import progress. It exits when the last range is done. If you would rather start the import and return to the shell immediately, set `scout.queue` — the whole import then runs on a worker.
+- If range jobs fail, the command stops with an error and the alias is **not** switched, so searches keep using the old index.
+- Starting a new `--parallel` import for an index cancels a still-running one. The superseded import stops with a message and never switches the alias, so only the newest import can publish its index.
+
+#### Checking an import you are not watching
+
+Whenever you cannot see the progress bar — the import runs on a worker, or you closed the terminal — ask for its status:
+
+```bash
+php artisan scout:import:status
 ```
 
-Set `model` to your own Eloquent model class if you need custom tracking behaviour. The custom model must implement `\Matchish\ScoutElasticSearch\Jobs\TrackableJobs\TrackedJobContract`.
+```
++----------+---------+----------+--------+--------+----------------+
+| Index    | Status  | Progress | Ranges | Failed | Started        |
++----------+---------+----------+--------+--------+----------------+
+| products | running | 45%      | 9/20   | 0      | 2 minutes ago  |
++----------+---------+----------+--------+--------+----------------+
+```
+
+Pass a model name to check one index, for example `php artisan scout:import:status "App\Models\Product"`.
+
+Closing the terminal never stops an import. The range jobs are already on the queue, and the alias switch runs on a worker when the last one finishes.
+
+If you use [Laravel Horizon](https://laravel.com/docs/horizon), the same import appears on its Batches screen, named `scout-import:{index}`.
+- Live model changes during the import are indexed through Scout observers as usual. If your application also writes to the database without Eloquent events, add `--catch-up`: right before the alias switch, rows with `updated_at` newer than the import start are re-imported.
+- `elasticsearch.parallel.chunks_per_range` (default `8`) controls the range size: each range job processes about `chunks_per_range × scout.chunk.searchable` rows.
 
 ### Search
 

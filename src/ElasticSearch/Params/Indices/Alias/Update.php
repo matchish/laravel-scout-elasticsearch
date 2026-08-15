@@ -40,6 +40,14 @@ final class Update
         ]];
     }
 
+    public function remove(string $index, string $alias): void
+    {
+        $this->actions[] = ['remove' => [
+            'index' => $index,
+            'alias' => $alias,
+        ]];
+    }
+
     public function removeIndex(string $index): void
     {
         $this->actions[] = ['remove_index' => ['index' => $index]];
