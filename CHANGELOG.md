@@ -59,7 +59,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [7.2.2] - 2023-06-06
 ### Fixed
-- [No duplicates in search on reindex anymore. updates/inserts will be visible only after reindex. For most projects should be ok but for some could be breaking changes](https://github.com/matchish/laravel-scout-elasticsearch/issues/247)
+- [Check the `routing` attribute is loaded before reading it, so models using `preventAccessingMissingAttributes` no longer throw `MissingAttributeException`](https://github.com/matchish/laravel-scout-elasticsearch/issues/247)
 
 ## [7.0.0] - 2023-02-01
 ### Changed
