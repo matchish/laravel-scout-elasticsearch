@@ -259,7 +259,7 @@ Product::search('(title:this OR description:this) AND (title:that OR description
     ->where('price', new RangeQuery('price', [
         RangeQuery::GTE => 100,
         RangeQuery::LTE => 1000,
-    ]);
+    ]));
 ```
 
 And if you just want to search using RangeQuery without any query_string, you can call the search() method directly and leave the param empty.
@@ -271,10 +271,44 @@ use ONGR\ElasticsearchDSL\Query\TermLevel\RangeQuery;
 Product::search()
     ->where('price', new RangeQuery('price', [
         RangeQuery::GTE => 100,
-    ]);
+    ]));
 ```
 
-Full list of ElasticSearch terms is in `vendor/handcraftedinthealps/elasticsearch-dsl/src/Query/TermLevel`.
+The value is not limited to term-level queries. You can pass any ElasticSearch query object, for example a full-text `QueryStringQuery`:
+
+```php
+
+use ONGR\ElasticsearchDSL\Query\FullText\QueryStringQuery;
+
+Product::search()
+    ->where('q', new QueryStringQuery('this AND that', [
+        'fields' => ['name', 'email'],
+    ]));
+```
+
+When the value is a query object, the first argument of `->where()` (`'q'` in this example) is ignored, because the query object already knows its fields.
+
+Full list of ElasticSearch queries is in `vendor/handcraftedinthealps/elasticsearch-dsl/src/Query` (`TermLevel`, `FullText`, `Compound`, etc.).
+
+> Note : `->where()` always adds the query to the `filter` context of a [bool](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html) query
+> (or to `must_not` when you use the `!=` operator). ElasticSearch does not calculate a score in these contexts.
+> So such a query only filters the hits and never changes their `_score`, and with an empty search string every hit has `_score` 0.
+
+If you need a scored query, use the callback from the [Search](#search) section. The `$body` parameter is the `\ONGR\ElasticsearchDSL\Search` object,
+so you can add the query with `addQuery()`:
+
+```php
+use ONGR\ElasticsearchDSL\Query\FullText\QueryStringQuery;
+
+$results = Product::search('', function(\Elastic\Elasticsearch\Client $client, $body) {
+
+    $body->addQuery(new QueryStringQuery('this AND that', [
+        'fields' => ['name', 'email'],
+    ]));
+
+    return $client->search(['index' => 'products', 'body' => $body->toArray()])->asArray();
+})->raw();
+```
 
 ### Limiting returned fields
 Sometimes your indexed models have fields that should not appear in returned result.
