@@ -313,10 +313,130 @@ In this example you will get collection of `Ticket` and `Book` models where tick
 book title is `Barcelona`
 
 ### Working with results
-Often your response isn't collection of models but aggregations or models with higlights and so on.
-In this case you need to implement your own implementation of `HitsIteratorAggregate` and bind it in your service provider
 
-[Here is a case](https://github.com/matchish/laravel-scout-elasticsearch/issues/28)
+Sometimes you need more than models in the result. For example, the highlighted text or the score of each hit.
+
+The engine builds the result collection with a `HitsIteratorAggregate` taken from the container. You can bind your own class there and put anything you want into the result.
+
+The example below adds highlights to the models.
+
+#### 1. Ask Elasticsearch for highlights
+
+Elasticsearch does not send highlights by default. Add a `Highlight` object to the search body in a callback:
+
+```php
+use ONGR\ElasticsearchDSL\Highlight\Highlight;
+
+$products = Product::search('zonga', function (\Elastic\Elasticsearch\Client $client, $body) {
+    $highlight = new Highlight();
+    $highlight->addField('title');
+    $highlight->addField('description');
+
+    $body->addHighlight($highlight);
+
+    return $client->search([
+        'index' => (new Product)->searchableAs(),
+        'body' => $body->toArray(),
+    ])->asArray();
+})->get();
+```
+
+Now every hit in the response has a `highlight` key. But `->get()` returns only models, so this data is lost. The next step keeps it.
+
+#### 2. Write your own `HitsIteratorAggregate`
+
+```php
+namespace App\Search;
+
+use ArrayIterator;
+use Illuminate\Support\Collection;
+use Laravel\Scout\Builder;
+use Matchish\ScoutElasticSearch\ElasticSearch\HitsIteratorAggregate;
+
+final class HighlightedHitsIteratorAggregate implements HitsIteratorAggregate
+{
+    private array $results;
+
+    /** @var callable|null */
+    private $callback;
+
+    public function __construct(array $results, ?callable $callback = null)
+    {
+        $this->results = $results;
+        $this->callback = $callback;
+    }
+
+    public function getIterator(): ArrayIterator
+    {
+        $hits = $this->results['hits']['hits'] ?? [];
+
+        // MixedSearch can return hits of different classes.
+        // Group them by class and load each group with one query.
+        $models = collect($hits)
+            ->groupBy('_source.__class_name')
+            ->flatMap(function (Collection $classHits, string $class) {
+                $model = new $class;
+                $model->setKeyType('string');
+
+                $builder = new Builder($model, '');
+
+                // Keep the ->query() callback so eager loading still works.
+                if ($this->callback) {
+                    $builder->query($this->callback);
+                }
+
+                return $model->getScoutModelsByIds($builder, $classHits->pluck('_id')->all())
+                    ->keyBy(function ($model) use ($class) {
+                        return $class.'::'.$model->getScoutKey();
+                    });
+            });
+
+        // Sort the models in the same order as the hits
+        // and copy the highlights to each model.
+        $result = collect($hits)->map(function (array $hit) use ($models) {
+            $model = $models->get(($hit['_source']['__class_name'] ?? '').'::'.$hit['_id']);
+
+            // The document is in the index, but the model is not in the database.
+            if ($model === null) {
+                return null;
+            }
+
+            $model->highlight = $hit['highlight'] ?? [];
+
+            return $model;
+        })->filter()->values()->all();
+
+        return new ArrayIterator($result);
+    }
+}
+```
+
+#### 3. Bind the class in a service provider
+
+```php
+use Matchish\ScoutElasticSearch\ElasticSearch\HitsIteratorAggregate;
+use App\Search\HighlightedHitsIteratorAggregate;
+...
+public function register(): void
+{
+    $this->app->bind(HitsIteratorAggregate::class, HighlightedHitsIteratorAggregate::class);
+}
+```
+
+#### 4. Read the highlights
+
+```php
+foreach ($products as $product) {
+    $product->highlight; // ['title' => ['<em>zonga</em> sneakers']]
+}
+```
+
+#### Good to know
+
+- The engine creates your class with `makeWith(['results' => ..., 'callback' => ...])`. Do not change the constructor signature.
+- `$callback` is the callback from the Scout `->query()` method. Give it to the `Builder`. If you skip this, eager loading with `->query()` no longer works.
+- `$model->highlight = ...` creates a normal model attribute. It appears in `toArray()`, and `save()` tries to write a `highlight` column. To avoid this, declare `public array $highlight = [];` in your model. Then PHP sets a real property, and Eloquent does not see an attribute.
+- Aggregations are in `$this->results['aggregations']`. You can read them in the same class. If you need only the raw response, call `->raw()` instead.
 
 ## :free: License
 Scout ElasticSearch is an open-sourced software licensed under the [MIT license](LICENSE.md).
