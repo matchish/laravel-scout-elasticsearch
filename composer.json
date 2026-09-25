@@ -19,7 +19,9 @@
         "php": "^8.0.12|^8.1",
         "elasticsearch/elasticsearch": "^8.0",
         "handcraftedinthealps/elasticsearch-dsl": "^8.0",
-        "laravel/scout": "^8.0|^9.0|^10.0|^11.0"
+        "laravel/scout": "^8.0|^9.0|^10.0|^11.0",
+        "nikic/php-parser": "^5.0",
+        "symfony/finder": "^5.4|^6.0|^7.0"
     },
     "require-dev": {
         "laravel/legacy-factories": "^1.0",
