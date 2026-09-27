@@ -282,7 +282,18 @@ Product::search('(title:this OR description:this) AND (title:that OR description
     ->whereNotIn('type', ['new', 'refurbished']);
 ```
 
-Scout does not support any operators, but you can pass ElasticSearch terms like `RangeQuery` as value to `->where()`:
+With Scout 11.1 or newer `->where()` also accepts an operator: `->where(column, operator, value)`.
+Supported operators are `=`, `!=`, `>`, `>=`, `<` and `<=`:
+
+```php
+Product::search('(title:this OR description:this) AND (title:that OR description:that)')
+    ->where('price', '>=', 100)
+    ->where('type', '!=', 'used');
+```
+
+Other operators (for example `<>` or `like`) and `null` values are not supported.
+
+With any Scout version you can pass ElasticSearch terms like `RangeQuery` as value to `->where()`:
 
 ```php
 
@@ -292,7 +303,7 @@ Product::search('(title:this OR description:this) AND (title:that OR description
     ->where('price', new RangeQuery('price', [
         RangeQuery::GTE => 100,
         RangeQuery::LTE => 1000,
-    ]);
+    ]));
 ```
 
 And if you just want to search using RangeQuery without any query_string, you can call the search() method directly and leave the param empty.
@@ -304,7 +315,7 @@ use ONGR\ElasticsearchDSL\Query\TermLevel\RangeQuery;
 Product::search()
     ->where('price', new RangeQuery('price', [
         RangeQuery::GTE => 100,
-    ]);
+    ]));
 ```
 
 Full list of ElasticSearch terms is in `vendor/handcraftedinthealps/elasticsearch-dsl/src/Query/TermLevel`.
