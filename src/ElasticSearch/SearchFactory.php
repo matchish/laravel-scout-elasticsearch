@@ -3,10 +3,12 @@
 namespace Matchish\ScoutElasticSearch\ElasticSearch;
 
 use Illuminate\Support\Arr;
+use InvalidArgumentException;
 use Laravel\Scout\Builder;
 use ONGR\ElasticsearchDSL\BuilderInterface;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\FullText\QueryStringQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\ExistsQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\RangeQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermsQuery;
@@ -73,40 +75,34 @@ final class SearchFactory
         if (static::hasWheres($builder)) {
             foreach ($builder->wheres as $field => $where) {
                 if (is_array($where) && isset($where['field'])) {
-                    $field = $where['field'];
-                }
-
-                if (is_array($where) && isset($where['value']) && $where['value'] instanceof BuilderInterface) {
-                    if ($where['operator'] === '!=') {
-                        $boolQuery->add($where['value'], BoolQuery::MUST_NOT);
-                        continue;
-                    }
-                    $where = $where['value'];
-                }
-
-                if (is_array($where) && isset($where['field'])) {
                     // Post v11.1.0 scout
-                    $operator = $where['operator'];
-
-                    $where = match ($operator) {
-                        '=', '!=' => new TermQuery((string) $field, $where['value']),
-                        '>' => new RangeQuery((string) $field, [RangeQuery::GT => $where['value']]),
-                        '>=' => new RangeQuery((string) $field, [RangeQuery::GTE => $where['value']]),
-                        '<' => new RangeQuery((string) $field, [RangeQuery::LT => $where['value']]),
-                        '<=' => new RangeQuery((string) $field, [RangeQuery::LTE => $where['value']]),
-                        default => $where
-                    };
-
-                    if ($operator === '!=') {
-                        $boolQuery->add($where, BoolQuery::MUST_NOT);
-                        continue;
-                    }
+                    $field = $where['field'];
+                    $operator = $where['operator'] === '<>' ? '!=' : $where['operator'];
+                    $value = $where['value'];
+                } else {
+                    $operator = '=';
+                    $value = $where;
                 }
 
-                if (! ($where instanceof BuilderInterface)) {
-                    $where = new TermQuery((string) $field, $where);
+                if ($value === null && in_array($operator, ['=', '!='], true)) {
+                    // Elasticsearch does not index null, so check if the field has a value
+                    $boolQuery->add(new ExistsQuery((string) $field), $operator === '=' ? BoolQuery::MUST_NOT : BoolQuery::FILTER);
+                    continue;
                 }
-                $boolQuery->add($where, BoolQuery::FILTER);
+
+                $query = $value instanceof BuilderInterface ? $value : match ($operator) {
+                    '=', '!=' => new TermQuery((string) $field, $value),
+                    '>' => new RangeQuery((string) $field, [RangeQuery::GT => $value]),
+                    '>=' => new RangeQuery((string) $field, [RangeQuery::GTE => $value]),
+                    '<' => new RangeQuery((string) $field, [RangeQuery::LT => $value]),
+                    '<=' => new RangeQuery((string) $field, [RangeQuery::LTE => $value]),
+                    default => throw new InvalidArgumentException(sprintf(
+                        'Operator [%s] is not supported by the Elasticsearch engine. Supported operators: =, !=, <>, >, >=, <, <=.',
+                        is_string($operator) ? $operator : get_debug_type($operator)
+                    )),
+                };
+
+                $boolQuery->add($query, $operator === '!=' ? BoolQuery::MUST_NOT : BoolQuery::FILTER);
             }
         }
 

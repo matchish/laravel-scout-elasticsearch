@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
+## [Unreleased]
+### Fixed
+- `where()` with an unsupported operator, for example `like`, now throws an `InvalidArgumentException` that names the operator. Before, Elasticsearch rejected the query with a 400 error. `<>` now works the same as `!=`.
+- `where()` with a `null` value now checks if the field has a value: `= null` finds documents without a value, and `!= null` finds documents with a value. Before, Elasticsearch rejected the query with a 400 error.
+
 ## [7.13.0] - 2026-05-09
 ### Added
 - Support for Laravel Scout v11.1.0+ by updating query where handling for the new Scout where structure and operators. [#322](https://github.com/matchish/laravel-scout-elasticsearch/pull/322)
