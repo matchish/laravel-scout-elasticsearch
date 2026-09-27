@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 - `suggest` dependency on `mateusjunges/laravel-trackable-jobs` from `composer.json`.
 - `stubs/` directory (fallback no-op implementations are no longer needed).
 
+### Fixed
+- `where()` with an unsupported operator, for example `like`, now throws an `InvalidArgumentException` that names the operator. Before, Elasticsearch rejected the query with a 400 error. `<>` now works the same as `!=`.
+- `where()` with a `null` value now checks if the field has a value: `= null` finds documents without a value, and `!= null` finds documents with a value. Before, Elasticsearch rejected the query with a 400 error.
+
 ## [8.0.0-alpha.3] - 2026-02-09
 ### Changed
 - The usage of mateusjunges/laravel-trackable-jobs package for parallel import
