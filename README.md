@@ -290,8 +290,6 @@ Product::search()
     ]);
 ```
 
-With Scout 11.1 or newer, the `!=` and `<>` operators exclude the documents that match the term: `->where('price', '!=', new RangeQuery(...))`.
-
 Full list of ElasticSearch terms is in `vendor/handcraftedinthealps/elasticsearch-dsl/src/Query/TermLevel`.
 
 ### Limiting returned fields
