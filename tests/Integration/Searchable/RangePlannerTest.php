@@ -5,18 +5,48 @@ declare(strict_types=1);
 namespace Tests\Integration\Searchable;
 
 use App\Product;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
 use Matchish\ScoutElasticSearch\Searchable\Partitionable;
 use Matchish\ScoutElasticSearch\Searchable\Range;
 use Matchish\ScoutElasticSearch\Searchable\RangePlan;
 use Matchish\ScoutElasticSearch\Searchable\RangePlanner;
 use Tests\Fixtures\BookWithoutPartitionKey;
+use Tests\Fixtures\ProductWithBigIntegerKey;
 use Tests\Fixtures\ProductWithPartitionKey;
 use Tests\Fixtures\ProductWithStringPartitionKey;
 use Tests\IntegrationTestCase;
 
 final class RangePlannerTest extends IntegrationTestCase
 {
+    /**
+     * @group parallel-import-regressions
+     */
+    public function test_covers_integer_primary_keys_above_float_precision(): void
+    {
+        // The usual products fixture has a 32-bit key on MySQL.
+        Schema::create('big_integer_products', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->softDeletes();
+        });
+
+        try {
+            DB::table('big_integer_products')->insert(['id' => 9007199254740995]);
+
+            $plan = RangePlanner::plan($this->source(ProductWithBigIntegerKey::class), 3, 2);
+
+            $this->assertSame(
+                1,
+                $this->coveredRows(ProductWithBigIntegerKey::class, $plan),
+                'a large integer key must be covered without rounding it through a float'
+            );
+        } finally {
+            Schema::dropIfExists('big_integer_products');
+        }
+    }
+
     public function test_plans_contiguous_ranges_for_integer_primary_key(): void
     {
         $dispatcher = Product::getEventDispatcher();

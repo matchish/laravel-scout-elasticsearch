@@ -22,6 +22,42 @@ final class DeleteDuringImportTest extends IntegrationTestCase
 {
     private const INDEX = 'products_import';
 
+    /**
+     * @group parallel-import-regressions
+     */
+    public function test_force_deleting_a_stale_model_removes_the_newer_document(): void
+    {
+        new Product();
+        $stale = Product::withoutEvents(function () {
+            return factory(Product::class)->create([
+                'title' => 'old title',
+                'updated_at' => '2000-01-01 00:00:00',
+            ]);
+        });
+
+        $this->elasticsearch->indices()->create([
+            'index' => self::INDEX,
+            'body' => ['aliases' => ['products' => new stdClass()]],
+        ]);
+
+        // Another request updates the row after the deleting request loaded it.
+        $fresh = Product::findOrFail($stale->getKey());
+        $fresh->updated_at = '2000-01-02 00:00:00';
+        $fresh->update(['title' => 'new title']);
+        $this->assertTrue($this->elasticsearch->exists([
+            'index' => self::INDEX,
+            'id' => (string) $stale->getKey(),
+        ])->asBool());
+
+        $stale->forceDelete();
+
+        $this->assertFalse(Product::withTrashed()->whereKey($stale->getKey())->exists());
+        $this->assertFalse(
+            $this->elasticsearch->exists(['index' => self::INDEX, 'id' => (string) $stale->getKey()])->asBool(),
+            'a force-deleted row must not remain searchable because its model instance was stale'
+        );
+    }
+
     public function test_product_deleted_while_its_chunk_is_in_memory_does_not_survive(): void
     {
         // Boot the model while the dispatcher is still in place, so

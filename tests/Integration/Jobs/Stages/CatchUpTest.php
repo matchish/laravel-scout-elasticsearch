@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Tests\Integration\Jobs\Stages;
 
 use App\Product;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Matchish\ScoutElasticSearch\ElasticSearch\ImportAlias;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
+use Matchish\ScoutElasticSearch\Jobs\ImportRange;
 use Matchish\ScoutElasticSearch\Jobs\Stages\CatchUp;
 use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
+use Matchish\ScoutElasticSearch\Searchable\Range;
 use stdClass;
 use Tests\Fixtures\ProductWithoutTimestamps;
 use Tests\IntegrationTestCase;
@@ -17,6 +20,84 @@ use Tests\IntegrationTestCase;
 final class CatchUpTest extends IntegrationTestCase
 {
     private const INDEX = 'products_import';
+
+    /**
+     * @group parallel-import-regressions
+     */
+    public function test_removes_a_row_that_became_unsearchable_after_its_range_was_imported(): void
+    {
+        $product = Product::withoutEvents(function () {
+            return factory(Product::class)->create(['updated_at' => '2000-01-01 00:00:00']);
+        });
+        $this->elasticsearch->indices()->create([
+            'index' => self::INDEX,
+            'body' => ['aliases' => [ImportAlias::of(self::INDEX) => new stdClass()]],
+        ]);
+        $source = DefaultImportSourceFactory::from(Product::class);
+        (new ImportRange($source, Range::between((int) $product->getKey(), null), 'id', ImportAlias::of(self::INDEX), 3))
+            ->handle($this->elasticsearch);
+        $this->assertSame(1, $this->indexedCount());
+
+        // SQL writes bypass Scout observers, which is why catch-up is needed.
+        DB::table('products')->where('id', $product->getKey())->update([
+            'type' => 'archive',
+            'updated_at' => '2000-01-02 00:00:00',
+        ]);
+        $stage = new CatchUp($source, new Index(self::INDEX), new \DateTimeImmutable('2000-01-01'));
+
+        $stage->handle($this->elasticsearch);
+
+        $this->assertSame(0, $this->indexedCount(), 'catch-up must remove a snapshot that is no longer searchable');
+    }
+
+    /**
+     * @group parallel-import-regressions
+     */
+    public function test_preserves_a_live_update_from_the_same_second(): void
+    {
+        // Freeze the clock so both writes have the same second without sleeps.
+        Carbon::setTestNow('2000-01-01 00:00:00');
+
+        try {
+            new Product();
+            $writer = Product::withoutEvents(function () {
+                return factory(Product::class)->create(['title' => 'old title']);
+            });
+            $this->elasticsearch->indices()->create([
+                'index' => self::INDEX,
+                'body' => ['aliases' => [
+                    'products' => new stdClass(),
+                    ImportAlias::of(self::INDEX) => new stdClass(),
+                ]],
+            ]);
+
+            // The observer writes the new title after catch-up reads its copy,
+            // but before catch-up submits that older copy to Elasticsearch.
+            $updated = false;
+            Product::retrieved(function (Product $model) use ($writer, &$updated) {
+                if (! $updated && $model->getKey() === $writer->getKey()) {
+                    $updated = true;
+                    $writer->update(['title' => 'live title']);
+                }
+            });
+            $stage = new CatchUp(
+                DefaultImportSourceFactory::from(Product::class),
+                new Index(self::INDEX),
+                new \DateTimeImmutable('2000-01-01')
+            );
+
+            $stage->handle($this->elasticsearch);
+
+            $this->assertSame('live title', DB::table('products')->where('id', $writer->getKey())->value('title'));
+            $document = $this->elasticsearch->get([
+                'index' => self::INDEX,
+                'id' => (string) $writer->getKey(),
+            ])->asArray();
+            $this->assertSame('live title', $document['_source']['title'], 'catch-up must not roll back the live update');
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
 
     public function test_imports_only_rows_updated_since_the_given_time(): void
     {

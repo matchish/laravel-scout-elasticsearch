@@ -14,6 +14,18 @@ class IndexTest extends TestCase
         $index = Index::fromSource(DefaultImportSourceFactory::from(Product::class));
         $this->assertEquals($index->name(), 'products_1525376494');
     }
+
+    /**
+     * @group parallel-import-regressions
+     */
+    public function test_explicit_gc_deletes_setting_is_preserved(): void
+    {
+        config(['elasticsearch.indices.settings.default' => ['index.gc_deletes' => '24h']]);
+
+        $index = Index::fromSource(DefaultImportSourceFactory::from(Product::class));
+
+        $this->assertSame('24h', $index->config()['settings']['index.gc_deletes']);
+    }
 }
 
 namespace Matchish\ScoutElasticSearch\ElasticSearch;
