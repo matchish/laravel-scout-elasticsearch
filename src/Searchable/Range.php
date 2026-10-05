@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Matchish\ScoutElasticSearch\Searchable;
 
 /**
- * A half-open interval [from, to) of partition key values.
+ * A half-open interval [from, to) of non-null partition key values.
  *
- * A null $to means the range is open-ended, so rows inserted after
- * planning with keys above the last anchor are still covered.
+ * A null $from or $to leaves that side unbounded. A plan opens both of
+ * its outer ends, so every key is covered whatever bounds were chosen,
+ * including keys that appear after planning.
  * A null-bucket range matches rows where the partition key IS NULL.
  */
 final class Range
@@ -35,7 +36,7 @@ final class Range
         $this->nullBucket = $nullBucket;
     }
 
-    public static function between(int $from, ?int $to): self
+    public static function between(?int $from, ?int $to): self
     {
         return new self($from, $to, false);
     }

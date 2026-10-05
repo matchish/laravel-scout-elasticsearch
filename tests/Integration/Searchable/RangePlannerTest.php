@@ -47,6 +47,76 @@ final class RangePlannerTest extends IntegrationTestCase
         }
     }
 
+    public function test_covers_large_keys_split_into_several_ranges(): void
+    {
+        // Several keys above 2^53, so the plan has more than one range
+        // and the lowest key goes through the boundary arithmetic. As a
+        // float, 2^53 + 3 rounds up to 2^53 + 4.
+        Schema::create('big_integer_products', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->softDeletes();
+        });
+
+        try {
+            DB::table('big_integer_products')->insert([
+                ['id' => 9007199254740995],
+                ['id' => 9007199254741995],
+                ['id' => 9007199254742995],
+            ]);
+
+            $plan = RangePlanner::plan($this->source(ProductWithBigIntegerKey::class), 1, 1);
+
+            $this->assertGreaterThan(1, count($plan->ranges()), 'the keys should be split into ranges');
+            $this->assertSame(3, $this->coveredRows(ProductWithBigIntegerKey::class, $plan));
+        } finally {
+            Schema::dropIfExists('big_integer_products');
+        }
+    }
+
+    public function test_covers_keys_at_both_ends_of_the_signed_integer_range(): void
+    {
+        // A signed key spanning almost the whole 64-bit range: computing
+        // the span or the boundaries in plain integer math would overflow.
+        Schema::create('big_integer_products', function (Blueprint $table) {
+            $table->bigInteger('id')->primary();
+            $table->softDeletes();
+        });
+
+        try {
+            DB::table('big_integer_products')->insert([
+                ['id' => -9223372036854775000],
+                ['id' => 0],
+                ['id' => 9223372036854775000],
+            ]);
+
+            $plan = RangePlanner::plan($this->source(ProductWithBigIntegerKey::class), 1, 1);
+
+            $this->assertGreaterThan(1, count($plan->ranges()), 'the keys should still be split into ranges');
+            $this->assertSame(3, $this->coveredRows(ProductWithBigIntegerKey::class, $plan));
+        } finally {
+            Schema::dropIfExists('big_integer_products');
+        }
+    }
+
+    public function test_covers_a_row_added_below_the_planned_minimum(): void
+    {
+        $dispatcher = Product::getEventDispatcher();
+        Product::unsetEventDispatcher();
+        factory(Product::class, 6)->create(['weight' => 100]);
+        factory(Product::class, 6)->create(['weight' => 500]);
+        Product::setEventDispatcher($dispatcher);
+
+        $plan = RangePlanner::plan($this->source(ProductWithPartitionKey::class), 3, 2);
+
+        // Inserted after planning, with a partition value below anything
+        // the planner saw.
+        Product::withoutEvents(function () {
+            factory(Product::class)->create(['weight' => 5]);
+        });
+
+        $this->assertSame(13, $this->coveredRows(ProductWithPartitionKey::class, $plan));
+    }
+
     public function test_plans_contiguous_ranges_for_integer_primary_key(): void
     {
         $dispatcher = Product::getEventDispatcher();
@@ -58,7 +128,9 @@ final class RangePlannerTest extends IntegrationTestCase
 
         $this->assertSame('id', $plan->column());
         $this->assertCount(4, $plan->ranges());
-        $this->assertSame((int) Product::query()->min('id'), $plan->ranges()[0]->from());
+        // Both outer ends are open, so the plan covers every key by
+        // construction; min and max only place the inner boundaries.
+        $this->assertNull($plan->ranges()[0]->from());
 
         $previous = null;
         foreach ($plan->ranges() as $range) {
@@ -139,7 +211,11 @@ final class RangePlannerTest extends IntegrationTestCase
             if ($range->isNullBucket()) {
                 $query->whereNull($plan->column());
             } else {
-                $query->where($plan->column(), '>=', $range->from());
+                // Mirrors ImportRange: NULL values belong to the null bucket.
+                $query->whereNotNull($plan->column());
+                if ($range->from() !== null) {
+                    $query->where($plan->column(), '>=', $range->from());
+                }
                 if ($range->to() !== null) {
                     $query->where($plan->column(), '<', $range->to());
                 }

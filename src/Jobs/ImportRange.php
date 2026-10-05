@@ -123,12 +123,22 @@ final class ImportRange implements ShouldQueue
             }
         } elseif ($this->column === $keyName) {
             $query->orderBy($qualifiedKey);
-            $query->where($qualifiedKey, $lastKey === null ? '>=' : '>', $lastKey ?? $this->range->from());
+            if ($lastKey !== null) {
+                $query->where($qualifiedKey, '>', $lastKey);
+            } elseif ($this->range->from() !== null) {
+                $query->where($qualifiedKey, '>=', $this->range->from());
+            }
             if ($this->range->to() !== null) {
                 $query->where($qualifiedKey, '<', $this->range->to());
             }
         } else {
-            $query->where($qualifiedColumn, '>=', $this->range->from());
+            // NULL partition values belong to the null bucket. A range with
+            // no lower bound would otherwise pick them up too, and NULL
+            // breaks the tuple comparison used for paging.
+            $query->whereNotNull($qualifiedColumn);
+            if ($this->range->from() !== null) {
+                $query->where($qualifiedColumn, '>=', $this->range->from());
+            }
             if ($this->range->to() !== null) {
                 $query->where($qualifiedColumn, '<', $this->range->to());
             }
