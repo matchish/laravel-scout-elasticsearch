@@ -6,7 +6,11 @@ namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\Response\Elasticsearch;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Log;
+use Matchish\ScoutElasticSearch\Contracts\SearchableContract;
 use Matchish\ScoutElasticSearch\ElasticSearch\BulkResult;
 use Matchish\ScoutElasticSearch\ElasticSearch\ImportAlias;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
@@ -15,11 +19,17 @@ use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 use Matchish\ScoutElasticSearch\Searchable\Partitionable;
 
 /**
- * Re-imports rows whose updated_at changed since the import started.
- * Closes the gap for applications that write to the database without
- * firing Eloquent events, so Scout observers never saw the change.
+ * Re-imports rows that changed since the import started, and removes
+ * the ones that stopped being searchable or were trashed. Closes the
+ * gap for applications that write to the database without firing
+ * Eloquent events, so Scout observers never saw the change.
+ *
+ * A row deleted outright by raw SQL leaves nothing to read, so
+ * catch-up cannot remove it.
  *
  * @internal
+ *
+ * @phpstan-import-type SearchableModel from SearchableContract
  */
 final class CatchUp implements StageInterface
 {
@@ -57,6 +67,7 @@ final class CatchUp implements StageInterface
             return;
         }
 
+        /** @var SearchableModel $model */
         $model = $source->query()->getModel();
         if (! $model->usesTimestamps() || $model->getUpdatedAtColumn() === null) {
             Log::warning('scout:import catch-up skipped: the model does not use an updated_at timestamp.', [
@@ -71,12 +82,31 @@ final class CatchUp implements StageInterface
         $configChunkSize = config('scout.chunk.searchable', 500);
         $chunkSize = is_numeric($configChunkSize) ? (int) $configChunkSize : 500;
 
+        // A row trashed during the import must leave the index, unless
+        // Scout keeps soft-deleted rows searchable. The import query hides
+        // trashed rows, so catch-up has to ask for them. A soft delete
+        // written by raw SQL may set deleted_at alone, so both columns
+        // decide whether a row changed.
+        $usesSoftDeletes = $model::usesSoftDelete();
+        $removeTrashed = $usesSoftDeletes && ! config('scout.soft_delete', false);
+        $deletedAt = $usesSoftDeletes && method_exists($model, 'getDeletedAtColumn')
+            ? $model->qualifyColumn($model->getDeletedAtColumn())
+            : null;
+        $since = $this->since;
+
         $lastKey = null;
         do {
             $query = $source->query()->reorder()
-                ->where($updatedAt, '>=', $this->since)
                 ->orderBy($qualifiedKey)
                 ->limit($chunkSize);
+            if ($deletedAt !== null) {
+                $query->withoutGlobalScope(SoftDeletingScope::class)->where(function (Builder $changed) use ($updatedAt, $deletedAt, $since) {
+                    $changed->where($updatedAt, '>=', $since)
+                        ->orWhere($deletedAt, '>=', $since);
+                });
+            } else {
+                $query->where($updatedAt, '>=', $since);
+            }
             if ($lastKey !== null) {
                 $query->where($qualifiedKey, '>', $lastKey);
             }
@@ -89,22 +119,42 @@ final class CatchUp implements StageInterface
             $last = $models->last();
             $lastKey = $last->getKey();
 
-            $searchable = $models->filter->shouldBeSearchable();
-            if ($searchable->isNotEmpty()) {
-                // Catch-up reads rows and writes them a moment later, so it
-                // is a snapshot too: it must lose to a live change made in
-                // between. It read after every range job, so it still beats
-                // their copies from the same second.
-                $params = new Bulk(ImportAlias::of($this->index->name()), true, Bulk::WRITER_CATCH_UP);
-                $params->index($searchable->all());
-                /** @var Elasticsearch $elasticResponse */
-                $elasticResponse = $elasticsearch->bulk($params->toArray());
-                $result = new BulkResult($elasticResponse->asArray());
-                if ($result->hasFatalErrors()) {
-                    throw new \Exception('Bulk catch-up error: '.$result->toJson());
-                }
-            }
+            // Mirror Scout's own observer: a row that stopped being
+            // searchable is removed, not just left out.
+            [$current, $gone] = $models->partition(function ($model) use ($removeTrashed) {
+                /** @var SearchableModel $model */
+                $trashed = $removeTrashed && method_exists($model, 'trashed') && $model->trashed();
+
+                return ! $trashed && $model->shouldBeSearchable();
+            });
+            $this->write($elasticsearch, $current, $gone);
         } while ($models->count() === $chunkSize);
+    }
+
+    /**
+     * Catch-up reads rows and writes them a moment later, so it is a
+     * snapshot too: it must lose to a live change made in between. It
+     * read after every range job, so it still beats their copies from
+     * the same second.
+     *
+     * @param  EloquentCollection<int, \Illuminate\Database\Eloquent\Model>  $current
+     * @param  EloquentCollection<int, \Illuminate\Database\Eloquent\Model>  $gone
+     */
+    private function write(Client $elasticsearch, EloquentCollection $current, EloquentCollection $gone): void
+    {
+        if ($current->isEmpty() && $gone->isEmpty()) {
+            return;
+        }
+
+        $params = new Bulk(ImportAlias::of($this->index->name()), true, Bulk::WRITER_CATCH_UP);
+        $params->index($current->all());
+        $params->delete($gone->all());
+        /** @var Elasticsearch $elasticResponse */
+        $elasticResponse = $elasticsearch->bulk($params->toArray());
+        $result = new BulkResult($elasticResponse->asArray());
+        if ($result->hasFatalErrors()) {
+            throw new \Exception('Bulk catch-up error: '.$result->toJson());
+        }
     }
 
     public function title(): string

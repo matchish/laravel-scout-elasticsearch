@@ -50,6 +50,45 @@ final class CatchUpTest extends IntegrationTestCase
         $this->assertSame(0, $this->indexedCount(), 'catch-up must remove a snapshot that is no longer searchable');
     }
 
+    public function test_removes_a_row_soft_deleted_by_sql_after_its_range_was_imported(): void
+    {
+        $product = $this->importedProduct();
+
+        // A raw soft delete that sets deleted_at alone: updated_at stays
+        // before the catch-up window, so only deleted_at reveals it.
+        DB::table('products')->where('id', $product->getKey())->update(['deleted_at' => '2000-01-02 00:00:00']);
+        $stage = new CatchUp(
+            DefaultImportSourceFactory::from(Product::class),
+            new Index(self::INDEX),
+            new \DateTimeImmutable('2000-01-01 12:00:00')
+        );
+
+        $stage->handle($this->elasticsearch);
+
+        $this->assertSame(0, $this->indexedCount(), 'catch-up must remove a row trashed during the import');
+    }
+
+    public function test_marks_a_row_soft_deleted_by_sql_when_soft_deletes_stay_searchable(): void
+    {
+        $this->app['config']->set('scout.soft_delete', true);
+        $product = $this->importedProduct();
+
+        DB::table('products')->where('id', $product->getKey())->update(['deleted_at' => '2000-01-02 00:00:00']);
+        $stage = new CatchUp(
+            DefaultImportSourceFactory::from(Product::class),
+            new Index(self::INDEX),
+            new \DateTimeImmutable('2000-01-01 12:00:00')
+        );
+
+        $stage->handle($this->elasticsearch);
+
+        $document = $this->elasticsearch->get([
+            'index' => self::INDEX,
+            'id' => (string) $product->getKey(),
+        ])->asArray();
+        $this->assertSame(1, $document['_source']['__soft_deleted'], 'catch-up must mark the row as soft deleted');
+    }
+
     /**
      * @group parallel-import-regressions
      */
@@ -165,6 +204,32 @@ final class CatchUpTest extends IntegrationTestCase
         $stage->handle($this->elasticsearch);
 
         $this->assertSame(0, $this->indexedCount());
+    }
+
+    /**
+     * One product, last changed in 2000, already written by a range job
+     * into an index that has the import alias.
+     */
+    private function importedProduct(): Product
+    {
+        /** @var Product $product */
+        $product = Product::withoutEvents(function () {
+            return factory(Product::class)->create(['updated_at' => '2000-01-01 00:00:00']);
+        });
+        $this->elasticsearch->indices()->create([
+            'index' => self::INDEX,
+            'body' => ['aliases' => [ImportAlias::of(self::INDEX) => new stdClass()]],
+        ]);
+        (new ImportRange(
+            DefaultImportSourceFactory::from(Product::class),
+            Range::between((int) $product->getKey(), null),
+            'id',
+            ImportAlias::of(self::INDEX),
+            3
+        ))->handle($this->elasticsearch);
+        $this->assertSame(1, $this->indexedCount(), 'precondition: the range job imported the product');
+
+        return $product;
     }
 
     private function indexedCount(): int

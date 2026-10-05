@@ -89,12 +89,12 @@ final class Bulk
      * data, whatever order the writes arrive in.
      *
      * The time is when the data in the write became true:
-     * - an index write carries the row as of its updated_at;
      * - a live delete becomes true now, as it is sent — so it beats
      *   every copy read before it, even when it is sent from a model
      *   instance loaded before someone else edited the row;
-     * - any other delete records a row that stopped being searchable,
-     *   which became true at its last change or its deletion.
+     * - any other write carries the row as of its last change: its
+     *   updated_at, or its soft delete when that came later (a raw SQL
+     *   soft delete may set deleted_at alone).
      * Every time is capped at now, so a clock running ahead cannot let
      * old data claim to be from the future.
      *
@@ -121,7 +121,7 @@ final class Bulk
         } else {
             $time = $this->latest([
                 $model->getAttribute($column),
-                $delete && method_exists($model, 'getDeletedAtColumn')
+                method_exists($model, 'getDeletedAtColumn')
                     ? $model->getAttribute($model->getDeletedAtColumn())
                     : null,
             ]);
