@@ -38,14 +38,28 @@ final class PullFromSource implements StageInterface
     public function handle(?Client $elasticsearch = null): void
     {
         $this->handledChunks++;
-        $results = $this->source->get()->filter->shouldBeSearchable();
-        if (! $results->isEmpty()) {
-            $this->flush($elasticsearch ?? app(Client::class), $results);
-            if ($results->first()->getKeyType() !== 'int') {
-                $this->source->setChunkScope(new PageScope($this->handledChunks, $this->source->getChunkSize()));
-            } else {
-                $this->source->setChunkScope(new FromScope($results->last()->getKey(), $this->source->getChunkSize()));
-            }
+        $models = $this->source->get();
+        if ($models->isEmpty()) {
+            return;
+        }
+
+        $searchable = $models->filter->shouldBeSearchable();
+        if ($searchable->isNotEmpty()) {
+            $this->flush($elasticsearch ?? app(Client::class), $searchable);
+        }
+
+        // Move past every row read, searchable or not. Moving only past
+        // the searchable ones left a chunk with none of them in place,
+        // so it was read again until the chunk count ran out, and every
+        // row after it was skipped.
+        /** @var Model $last */
+        $last = $models->last();
+        if ($last->getKeyType() !== 'int') {
+            $this->source->setChunkScope(new PageScope($this->handledChunks, $this->source->getChunkSize()));
+        } else {
+            /** @var int $lastKey the key type is int in this branch */
+            $lastKey = $last->getKey();
+            $this->source->setChunkScope(new FromScope($lastKey, $this->source->getChunkSize()));
         }
     }
 

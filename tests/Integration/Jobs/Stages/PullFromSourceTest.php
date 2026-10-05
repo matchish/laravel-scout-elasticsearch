@@ -68,6 +68,29 @@ final class PullFromSourceTest extends IntegrationTestCase
         }
     }
 
+    public function test_moves_past_a_chunk_where_no_row_is_searchable(): void
+    {
+        // The test chunk size is 3: the first chunk holds only archived
+        // products, which are not searchable.
+        Product::withoutEvents(function () {
+            factory(Product::class, 3)->states(['archive'])->create();
+            factory(Product::class, 7)->create();
+        });
+        $this->elasticsearch->indices()->create([
+            'index' => 'products_index',
+            'body' => ['aliases' => ['products' => new stdClass()]],
+        ]);
+
+        $stage = PullFromSource::chunked(DefaultImportSourceFactory::from(Product::class));
+        while (! $stage->completed()) {
+            $stage->handle();
+        }
+
+        $this->elasticsearch->indices()->refresh(['index' => 'products']);
+        $count = $this->elasticsearch->count(['index' => 'products'])->asArray();
+        $this->assertSame(7, $count['count'], 'every searchable product after the unsearchable chunk must be imported');
+    }
+
     private function productInLiveIndex(): Product
     {
         // Boot the model while the dispatcher is in place, so Scout
