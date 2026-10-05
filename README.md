@@ -236,6 +236,9 @@ How it works:
 - The command follows the range jobs and shows how many have finished, so you can watch the import progress. It exits when the last range is done. If you would rather start the import and return to the shell immediately, set `scout.queue` — the whole import then runs on a worker.
 - If range jobs fail, the command stops with an error and the alias is **not** switched, so searches keep using the old index.
 - Starting a new `--parallel` import for an index cancels a still-running one. The superseded import stops with a message and never switches the alias, so only the newest import can publish its index.
+- Live model changes during the import are indexed through Scout observers as usual. A change made while an import is running is not overwritten by the import's older copy of the row, and a deleted record does not come back. This relies on the model's `updated_at` column; a model without one keeps the old behaviour, where the last write to arrive wins.
+- If your application also writes to the database without Eloquent events, add `--catch-up`. Right before the alias switch, it re-imports rows changed since the import started, and removes rows that stopped being searchable or were soft-deleted. A change counts only when it moved `updated_at` or `deleted_at`. A row deleted outright by raw SQL leaves nothing to read, so catch-up cannot remove it.
+- `elasticsearch.parallel.chunks_per_range` (default `8`) controls the range size: each range job processes about `chunks_per_range × scout.chunk.searchable` rows.
 
 #### Checking an import you are not watching
 
@@ -258,8 +261,6 @@ Pass a model name to check one index, for example `php artisan scout:import:stat
 Closing the terminal never stops an import. The range jobs are already on the queue, and the alias switch runs on a worker when the last one finishes.
 
 If you use [Laravel Horizon](https://laravel.com/docs/horizon), the same import appears on its Batches screen, named `scout-import:{index}`.
-- Live model changes during the import are indexed through Scout observers as usual. If your application also writes to the database without Eloquent events, add `--catch-up`: right before the alias switch, rows with `updated_at` newer than the import start are re-imported.
-- `elasticsearch.parallel.chunks_per_range` (default `8`) controls the range size: each range job processes about `chunks_per_range × scout.chunk.searchable` rows.
 
 ### Search
 
