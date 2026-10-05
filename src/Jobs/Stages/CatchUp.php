@@ -91,9 +91,11 @@ final class CatchUp implements StageInterface
 
             $searchable = $models->filter->shouldBeSearchable();
             if ($searchable->isNotEmpty()) {
-                // Catch-up re-reads rows as they are now, so it carries
-                // live changes rather than a snapshot.
-                $params = new Bulk(ImportAlias::of($this->index->name()), true, Bulk::WRITER_LIVE);
+                // Catch-up reads rows and writes them a moment later, so it
+                // is a snapshot too: it must lose to a live change made in
+                // between. It read after every range job, so it still beats
+                // their copies from the same second.
+                $params = new Bulk(ImportAlias::of($this->index->name()), true, Bulk::WRITER_CATCH_UP);
                 $params->index($searchable->all());
                 /** @var Elasticsearch $elasticResponse */
                 $elasticResponse = $elasticsearch->bulk($params->toArray());
