@@ -40,7 +40,7 @@ final class ImportStatusCommand extends Command
             return self::SUCCESS;
         }
 
-        $this->table(['Index', 'Status', 'Progress', 'Ranges', 'Failed', 'Started'], $rows);
+        $this->table(['Index', 'Status', 'Progress', 'Jobs', 'Failed', 'Started'], $rows);
 
         return self::SUCCESS;
     }

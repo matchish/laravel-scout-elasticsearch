@@ -238,7 +238,7 @@ How it works:
 - Starting a new `--parallel` import for an index cancels a still-running one. The superseded import stops with a message and never switches the alias, so only the newest import can publish its index.
 - Live model changes during the import are indexed through Scout observers as usual. A change made while an import is running is not overwritten by the import's older copy of the row, and a deleted record does not come back. This relies on the model's `updated_at` column; a model without one keeps the old behaviour, where the last write to arrive wins.
 - If your application also writes to the database without Eloquent events, add `--catch-up`. Right before the alias switch, it re-imports rows changed since the import started, and removes rows that stopped being searchable or were soft-deleted. A change counts only when it moved `updated_at` or `deleted_at`. A row deleted outright by raw SQL leaves nothing to read, so catch-up cannot remove it.
-- `elasticsearch.parallel.chunks_per_range` (default `8`) controls the range size: each range job processes about `chunks_per_range × scout.chunk.searchable` rows.
+- `elasticsearch.parallel.chunks_per_range` (default `8`) controls how much work one job carries: at most `chunks_per_range × scout.chunk.searchable` rows. A range with more rows — for example many rows that share one partition value — is handed on to further jobs in the same batch, so no single job runs long enough to hit your queue's `retry_after` or `--timeout`.
 
 #### Checking an import you are not watching
 
@@ -249,11 +249,11 @@ php artisan scout:import:status
 ```
 
 ```
-+----------+---------+----------+--------+--------+----------------+
-| Index    | Status  | Progress | Ranges | Failed | Started        |
-+----------+---------+----------+--------+--------+----------------+
-| products | running | 45%      | 9/20   | 0      | 2 minutes ago  |
-+----------+---------+----------+--------+--------+----------------+
++----------+---------+----------+-------+--------+----------------+
+| Index    | Status  | Progress | Jobs  | Failed | Started        |
++----------+---------+----------+-------+--------+----------------+
+| products | running | 45%      | 9/20  | 0      | 2 minutes ago  |
++----------+---------+----------+-------+--------+----------------+
 ```
 
 Pass a model name to check one index, for example `php artisan scout:import:status "App\Models\Product"`.

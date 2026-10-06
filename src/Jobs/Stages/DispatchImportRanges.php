@@ -85,10 +85,7 @@ final class DispatchImportRanges implements StageInterface
             ));
         }
 
-        $configChunksPerRange = config('elasticsearch.parallel.chunks_per_range', self::DEFAULT_CHUNKS_PER_RANGE);
-        $chunksPerRange = is_numeric($configChunksPerRange) ? (int) $configChunksPerRange : self::DEFAULT_CHUNKS_PER_RANGE;
-
-        return $this->plan = RangePlanner::plan($source, $this->chunkSize(), $chunksPerRange);
+        return $this->plan = RangePlanner::plan($source, $this->chunkSize(), $this->chunksPerRange());
     }
 
     /**
@@ -119,9 +116,12 @@ final class DispatchImportRanges implements StageInterface
 
         $column = $plan->column();
         $chunkSize = $this->chunkSize();
+        // The same amount of work sizes a range and caps one job: a range
+        // holding more rows than planned is handed on to further jobs.
+        $maxChunks = $this->chunksPerRange();
         $writeTarget = ImportAlias::of($index->name());
-        $jobs = array_map(function (Range $range) use ($source, $column, $writeTarget, $chunkSize) {
-            return new ImportRange($source, $range, $column, $writeTarget, $chunkSize);
+        $jobs = array_map(function (Range $range) use ($source, $column, $writeTarget, $chunkSize, $maxChunks) {
+            return new ImportRange($source, $range, $column, $writeTarget, $chunkSize, $maxChunks);
         }, $plan->ranges());
 
         $batch = Bus::batch($jobs)
@@ -158,6 +158,13 @@ final class DispatchImportRanges implements StageInterface
         $configChunkSize = config('scout.chunk.searchable', 500);
 
         return is_numeric($configChunkSize) ? (int) $configChunkSize : 500;
+    }
+
+    private function chunksPerRange(): int
+    {
+        $configChunksPerRange = config('elasticsearch.parallel.chunks_per_range', self::DEFAULT_CHUNKS_PER_RANGE);
+
+        return max(1, is_numeric($configChunksPerRange) ? (int) $configChunksPerRange : self::DEFAULT_CHUNKS_PER_RANGE);
     }
 
     private static function dispatchFinish(FinishImport $finish, ?string $connection, ?string $queue): void

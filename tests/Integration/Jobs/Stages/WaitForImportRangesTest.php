@@ -53,6 +53,34 @@ final class WaitForImportRangesTest extends IntegrationTestCase
         $this->assertTrue($wait->completed());
     }
 
+    public function test_progress_never_moves_back_when_jobs_hand_on_work(): void
+    {
+        [$dispatch, $wait] = $this->dispatchedStages(9);
+        $repository = app(BatchRepository::class);
+        $batchId = $dispatch->batchId();
+        $this->assertNotNull($batchId);
+
+        // One of three planned jobs finishes: a third of the bar.
+        $repository->decrementPendingJobs($batchId, 'job-1');
+        $wait->handle();
+        $this->assertSame(1, $wait->advance());
+
+        // Three jobs hand on the rest of their ranges. The finished share
+        // drops to 1 of 6, but the bar must not move back.
+        $repository->incrementTotalJobs($batchId, 3);
+        $wait->handle();
+        $this->assertSame(0, $wait->advance());
+
+        foreach (range(2, 6) as $job) {
+            $repository->decrementPendingJobs($batchId, 'job-'.$job);
+        }
+        $repository->markAsFinished($batchId);
+        $wait->handle();
+
+        $this->assertSame(2, $wait->advance(), 'the bar ends exactly at the planned total');
+        $this->assertTrue($wait->completed());
+    }
+
     public function test_failed_range_jobs_stop_the_import_with_an_explanation(): void
     {
         [$dispatch, $wait] = $this->dispatchedStages(9);

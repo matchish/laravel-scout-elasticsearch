@@ -26,6 +26,12 @@ use Matchish\ScoutElasticSearch\Searchable\Range;
  * of the write alias, so a job from a superseded import can never
  * pollute the index of a newer import.
  *
+ * Inside a batch, one job processes at most $maxChunks chunks and then
+ * hands the rest of its range to a new job in the same batch. A range
+ * can hold any number of rows — many rows can share one partition
+ * value, or one outlier key can stretch the key space — but no job
+ * runs long enough to outlive the queue's retry_after or --timeout.
+ *
  * @internal
  */
 final class ImportRange implements ShouldQueue
@@ -58,25 +64,46 @@ final class ImportRange implements ShouldQueue
     private $chunkSize;
 
     /**
+     * @var int
+     */
+    private $maxChunks;
+
+    /**
+     * @var array{0: mixed, 1: mixed}|null
+     */
+    private $after;
+
+    /**
      * @param  Partitionable  $source
      * @param  Range  $range
      * @param  string  $column  partition column, unqualified
      * @param  string  $indexName  concrete index name to write to
      * @param  int  $chunkSize
+     * @param  int  $maxChunks  chunks one job processes before it hands on the rest; 0 for no limit
+     * @param  array{0: mixed, 1: mixed}|null  $after  (partition, key) of the last row a previous job wrote
      */
-    public function __construct(Partitionable $source, Range $range, string $column, string $indexName, int $chunkSize)
-    {
+    public function __construct(
+        Partitionable $source,
+        Range $range,
+        string $column,
+        string $indexName,
+        int $chunkSize,
+        int $maxChunks = 0,
+        ?array $after = null
+    ) {
         $this->source = $source;
         $this->range = $range;
         $this->column = $column;
         $this->indexName = $indexName;
         $this->chunkSize = $chunkSize;
+        $this->maxChunks = $maxChunks;
+        $this->after = $after;
     }
 
     public function handle(Client $elasticsearch): void
     {
-        $lastKey = null;
-        $lastPartition = null;
+        [$lastPartition, $lastKey] = $this->after ?? [null, null];
+        $chunks = 0;
 
         do {
             if ($this->batch() !== null && $this->batch()->cancelled()) {
@@ -97,7 +124,26 @@ final class ImportRange implements ShouldQueue
             if ($searchable->isNotEmpty() && ! $this->flush($elasticsearch, $searchable)) {
                 return;
             }
-        } while ($models->count() === $this->chunkSize);
+
+            $more = $models->count() === $this->chunkSize;
+            $chunks++;
+            $batch = $this->batch();
+            if ($more && $batch !== null && $this->maxChunks > 0 && $chunks >= $this->maxChunks) {
+                // Added before this job finishes, so the batch never sees
+                // zero pending jobs while part of the range is left.
+                $batch->add([new self(
+                    $this->source,
+                    $this->range,
+                    $this->column,
+                    $this->indexName,
+                    $this->chunkSize,
+                    $this->maxChunks,
+                    [$lastPartition, $lastKey]
+                )]);
+
+                return;
+            }
+        } while ($more);
     }
 
     /**

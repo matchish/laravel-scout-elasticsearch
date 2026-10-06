@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration\Jobs;
 
 use App\Product;
+use Illuminate\Support\Facades\Bus;
 use Matchish\ScoutElasticSearch\Jobs\ImportRange;
 use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
 use Matchish\ScoutElasticSearch\Searchable\Partitionable;
@@ -171,6 +172,55 @@ final class ImportRangeTest extends IntegrationTestCase
      * way DispatchImportRanges wires it, so the tests create the
      * backing index with that alias attached.
      */
+    public function test_hands_the_rest_of_a_long_range_to_new_jobs_in_its_batch(): void
+    {
+        $ids = $this->createProducts(10);
+        $this->createWriteTarget();
+
+        // Chunks of 3 and at most one chunk per job: 10 rows need four
+        // jobs, and no single job sees more than one chunk.
+        $batch = Bus::batch([new ImportRange(
+            DefaultImportSourceFactory::from(Product::class),
+            Range::between($ids[0], null),
+            'id',
+            self::INDEX,
+            3,
+            1
+        )])->onConnection('sync')->dispatch();
+
+        $this->assertCount(10, $this->indexedIds(), 'every row of the range is imported');
+        $finished = Bus::findBatch($batch->id);
+        $this->assertNotNull($finished);
+        $this->assertSame(4, $finished->totalJobs, 'the range was handed on three times');
+        $this->assertSame(0, $finished->pendingJobs);
+    }
+
+    public function test_outside_a_batch_imports_the_whole_range_in_one_go(): void
+    {
+        $ids = $this->createProducts(10);
+        $this->createWriteTarget();
+
+        // No batch to hand work on to, so the limit does not apply.
+        (new ImportRange(
+            DefaultImportSourceFactory::from(Product::class),
+            Range::between($ids[0], null),
+            'id',
+            self::INDEX,
+            3,
+            1
+        ))->handle($this->elasticsearch);
+
+        $this->assertCount(10, $this->indexedIds());
+    }
+
+    private function createWriteTarget(): void
+    {
+        $this->elasticsearch->indices()->create([
+            'index' => self::INDEX.'_index',
+            'body' => ['aliases' => [self::INDEX => new stdClass()]],
+        ]);
+    }
+
     private function runJob(string $class, Range $range, string $column, int $chunkSize = 500): void
     {
         try {

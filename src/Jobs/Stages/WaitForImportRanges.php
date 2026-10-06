@@ -28,9 +28,11 @@ final class WaitForImportRanges implements StageInterface
     private $dispatch;
 
     /**
+     * Steps of the progress bar reported so far.
+     *
      * @var int
      */
-    private $finishedJobs = 0;
+    private $reported = 0;
 
     /**
      * @var int
@@ -63,9 +65,13 @@ final class WaitForImportRanges implements StageInterface
             return;
         }
 
+        // A job that hands on part of its range adds a job to the batch,
+        // so the total grows while the import runs. Show the finished
+        // share on the planned scale, and never move the bar back.
         $finished = $batch->totalJobs - $batch->pendingJobs;
-        $this->advanceBy = max(0, $finished - $this->finishedJobs);
-        $this->finishedJobs = $finished;
+        $position = $batch->totalJobs > 0 ? intdiv($this->estimate() * $finished, $batch->totalJobs) : 0;
+        $this->advanceBy = max(0, $position - $this->reported);
+        $this->reported = max($this->reported, $position);
 
         if ($batch->finished() || $batch->cancelled()) {
             $this->done = true;
