@@ -195,6 +195,28 @@ final class ImportRangeTest extends IntegrationTestCase
         $this->assertSame(0, $finished->pendingJobs);
     }
 
+    public function test_a_range_of_exactly_one_jobs_size_needs_no_second_job(): void
+    {
+        // Two full chunks of 3, and at most two chunks per job: the last
+        // chunk is full, but nothing is left after it.
+        $ids = $this->createProducts(6);
+        $this->createWriteTarget();
+
+        $batch = Bus::batch([new ImportRange(
+            DefaultImportSourceFactory::from(Product::class),
+            Range::between($ids[0], null),
+            'id',
+            self::INDEX,
+            3,
+            2
+        )])->onConnection('sync')->dispatch();
+
+        $this->assertCount(6, $this->indexedIds());
+        $finished = Bus::findBatch($batch->id);
+        $this->assertNotNull($finished);
+        $this->assertSame(1, $finished->totalJobs, 'no empty job is added after the last row');
+    }
+
     public function test_outside_a_batch_imports_the_whole_range_in_one_go(): void
     {
         $ids = $this->createProducts(10);

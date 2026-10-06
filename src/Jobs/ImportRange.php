@@ -129,6 +129,12 @@ final class ImportRange implements ShouldQueue
             $chunks++;
             $batch = $this->batch();
             if ($more && $batch !== null && $this->maxChunks > 0 && $chunks >= $this->maxChunks) {
+                // A full last chunk does not prove rows remain: a range
+                // planned at exactly this size ends right here. Check before
+                // adding a job that would find nothing.
+                if (! $this->rowsAfter($lastPartition, $lastKey)->exists()) {
+                    return;
+                }
                 // Added before this job finishes, so the batch never sees
                 // zero pending jobs while part of the range is left.
                 $batch->add([new self(
@@ -155,6 +161,19 @@ final class ImportRange implements ShouldQueue
      * @return EloquentCollection<int, \Illuminate\Database\Eloquent\Model>
      */
     private function nextChunk($lastPartition, $lastKey): EloquentCollection
+    {
+        return $this->rowsAfter($lastPartition, $lastKey)->limit($this->chunkSize)->get();
+    }
+
+    /**
+     * The rows of the range that come after the last seen row, in the
+     * order the range is imported.
+     *
+     * @param  mixed  $lastPartition
+     * @param  mixed  $lastKey
+     * @return Builder<\Illuminate\Database\Eloquent\Model>
+     */
+    private function rowsAfter($lastPartition, $lastKey): Builder
     {
         $query = $this->source->query()->reorder();
         $model = $query->getModel();
@@ -202,7 +221,7 @@ final class ImportRange implements ShouldQueue
             }
         }
 
-        return $query->limit($this->chunkSize)->get();
+        return $query;
     }
 
     /**
