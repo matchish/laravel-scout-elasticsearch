@@ -127,7 +127,9 @@ final class CatchUp implements StageInterface
 
                 return ! $trashed && $model->shouldBeSearchable();
             });
-            $this->write($elasticsearch, $current, $gone);
+            if (! $this->write($elasticsearch, $current, $gone)) {
+                return; // the import was revoked
+            }
         } while ($models->count() === $chunkSize);
     }
 
@@ -137,13 +139,17 @@ final class CatchUp implements StageInterface
      * read after every range job, so it still beats their copies from
      * the same second.
      *
+     * Returns false when the import alias is gone: a newer import
+     * replaced this one, or a repeated run of the finishing job comes
+     * after the alias switch. Either way there is nothing to catch up.
+     *
      * @param  EloquentCollection<int, \Illuminate\Database\Eloquent\Model>  $current
      * @param  EloquentCollection<int, \Illuminate\Database\Eloquent\Model>  $gone
      */
-    private function write(Client $elasticsearch, EloquentCollection $current, EloquentCollection $gone): void
+    private function write(Client $elasticsearch, EloquentCollection $current, EloquentCollection $gone): bool
     {
         if ($current->isEmpty() && $gone->isEmpty()) {
-            return;
+            return true;
         }
 
         $params = new Bulk(ImportAlias::of($this->index->name()), true, Bulk::WRITER_CATCH_UP);
@@ -152,9 +158,14 @@ final class CatchUp implements StageInterface
         /** @var Elasticsearch $elasticResponse */
         $elasticResponse = $elasticsearch->bulk($params->toArray());
         $result = new BulkResult($elasticResponse->asArray());
+        if ($result->allTargetsMissing()) {
+            return false;
+        }
         if ($result->hasFatalErrors()) {
             throw new \Exception('Bulk catch-up error: '.$result->toJson());
         }
+
+        return true;
     }
 
     public function title(): string

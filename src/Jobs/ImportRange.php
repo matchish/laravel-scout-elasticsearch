@@ -32,11 +32,30 @@ use Matchish\ScoutElasticSearch\Searchable\Range;
  * value, or one outlier key can stretch the key space — but no job
  * runs long enough to outlive the queue's retry_after or --timeout.
  *
+ * The job that writes the last row of the range records the range as
+ * finished, and the job that records the last range starts the job
+ * that publishes the import. Running a job twice repeats idempotent
+ * writes and the same records, so a retry is always safe.
+ *
  * @internal
  */
 final class ImportRange implements ShouldQueue
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable;
+
+    /**
+     * Retrying is safe, so a job the queue delivers again — or one that
+     * hit a short Elasticsearch error — gets another attempt instead of
+     * cancelling the whole import. This overrides the worker's --tries.
+     *
+     * @var int
+     */
+    public $tries = 3;
+
+    /**
+     * @var int
+     */
+    public $backoff = 5;
 
     /**
      * @var Partitionable
@@ -74,6 +93,21 @@ final class ImportRange implements ShouldQueue
     private $after;
 
     /**
+     * @var ImportState|null
+     */
+    private $state;
+
+    /**
+     * @var int|null
+     */
+    private $rangeNumber;
+
+    /**
+     * @var FinishImport|null
+     */
+    private $finish;
+
+    /**
      * @param  Partitionable  $source
      * @param  Range  $range
      * @param  string  $column  partition column, unqualified
@@ -81,6 +115,9 @@ final class ImportRange implements ShouldQueue
      * @param  int  $chunkSize
      * @param  int  $maxChunks  chunks one job processes before it hands on the rest; 0 for no limit
      * @param  array{0: mixed, 1: mixed}|null  $after  (partition, key) of the last row a previous job wrote
+     * @param  ImportState|null  $state  where to record the range once every row is written
+     * @param  int|null  $rangeNumber  the range's position in the plan
+     * @param  FinishImport|null  $finish  started once every range is recorded
      */
     public function __construct(
         Partitionable $source,
@@ -89,7 +126,10 @@ final class ImportRange implements ShouldQueue
         string $indexName,
         int $chunkSize,
         int $maxChunks = 0,
-        ?array $after = null
+        ?array $after = null,
+        ?ImportState $state = null,
+        ?int $rangeNumber = null,
+        ?FinishImport $finish = null
     ) {
         $this->source = $source;
         $this->range = $range;
@@ -98,6 +138,9 @@ final class ImportRange implements ShouldQueue
         $this->chunkSize = $chunkSize;
         $this->maxChunks = $maxChunks;
         $this->after = $after;
+        $this->state = $state;
+        $this->rangeNumber = $rangeNumber;
+        $this->finish = $finish;
     }
 
     public function handle(Client $elasticsearch): void
@@ -105,14 +148,14 @@ final class ImportRange implements ShouldQueue
         [$lastPartition, $lastKey] = $this->after ?? [null, null];
         $chunks = 0;
 
-        do {
+        while (true) {
             if ($this->batch() !== null && $this->batch()->cancelled()) {
                 return;
             }
 
             $models = $this->nextChunk($lastPartition, $lastKey);
             if ($models->isEmpty()) {
-                return;
+                break;
             }
 
             /** @var \Illuminate\Database\Eloquent\Model $last */
@@ -122,21 +165,34 @@ final class ImportRange implements ShouldQueue
 
             $searchable = $models->filter->shouldBeSearchable();
             if ($searchable->isNotEmpty() && ! $this->flush($elasticsearch, $searchable)) {
-                return;
+                return; // the import was revoked
             }
 
-            $more = $models->count() === $this->chunkSize;
+            if ($models->count() < $this->chunkSize) {
+                break;
+            }
+
             $chunks++;
             $batch = $this->batch();
-            if ($more && $batch !== null && $this->maxChunks > 0 && $chunks >= $this->maxChunks) {
+            if ($batch !== null && $this->maxChunks > 0 && $chunks >= $this->maxChunks) {
                 // A full last chunk does not prove rows remain: a range
                 // planned at exactly this size ends right here. Check before
                 // adding a job that would find nothing.
                 if (! $this->rowsAfter($lastPartition, $lastKey)->exists()) {
+                    break;
+                }
+                // A job the queue delivers twice reaches this point twice.
+                // Hand on only once, so a repeat cannot start a second job
+                // for the same rows. The record is written after the job is
+                // added: a crash in between costs a duplicate, which stops
+                // at its own hand-off, but never loses the rest of the range.
+                $job = $this->jobKey();
+                if ($this->state !== null && $this->state->handedOff($elasticsearch, $job)) {
                     return;
                 }
                 // Added before this job finishes, so the batch never sees
-                // zero pending jobs while part of the range is left.
+                // zero pending jobs while part of the range is left. The new
+                // job finishes the range, so it is the one that records it.
                 $batch->add([new self(
                     $this->source,
                     $this->range,
@@ -144,12 +200,43 @@ final class ImportRange implements ShouldQueue
                     $this->indexName,
                     $this->chunkSize,
                     $this->maxChunks,
-                    [$lastPartition, $lastKey]
+                    [$lastPartition, $lastKey],
+                    $this->state,
+                    $this->rangeNumber,
+                    $this->finish
                 )]);
+                if ($this->state !== null) {
+                    $this->state->recordHandOff($elasticsearch, $job);
+                }
 
                 return;
             }
-        } while ($more);
+        }
+
+        // Every row of the range is written.
+        if ($this->state === null || $this->rangeNumber === null) {
+            return;
+        }
+        $this->state->recordFinished($elasticsearch, $this->rangeNumber);
+
+        // Each job records its range before it checks the others, so the
+        // job that records the last range sees every range recorded. Two
+        // jobs finishing together may both see it; the claim lets one of
+        // them start the finishing job.
+        if ($this->finish !== null
+            && $this->state->complete($elasticsearch)
+            && $this->state->claimFinish($elasticsearch, $this->jobKey())) {
+            dispatch($this->finish->forBatch($this->batchId));
+        }
+    }
+
+    /**
+     * Identifies this job by its range and the row it starts after, which
+     * every delivery of the job shares.
+     */
+    private function jobKey(): string
+    {
+        return sha1(serialize([$this->rangeNumber, $this->after]));
     }
 
     /**

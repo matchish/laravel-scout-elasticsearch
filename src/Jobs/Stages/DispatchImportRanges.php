@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elastic\Elasticsearch\Client;
-use Illuminate\Bus\Batch;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Bus;
 use Matchish\ScoutElasticSearch\ElasticSearch\ImportAlias;
@@ -13,18 +12,19 @@ use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Jobs\FinishImport;
 use Matchish\ScoutElasticSearch\Jobs\ImportBatches;
 use Matchish\ScoutElasticSearch\Jobs\ImportRange;
+use Matchish\ScoutElasticSearch\Jobs\ImportState;
 use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 use Matchish\ScoutElasticSearch\Searchable\Partitionable;
-use Matchish\ScoutElasticSearch\Searchable\Range;
 use Matchish\ScoutElasticSearch\Searchable\RangePlan;
 use Matchish\ScoutElasticSearch\Searchable\RangePlanner;
 
 /**
  * Plans the key ranges and dispatches one ImportRange job per range
- * as a named batch. When the batch finishes, FinishImport refreshes
- * the new index and switches the aliases. The stage never waits for
- * the batch, so a worker running the import cannot deadlock itself;
- * WaitForImportRanges does the waiting when it is safe.
+ * as a named batch. The range job that records the last finished range
+ * starts FinishImport, which refreshes the new index and switches the
+ * aliases. The stage never waits for the batch, so a worker running
+ * the import cannot deadlock itself; WaitForImportRanges and
+ * WaitForPublish do the waiting when it is safe.
  *
  * @internal
  */
@@ -56,6 +56,11 @@ final class DispatchImportRanges implements StageInterface
      * @var string|null
      */
     private $batchId;
+
+    /**
+     * @var ImportState|null
+     */
+    private $state;
 
     public function __construct(ImportSource $source, Index $index, FinishImport $finish)
     {
@@ -97,8 +102,18 @@ final class DispatchImportRanges implements StageInterface
         return $this->batchId;
     }
 
+    /**
+     * Where range jobs record finished ranges and the finishing job
+     * records a failure, or null before the stage has run.
+     */
+    public function state(): ?ImportState
+    {
+        return $this->state;
+    }
+
     public function handle(?Client $elasticsearch = null): void
     {
+        $elasticsearch = $elasticsearch ?? app(Client::class);
         $plan = $this->plan();
         /** @var Partitionable $source */
         $source = $this->source;
@@ -106,10 +121,21 @@ final class DispatchImportRanges implements StageInterface
         $index = $this->index;
         $connection = $this->source->syncWithSearchUsing();
         $queue = $this->source->syncWithSearchUsingQueue();
-        $finish = $this->finish;
+
+        $state = ImportState::forImport($index->name(), count($plan->ranges()));
+        $state->create($elasticsearch);
+        $this->state = $state;
+
+        $finish = $this->finish->forImport($state);
+        if ($connection !== null) {
+            $finish->onConnection($connection);
+        }
+        if ($queue !== null) {
+            $finish->onQueue($queue);
+        }
 
         if ($plan->isEmpty()) {
-            self::dispatchFinish($finish, $connection, $queue);
+            dispatch($finish);
 
             return;
         }
@@ -120,20 +146,16 @@ final class DispatchImportRanges implements StageInterface
         // holding more rows than planned is handed on to further jobs.
         $maxChunks = $this->chunksPerRange();
         $writeTarget = ImportAlias::of($index->name());
-        $jobs = array_map(function (Range $range) use ($source, $column, $writeTarget, $chunkSize, $maxChunks) {
-            return new ImportRange($source, $range, $column, $writeTarget, $chunkSize, $maxChunks);
-        }, $plan->ranges());
 
-        $batch = Bus::batch($jobs)
-            ->name(ImportBatches::name($this->source->searchableAs()))
-            ->then(function (Batch $batch) use ($finish, $connection, $queue) {
-                // A cancelled batch still reaches this callback, because
-                // Laravel counts its skipped jobs as successful.
-                if ($batch->cancelled()) {
-                    return;
-                }
-                self::dispatchFinish($finish->forBatch($batch->id), $connection, $queue);
-            });
+        $jobs = [];
+        foreach (array_values($plan->ranges()) as $number => $range) {
+            $jobs[] = new ImportRange($source, $range, $column, $writeTarget, $chunkSize, $maxChunks, null, $state, $number, $finish);
+        }
+
+        // The batch only reports progress and lets a newer import cancel
+        // this one. It does not decide when the import is finished: it
+        // counts deliveries, and any queue may deliver a job twice.
+        $batch = Bus::batch($jobs)->name(ImportBatches::name($this->source->searchableAs()));
 
         if ($connection !== null) {
             $batch->onConnection($connection);
@@ -165,17 +187,6 @@ final class DispatchImportRanges implements StageInterface
         $configChunksPerRange = config('elasticsearch.parallel.chunks_per_range', self::DEFAULT_CHUNKS_PER_RANGE);
 
         return max(1, is_numeric($configChunksPerRange) ? (int) $configChunksPerRange : self::DEFAULT_CHUNKS_PER_RANGE);
-    }
-
-    private static function dispatchFinish(FinishImport $finish, ?string $connection, ?string $queue): void
-    {
-        $pending = dispatch($finish);
-        if ($connection !== null) {
-            $pending->onConnection($connection);
-        }
-        if ($queue !== null) {
-            $pending->onQueue($queue);
-        }
     }
 
     public function title(): string

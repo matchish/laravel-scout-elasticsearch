@@ -164,6 +164,28 @@ final class CatchUpTest extends IntegrationTestCase
         $this->assertSame(2, $this->indexedCount());
     }
 
+    /**
+     * A repeated run of the finishing job comes after the alias switch
+     * took the import alias away. Catch-up has nothing left to do then,
+     * and must not fail the job that already published the import.
+     */
+    public function test_stops_quietly_once_the_import_alias_is_gone(): void
+    {
+        Product::withoutEvents(function () {
+            factory(Product::class, 2)->create();
+        });
+        $this->elasticsearch->indices()->create(['index' => self::INDEX]);
+        $stage = new CatchUp(
+            DefaultImportSourceFactory::from(Product::class),
+            new Index(self::INDEX),
+            new \DateTimeImmutable('2000-01-01 00:00:00')
+        );
+
+        $stage->handle($this->elasticsearch);
+
+        $this->assertSame(0, $this->indexedCount(), 'nothing is written without the import alias');
+    }
+
     public function test_pages_through_more_rows_than_chunk_size(): void
     {
         $dispatcher = Product::getEventDispatcher();
