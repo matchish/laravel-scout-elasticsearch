@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration\Jobs\Stages;
 
 use App\Product;
+use Matchish\ScoutElasticSearch\Jobs\ImportState;
 use Matchish\ScoutElasticSearch\Jobs\Stages\CleanUp;
 use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
 use stdClass;
@@ -49,6 +50,34 @@ final class CleanUpTest extends IntegrationTestCase
         $this->runStage();
 
         $this->assertTrue($this->exists('products_333'));
+    }
+
+    public function test_reclaims_the_state_of_an_import_that_died(): void
+    {
+        // The state index has an alias of its own, but no search alias.
+        $state = ImportState::forImport('products_444', 1);
+        $state->create($this->elasticsearch);
+
+        $this->runStage();
+
+        $this->assertFalse($state->exists($this->elasticsearch));
+    }
+
+    public function test_never_touches_another_model_whose_name_starts_the_same(): void
+    {
+        // A model named products_archive: its live index is marked and has
+        // its own alias, but none named "products".
+        $this->elasticsearch->indices()->create([
+            'index' => 'products_archive_555',
+            'body' => [
+                'mappings' => ['_meta' => ['scout_import' => true]],
+                'aliases' => ['products_archive' => new stdClass()],
+            ],
+        ]);
+
+        $this->runStage();
+
+        $this->assertTrue($this->exists('products_archive_555'));
     }
 
     private function runStage(): void

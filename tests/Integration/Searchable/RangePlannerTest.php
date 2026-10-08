@@ -5,18 +5,91 @@ declare(strict_types=1);
 namespace Tests\Integration\Searchable;
 
 use App\Product;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
 use Matchish\ScoutElasticSearch\Searchable\Partitionable;
 use Matchish\ScoutElasticSearch\Searchable\Range;
 use Matchish\ScoutElasticSearch\Searchable\RangePlan;
 use Matchish\ScoutElasticSearch\Searchable\RangePlanner;
 use Tests\Fixtures\BookWithoutPartitionKey;
+use Tests\Fixtures\ProductWithBigIntegerKey;
 use Tests\Fixtures\ProductWithPartitionKey;
 use Tests\Fixtures\ProductWithStringPartitionKey;
 use Tests\IntegrationTestCase;
 
 final class RangePlannerTest extends IntegrationTestCase
 {
+    public function test_covers_keys_too_large_for_a_float(): void
+    {
+        // A float cannot hold every integer above 2^53: 2^53 + 3 becomes
+        // 2^53 + 4. The usual products table has a 32-bit key, so these
+        // keys need a table of their own.
+        Schema::create('big_integer_products', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->softDeletes();
+        });
+
+        try {
+            DB::table('big_integer_products')->insert([
+                ['id' => 9007199254740995],
+                ['id' => 9007199254741995],
+                ['id' => 9007199254742995],
+            ]);
+
+            $plan = RangePlanner::plan($this->source(ProductWithBigIntegerKey::class), 1, 1);
+
+            $this->assertGreaterThan(1, count($plan->ranges()), 'precondition: the keys are split into ranges');
+            $this->assertSame(3, $this->coveredRows(ProductWithBigIntegerKey::class, $plan));
+        } finally {
+            Schema::dropIfExists('big_integer_products');
+        }
+    }
+
+    public function test_covers_keys_at_both_ends_of_the_signed_integer_range(): void
+    {
+        // The widest span a signed 64-bit key can have.
+        Schema::create('big_integer_products', function (Blueprint $table) {
+            $table->bigInteger('id')->primary();
+            $table->softDeletes();
+        });
+
+        try {
+            DB::table('big_integer_products')->insert([
+                ['id' => -9223372036854775000],
+                ['id' => 0],
+                ['id' => 9223372036854775000],
+            ]);
+
+            $plan = RangePlanner::plan($this->source(ProductWithBigIntegerKey::class), 1, 1);
+
+            $this->assertGreaterThan(1, count($plan->ranges()), 'precondition: the keys are split into ranges');
+            $this->assertSame(3, $this->coveredRows(ProductWithBigIntegerKey::class, $plan));
+        } finally {
+            Schema::dropIfExists('big_integer_products');
+        }
+    }
+
+    public function test_covers_a_row_added_below_the_planned_minimum(): void
+    {
+        $dispatcher = Product::getEventDispatcher();
+        Product::unsetEventDispatcher();
+        factory(Product::class, 6)->create(['weight' => 100]);
+        factory(Product::class, 6)->create(['weight' => 500]);
+        Product::setEventDispatcher($dispatcher);
+
+        $plan = RangePlanner::plan($this->source(ProductWithPartitionKey::class), 3, 2);
+
+        // Inserted after planning, with a partition value below anything
+        // the planner saw.
+        Product::withoutEvents(function () {
+            factory(Product::class)->create(['weight' => 5]);
+        });
+
+        $this->assertSame(13, $this->coveredRows(ProductWithPartitionKey::class, $plan));
+    }
+
     public function test_plans_contiguous_ranges_for_integer_primary_key(): void
     {
         $dispatcher = Product::getEventDispatcher();
@@ -28,7 +101,9 @@ final class RangePlannerTest extends IntegrationTestCase
 
         $this->assertSame('id', $plan->column());
         $this->assertCount(4, $plan->ranges());
-        $this->assertSame((int) Product::query()->min('id'), $plan->ranges()[0]->from());
+        // Both outer ends are open, so the plan covers every key by
+        // construction; min and max only place the inner boundaries.
+        $this->assertNull($plan->ranges()[0]->from());
 
         $previous = null;
         foreach ($plan->ranges() as $range) {
@@ -109,7 +184,11 @@ final class RangePlannerTest extends IntegrationTestCase
             if ($range->isNullBucket()) {
                 $query->whereNull($plan->column());
             } else {
-                $query->where($plan->column(), '>=', $range->from());
+                // Mirrors ImportRange: NULL values belong to the null bucket.
+                $query->whereNotNull($plan->column());
+                if ($range->from() !== null) {
+                    $query->where($plan->column(), '>=', $range->from());
+                }
                 if ($range->to() !== null) {
                     $query->where($plan->column(), '<', $range->to());
                 }

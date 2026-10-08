@@ -48,9 +48,96 @@ final class WaitForImportRangesTest extends IntegrationTestCase
         $repository->decrementPendingJobs($batchId, 'job-2');
         $repository->decrementPendingJobs($batchId, 'job-3');
         $repository->markAsFinished($batchId);
+        $this->recordEveryRange($dispatch);
         $wait->handle();
         $this->assertSame(2, $wait->advance());
         $this->assertTrue($wait->completed());
+    }
+
+    public function test_progress_never_moves_back_when_jobs_hand_on_work(): void
+    {
+        [$dispatch, $wait] = $this->dispatchedStages(9);
+        $repository = app(BatchRepository::class);
+        $batchId = $dispatch->batchId();
+        $this->assertNotNull($batchId);
+
+        // One of three planned jobs finishes: a third of the bar.
+        $repository->decrementPendingJobs($batchId, 'job-1');
+        $wait->handle();
+        $this->assertSame(1, $wait->advance());
+
+        // Three jobs hand on the rest of their ranges. The finished share
+        // drops to 1 of 6, but the bar stays where it was.
+        $repository->incrementTotalJobs($batchId, 3);
+        $wait->handle();
+        $this->assertSame(0, $wait->advance());
+
+        foreach (range(2, 6) as $job) {
+            $repository->decrementPendingJobs($batchId, 'job-'.$job);
+        }
+        $repository->markAsFinished($batchId);
+        $this->recordEveryRange($dispatch);
+        $wait->handle();
+
+        $this->assertSame(2, $wait->advance(), 'the bar ends exactly at the planned total');
+        $this->assertTrue($wait->completed());
+    }
+
+    public function test_waits_until_every_range_is_recorded(): void
+    {
+        [$dispatch, $wait] = $this->dispatchedStages(9);
+        $repository = app(BatchRepository::class);
+        $batchId = $dispatch->batchId();
+        $this->assertNotNull($batchId);
+        $state = $dispatch->state();
+        $this->assertNotNull($state);
+
+        // Range 0 ran twice, so the batch counts three finished jobs and
+        // marks itself finished, although range 2 has not run.
+        foreach (['delivery-1', 'delivery-2', 'delivery-3'] as $delivery) {
+            $repository->decrementPendingJobs($batchId, $delivery);
+        }
+        $repository->markAsFinished($batchId);
+        $state->recordFinished($this->elasticsearch, 0);
+        $state->recordFinished($this->elasticsearch, 1);
+
+        $wait->handle();
+        $this->assertFalse($wait->completed(), 'range 2 is not recorded yet');
+
+        $state->recordFinished($this->elasticsearch, 2);
+        $wait->handle();
+        $this->assertTrue($wait->completed());
+    }
+
+    public function test_completes_once_every_range_is_recorded_after_jobs_ran_twice(): void
+    {
+        [$dispatch, $wait] = $this->dispatchedStages(9);
+        $repository = app(BatchRepository::class);
+        $batchId = $dispatch->batchId();
+        $this->assertNotNull($batchId);
+
+        // Five successes for three jobs: pending is -2. The batch is not
+        // marked finished — a hand-off that adds a job clears that mark.
+        foreach (range(1, 5) as $delivery) {
+            $repository->decrementPendingJobs($batchId, 'delivery-'.$delivery);
+        }
+        $this->recordEveryRange($dispatch);
+
+        $wait->handle();
+
+        $this->assertTrue($wait->completed());
+    }
+
+    public function test_completes_once_every_range_is_recorded_while_jobs_are_still_queued(): void
+    {
+        // Repeats of a job may still be queued; they write nothing new.
+        [$dispatch, $wait] = $this->dispatchedStages(9);
+        $this->recordEveryRange($dispatch);
+
+        $wait->handle();
+
+        $this->assertTrue($wait->completed());
+        $this->assertSame(3, $wait->advance(), 'the bar is full');
     }
 
     public function test_failed_range_jobs_stop_the_import_with_an_explanation(): void
@@ -115,6 +202,19 @@ final class WaitForImportRangesTest extends IntegrationTestCase
 
         $this->assertTrue($wait->completed());
         $this->assertSame(0, $wait->advance());
+    }
+
+    /**
+     * What the range jobs do once each has written its last row; the
+     * null queue never runs them in these tests.
+     */
+    private function recordEveryRange(DispatchImportRanges $dispatch): void
+    {
+        $state = $dispatch->state();
+        $this->assertNotNull($state);
+        foreach (array_keys($dispatch->plan()->ranges()) as $number) {
+            $state->recordFinished($this->elasticsearch, $number);
+        }
     }
 
     /**

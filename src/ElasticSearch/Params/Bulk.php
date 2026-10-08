@@ -13,15 +13,32 @@ use Matchish\ScoutElasticSearch\Contracts\SearchableContract;
 final class Bulk
 {
     /**
-     * A live change: the row as it is right now.
+     * A change happening right now: Scout's observers, and anything
+     * else that goes through the engine.
      */
     const WRITER_LIVE = 'live';
 
     /**
-     * A snapshot taken by an import, which may already be stale by
-     * the time it reaches Elasticsearch.
+     * Rows an import read earlier and writes now, which may already be
+     * stale by the time they reach Elasticsearch.
      */
     const WRITER_SNAPSHOT = 'snapshot';
+
+    /**
+     * Rows the catch-up pass re-read after every snapshot was written.
+     * Still a snapshot, but a later one.
+     */
+    const WRITER_CATCH_UP = 'catch-up';
+
+    /**
+     * Writers in order of how fresh their data can be at the same
+     * second. A write from a later rank wins a tie.
+     */
+    private const RANKS = [
+        self::WRITER_SNAPSHOT => 0,
+        self::WRITER_CATCH_UP => 1,
+        self::WRITER_LIVE => 2,
+    ];
 
     /**
      * @var array<string|int, Model>
@@ -52,29 +69,42 @@ final class Bulk
      * @param  string|null  $index  write target; defaults to the model's searchableAs() alias
      * @param  bool  $requireAlias  reject the write unless the target is an alias, so a
      *                              revoked import can never auto-create its old index
-     * @param  string  $writer  self::WRITER_LIVE or self::WRITER_SNAPSHOT — decides which
-     *                          write wins when both touch a document at the same moment
+     * @param  string  $writer  one of the WRITER_* constants — decides which write wins
+     *                          when two writers touch a document at the same moment
      */
     public function __construct(?string $index = null, bool $requireAlias = false, string $writer = self::WRITER_LIVE)
     {
+        if (! isset(self::RANKS[$writer])) {
+            throw new \InvalidArgumentException("Unknown writer [$writer].");
+        }
+
         $this->index = $index;
         $this->requireAlias = $requireAlias;
         $this->writer = $writer;
     }
 
     /**
-     * The version a write carries, as a (timestamp, writer) pair packed
-     * into one integer: the row's updated_at doubled, plus one for a
-     * live write. A live change therefore outranks a snapshot taken in
-     * the same second, so the two orderings of the same pair of writes
-     * reach the same result.
+     * The version a write carries: a (time, rank) pair packed into one
+     * integer, so Elasticsearch keeps whichever write holds the newest
+     * data, whatever order the writes arrive in.
      *
-     * Null when the model keeps no updated_at, which leaves the write
-     * unversioned and preserves the previous behaviour.
+     * The time is when the data in the write became true:
+     * - a live delete becomes true now, as it is sent — so it beats
+     *   every copy read before it, even when it is sent from a model
+     *   instance loaded before someone else edited the row;
+     * - any other write carries the row as of its last change: its
+     *   updated_at, or its soft delete when that came later (a raw SQL
+     *   soft delete may set deleted_at alone).
+     * Every time is capped at now, so a clock running ahead cannot let
+     * old data claim to be from the future.
+     *
+     * Null when the model keeps no updated_at: its snapshots could not
+     * be ordered against live writes, so the write stays unversioned,
+     * as before.
      *
      * @param  Model  $model
      */
-    private function version($model): ?int
+    private function version($model, bool $delete): ?int
     {
         if (! $model->usesTimestamps()) {
             return null;
@@ -85,19 +115,46 @@ final class Bulk
             return null;
         }
 
-        $updatedAt = $model->getAttribute($column);
-        if (! $updatedAt instanceof \DateTimeInterface) {
-            return null;
+        $now = $model->freshTimestamp();
+        if ($delete && $this->writer === self::WRITER_LIVE) {
+            $time = $now;
+        } else {
+            $time = $this->latest([
+                $model->getAttribute($column),
+                method_exists($model, 'getDeletedAtColumn')
+                    ? $model->getAttribute($model->getDeletedAtColumn())
+                    : null,
+            ]);
+            if ($time === null) {
+                return null;
+            }
+            if ($time > $now) {
+                $time = $now;
+            }
         }
 
-        return ((int) $updatedAt->format('U')) * 2 + ($this->writer === self::WRITER_LIVE ? 1 : 0);
+        return ((int) $time->format('U')) * count(self::RANKS) + self::RANKS[$this->writer];
     }
 
     /**
-     * Snapshot writes must lose to anything already stored at the same
-     * version or later; live writes may overwrite an equal version,
-     * because the pairing above already put them ahead of a snapshot
-     * from the same second.
+     * @param  array<int, mixed>  $times
+     */
+    private function latest(array $times): ?\DateTimeInterface
+    {
+        $latest = null;
+        foreach ($times as $time) {
+            if ($time instanceof \DateTimeInterface && ($latest === null || $time > $latest)) {
+                $latest = $time;
+            }
+        }
+
+        return $latest;
+    }
+
+    /**
+     * Snapshots must lose to anything already stored at the same version
+     * or later. Live writes may replace an equal version, so a second
+     * change within the same second still lands.
      */
     private function versionType(): string
     {
@@ -146,7 +203,7 @@ final class Bulk
                     '_id' => $scoutKey,
                     'routing' => false === empty($routing) ? $routing : $scoutKey,
                 ];
-                $version = $this->version($model);
+                $version = $this->version($model, false);
                 if ($version !== null) {
                     $action['version'] = $version;
                     $action['version_type'] = $this->versionType();
@@ -176,11 +233,13 @@ final class Bulk
                     '_id' => $scoutKey,
                     'routing' => false === empty($routing) ? $routing : $scoutKey,
                 ];
-                // A delete is always a live change, so it outranks any
-                // snapshot of the row — including one taken in the same
-                // second, which is what stops a straggling import job
-                // from resurrecting a deleted document.
-                $version = $this->version($model);
+                // A delete is versioned like any other write. A live delete
+                // carries the current time, so it beats every copy of the
+                // row read before it: a straggling import job cannot bring
+                // the document back, and a delete sent from a stale model
+                // instance is not refused because someone edited the row
+                // after the instance was loaded.
+                $version = $this->version($model, true);
                 if ($version !== null) {
                     $action['version'] = $version;
                     $action['version_type'] = $this->versionType();

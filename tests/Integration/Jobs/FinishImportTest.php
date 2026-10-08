@@ -8,6 +8,7 @@ use Elastic\Elasticsearch\Client;
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Support\Facades\Bus;
 use Matchish\ScoutElasticSearch\Jobs\FinishImport;
+use Matchish\ScoutElasticSearch\Jobs\ImportState;
 use Matchish\ScoutElasticSearch\Jobs\Stages\StageInterface;
 use Tests\IntegrationTestCase;
 
@@ -25,9 +26,8 @@ final class FinishImportTest extends IntegrationTestCase
     }
 
     /**
-     * Laravel counts the skipped jobs of a cancelled batch as
-     * successful, so this callback still runs. It must not publish an
-     * index that was abandoned half-built.
+     * A newer import cancels the batch of the one it replaces. This
+     * import's index was abandoned half-built and must not go live.
      */
     public function test_cancelled_batch_never_publishes_its_index(): void
     {
@@ -50,6 +50,72 @@ final class FinishImportTest extends IntegrationTestCase
         (new FinishImport([$stage]))->forBatch($batch->id)->handle($this->elasticsearch);
 
         $this->assertTrue($stage->ran);
+    }
+
+    public function test_publishes_and_removes_the_state_once_every_range_is_finished(): void
+    {
+        $stage = $this->spyStage();
+        $state = $this->state(2);
+        $state->recordFinished($this->elasticsearch, 0);
+        $state->recordFinished($this->elasticsearch, 1);
+
+        (new FinishImport([$stage]))->forImport($state)->handle($this->elasticsearch);
+
+        $this->assertTrue($stage->ran);
+        $this->assertFalse($state->exists($this->elasticsearch), 'a console that follows the import sees it published');
+    }
+
+    public function test_never_publishes_while_a_range_is_missing_and_says_why(): void
+    {
+        $stage = $this->spyStage();
+        $state = $this->state(2);
+        $state->recordFinished($this->elasticsearch, 0);
+
+        (new FinishImport([$stage]))->forImport($state)->handle($this->elasticsearch);
+
+        $this->assertFalse($stage->ran, 'range 1 is not finished');
+        $this->assertNotNull($state->failure($this->elasticsearch));
+    }
+
+    public function test_does_nothing_once_the_state_is_gone(): void
+    {
+        // Published by an earlier delivery of this job, or replaced by a
+        // newer import.
+        $stage = $this->spyStage();
+        $state = $this->state(1);
+        $state->recordFinished($this->elasticsearch, 0);
+        $state->delete($this->elasticsearch);
+
+        (new FinishImport([$stage]))->forImport($state)->handle($this->elasticsearch);
+
+        $this->assertFalse($stage->ran);
+    }
+
+    public function test_a_failure_after_the_last_try_is_kept_for_the_console(): void
+    {
+        $state = $this->state(1);
+
+        (new FinishImport([$this->spyStage()]))->forImport($state)->failed(new \Exception('cluster is read-only'));
+
+        $this->assertSame('cluster is read-only', $state->failure($this->elasticsearch));
+    }
+
+    public function test_keeps_its_queue_when_tied_to_an_import_and_a_batch(): void
+    {
+        $finish = (new FinishImport([]))->onConnection('database')->onQueue('imports');
+
+        $copy = $finish->forImport($this->state(1))->forBatch('batch-id');
+
+        $this->assertSame('database', $copy->connection);
+        $this->assertSame('imports', $copy->queue);
+    }
+
+    private function state(int $ranges): ImportState
+    {
+        $state = ImportState::forImport('products_'.random_int(1, 999999), $ranges);
+        $state->create($this->elasticsearch);
+
+        return $state;
     }
 
     private function spyStage(): StageInterface

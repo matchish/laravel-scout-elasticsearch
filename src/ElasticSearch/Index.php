@@ -100,7 +100,7 @@ final class Index
         $gcDeletes = config('elasticsearch.indices.gc_deletes', '12h');
         /** @var array<string, mixed> $settings */
         $settings = config($settingsConfigKey, config('elasticsearch.indices.settings.default', $defaultSettings));
-        if ($gcDeletes !== null && ! isset($settings['index.gc_deletes'], $settings['gc_deletes'])) {
+        if ($gcDeletes !== null && ! self::definesGcDeletes($settings)) {
             $settings['index.gc_deletes'] = $gcDeletes;
         }
         /** @var array<string, mixed> $mappings */
@@ -116,5 +116,18 @@ final class Index
         $mappings['_meta'] = array_merge($meta, ['scout_import' => true]);
 
         return new static($name, $settings, $mappings);
+    }
+
+    /**
+     * Elasticsearch accepts the setting in three spellings; a value the
+     * application set in any of them wins over the package default.
+     *
+     * @param  array<string, mixed>  $settings
+     */
+    private static function definesGcDeletes(array $settings): bool
+    {
+        return isset($settings['index.gc_deletes'])
+            || isset($settings['gc_deletes'])
+            || (isset($settings['index']) && is_array($settings['index']) && isset($settings['index']['gc_deletes']));
     }
 }
