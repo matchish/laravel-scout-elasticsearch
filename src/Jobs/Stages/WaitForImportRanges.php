@@ -6,10 +6,12 @@ namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elastic\Elasticsearch\Client;
 use Illuminate\Support\Facades\Bus;
+use Matchish\ScoutElasticSearch\Jobs\ImportBatches;
 
 /**
  * Follows the batch of range jobs and reports how many have finished,
  * so the console shows real progress instead of stopping at "queued".
+ * WaitForPublish then follows the job that publishes the import.
  *
  * The import loop calls handle() again while completed() is false, so
  * each call polls once and then waits. Only the console process runs
@@ -68,27 +70,30 @@ final class WaitForImportRanges implements StageInterface
         // A job that hands on part of its range adds a job to the batch,
         // so the total grows while the import runs. Show the finished
         // share on the planned scale, and never move the bar back.
+        // A job counted twice can push the finished count past the total,
+        // so the position is capped at the planned scale too.
         $finished = $batch->totalJobs - $batch->pendingJobs;
         $position = $batch->totalJobs > 0 ? intdiv($this->estimate() * $finished, $batch->totalJobs) : 0;
+        $position = min($this->estimate(), $position);
         $this->advanceBy = max(0, $position - $this->reported);
         $this->reported = max($this->reported, $position);
 
-        if ($batch->finished() || $batch->cancelled()) {
+        if ($batch->cancelled()) {
             $this->done = true;
 
-            if ($batch->failedJobs > 0) {
-                throw new \Exception(sprintf(
-                    '%d of %d range jobs failed, so the search alias was not switched. The old index still serves searches; check the failed_jobs table for the cause.',
-                    $batch->failedJobs,
-                    $batch->totalJobs
-                ));
-            }
+            throw ImportBatches::cancelledError($batch);
+        }
 
-            if ($batch->cancelled()) {
-                throw new \Exception(
-                    'This import was cancelled before it finished, most likely because a newer import for the same index started. The search alias was not changed.'
-                );
-            }
+        // The batch counts deliveries, not ranges: a job delivered twice is
+        // counted twice. The ranges' own records decide. When the state is
+        // gone, the import is over; WaitForPublish finds out how it ended.
+        $elasticsearch = $elasticsearch ?? app(Client::class);
+        $state = $this->dispatch->state();
+        if ($state === null || ! $state->exists($elasticsearch) || $state->complete($elasticsearch)) {
+            // Fill the bar: duplicates may still be running, but no range is.
+            $this->advanceBy += $this->estimate() - $this->reported;
+            $this->reported = $this->estimate();
+            $this->done = true;
 
             return;
         }
