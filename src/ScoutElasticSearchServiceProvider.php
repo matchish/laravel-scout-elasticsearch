@@ -10,6 +10,7 @@ use Laravel\Scout\EngineManager;
 use Laravel\Scout\ScoutServiceProvider;
 use Matchish\ScoutElasticSearch\Console\Commands\FlushCommand;
 use Matchish\ScoutElasticSearch\Console\Commands\ImportCommand;
+use Matchish\ScoutElasticSearch\Console\Commands\ImportStatusCommand;
 use Matchish\ScoutElasticSearch\Engines\ElasticSearchEngine;
 use Matchish\ScoutElasticSearch\Searchable\DefaultImportSourceFactory;
 use Matchish\ScoutElasticSearch\Searchable\ImportSourceFactory;
@@ -22,11 +23,6 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'scout');
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-        $this->publishes(
-            [__DIR__.'/../database/migrations' => database_path('migrations')],
-            'scout-elasticsearch-migrations'
-        );
 
         $this->app->make(EngineManager::class)->extend(ElasticSearchEngine::class, function () {
             $elasticsearch = app(Client::class);
@@ -55,6 +51,7 @@ final class ScoutElasticSearchServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 ImportCommand::class,
+                ImportStatusCommand::class,
                 FlushCommand::class,
             ]);
         }

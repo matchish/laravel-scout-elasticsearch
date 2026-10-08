@@ -15,7 +15,7 @@ use Matchish\ScoutElasticSearch\Database\Scopes\PageScope;
 /**
  * @phpstan-import-type SearchableModel from SearchableContract
  */
-final class DefaultImportSource implements ImportSource
+final class DefaultImportSource implements ImportSource, Partitionable
 {
     /**
      * @var int
@@ -176,6 +176,14 @@ final class DefaultImportSource implements ImportSource
         }
 
         return $query;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function query(): Builder
+    {
+        return $this->newQuery();
     }
 
     /**

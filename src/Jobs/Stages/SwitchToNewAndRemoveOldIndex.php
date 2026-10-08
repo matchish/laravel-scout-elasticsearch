@@ -6,6 +6,7 @@ namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\Response\Elasticsearch;
+use Matchish\ScoutElasticSearch\ElasticSearch\ImportAlias;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias\Get;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Alias\Update;
@@ -53,6 +54,9 @@ final class SwitchToNewAndRemoveOldIndex implements StageInterface
                 $params->removeIndex((string) $indexName);
             } else {
                 $params->add((string) $indexName, $source->searchableAs());
+                // Publishing revokes the import's write capability: any
+                // job still holding the alias must not reach the live index.
+                $params->remove((string) $indexName, ImportAlias::of($this->index->name()));
             }
         }
         $elasticsearch->indices()->updateAliases($params->toArray());
