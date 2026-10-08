@@ -16,13 +16,13 @@ use stdClass;
 use Tests\IntegrationTestCase;
 
 /**
- * Any Laravel queue may deliver a job twice, and the batch counts the
- * second delivery as another finished job. The import must still
- * publish only once every range has written its rows, and only once.
+ * Queues deliver every job at least once, so a job can run twice, and
+ * the batch then counts it twice. A parallel import is published once,
+ * after every range is imported, however often its jobs run.
  */
 final class RepeatedDeliveryTest extends IntegrationTestCase
 {
-    public function test_a_job_counted_twice_does_not_publish_an_incomplete_import(): void
+    public function test_publishes_only_after_every_range_is_imported(): void
     {
         [$dispatch, $batchId, $ranges] = $this->dispatched(9);
         $this->assertCount(3, $ranges, 'nine products in chunks of three, one chunk per range');
@@ -30,28 +30,27 @@ final class RepeatedDeliveryTest extends IntegrationTestCase
         // The worker runs range 0, and the queue delivers it a second time.
         $this->work($ranges[0], $batchId, 'delivery-1');
         $this->work($ranges[0], $batchId, 'delivery-2');
-        // Range 1 brings the pending count to zero: the batch is "done".
         $this->work($ranges[1], $batchId, 'delivery-3');
 
         $batch = Bus::findBatch($batchId);
         $this->assertNotNull($batch);
-        $this->assertSame(0, $batch->pendingJobs, 'the batch believes every job has finished');
+        $this->assertSame(0, $batch->pendingJobs, 'precondition: the batch counts three finished jobs');
         Queue::assertNotPushed(FinishImport::class);
 
-        // Range 2 finally runs; it records the last range.
+        // Range 2 runs last; it records the last range.
         $this->work($ranges[2], $batchId, 'delivery-4');
 
         $finishing = Queue::pushed(FinishImport::class)->values()->all();
         $this->assertCount(1, $finishing);
         $finishing[0]->handle($this->elasticsearch);
 
-        $this->assertSame(9, $this->searchableCount(), 'every range has written its rows');
+        $this->assertSame(9, $this->searchableCount());
         $state = $dispatch->state();
         $this->assertNotNull($state);
         $this->assertFalse($state->exists($this->elasticsearch), 'the state is removed once published');
     }
 
-    public function test_a_repeat_after_publishing_starts_nothing(): void
+    public function test_publishes_once_when_the_last_range_job_runs_again(): void
     {
         [, $batchId, $ranges] = $this->dispatched(6);
         foreach ($ranges as $number => $range) {
@@ -64,7 +63,7 @@ final class RepeatedDeliveryTest extends IntegrationTestCase
         // The queue delivers the last range job once more.
         $this->work($ranges[count($ranges) - 1], $batchId, 'late-delivery');
 
-        $this->assertCount(1, Queue::pushed(FinishImport::class), 'the import is finished by one job only');
+        $this->assertCount(1, Queue::pushed(FinishImport::class));
         $this->assertSame(6, $this->searchableCount());
     }
 

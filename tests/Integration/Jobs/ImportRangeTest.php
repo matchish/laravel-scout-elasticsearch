@@ -171,11 +171,6 @@ final class ImportRangeTest extends IntegrationTestCase
         })->values()->all();
     }
 
-    /**
-     * The job writes through an import alias with require_alias, the
-     * way DispatchImportRanges wires it, so the tests create the
-     * backing index with that alias attached.
-     */
     public function test_hands_the_rest_of_a_long_range_to_new_jobs_in_its_batch(): void
     {
         $ids = $this->createProducts(10);
@@ -225,8 +220,8 @@ final class ImportRangeTest extends IntegrationTestCase
     {
         $ids = $this->createProducts(10);
         $this->createWriteTarget();
-        $records = ImportState::forImport(self::INDEX, 1);
-        $records->create($this->elasticsearch);
+        $state = ImportState::forImport(self::INDEX, 1);
+        $state->create($this->elasticsearch);
 
         // Four jobs share the range; only the last one reaches its end.
         Bus::batch([new ImportRange(
@@ -237,11 +232,11 @@ final class ImportRangeTest extends IntegrationTestCase
             3,
             1,
             null,
-            $records,
+            $state,
             0
         )])->onConnection('sync')->dispatch();
 
-        $this->assertTrue($records->complete($this->elasticsearch));
+        $this->assertTrue($state->complete($this->elasticsearch));
     }
 
     public function test_the_job_that_records_the_last_range_starts_the_finishing_job(): void
@@ -282,8 +277,8 @@ final class ImportRangeTest extends IntegrationTestCase
         $this->app['config']->set('queue.connections.null', ['driver' => 'null']);
         $ids = $this->createProducts(10);
         $this->createWriteTarget();
-        $records = ImportState::forImport(self::INDEX, 1);
-        $records->create($this->elasticsearch);
+        $state = ImportState::forImport(self::INDEX, 1);
+        $state->create($this->elasticsearch);
         $batch = app(BatchRepository::class)->store(Bus::batch([])->onConnection('null'));
 
         $job = new ImportRange(
@@ -294,14 +289,14 @@ final class ImportRangeTest extends IntegrationTestCase
             3,
             1,
             null,
-            $records,
+            $state,
             0
         );
         $job->withBatchId($batch->id);
         $job->handle($this->elasticsearch);
 
         $this->assertCount(3, $this->indexedIds(), 'one chunk, then the rest was handed on');
-        $this->assertFalse($records->complete($this->elasticsearch), 'rows of the range are still unwritten');
+        $this->assertFalse($state->complete($this->elasticsearch), 'rows of the range are still unwritten');
     }
 
     public function test_a_job_delivered_twice_hands_on_only_once(): void
@@ -366,6 +361,11 @@ final class ImportRangeTest extends IntegrationTestCase
         );
     }
 
+    /**
+     * The job writes through an import alias with require_alias, the
+     * way DispatchImportRanges wires it, so the tests create the
+     * backing index with that alias attached.
+     */
     private function createWriteTarget(): void
     {
         $this->elasticsearch->indices()->create([

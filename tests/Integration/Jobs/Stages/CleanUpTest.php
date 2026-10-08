@@ -54,8 +54,7 @@ final class CleanUpTest extends IntegrationTestCase
 
     public function test_reclaims_the_state_of_an_import_that_died(): void
     {
-        // The state index carries its own alias, so "has no alias" would
-        // never match it.
+        // The state index has an alias of its own, but no search alias.
         $state = ImportState::forImport('products_444', 1);
         $state->create($this->elasticsearch);
 

@@ -21,37 +21,11 @@ use Tests\IntegrationTestCase;
 
 final class RangePlannerTest extends IntegrationTestCase
 {
-    /**
-     * @group parallel-import-regressions
-     */
-    public function test_covers_integer_primary_keys_above_float_precision(): void
+    public function test_covers_keys_too_large_for_a_float(): void
     {
-        // The usual products fixture has a 32-bit key on MySQL.
-        Schema::create('big_integer_products', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->softDeletes();
-        });
-
-        try {
-            DB::table('big_integer_products')->insert(['id' => 9007199254740995]);
-
-            $plan = RangePlanner::plan($this->source(ProductWithBigIntegerKey::class), 3, 2);
-
-            $this->assertSame(
-                1,
-                $this->coveredRows(ProductWithBigIntegerKey::class, $plan),
-                'a large integer key must be covered without rounding it through a float'
-            );
-        } finally {
-            Schema::dropIfExists('big_integer_products');
-        }
-    }
-
-    public function test_covers_large_keys_split_into_several_ranges(): void
-    {
-        // Several keys above 2^53, so the plan has more than one range
-        // and the lowest key goes through the boundary arithmetic. As a
-        // float, 2^53 + 3 rounds up to 2^53 + 4.
+        // A float cannot hold every integer above 2^53: 2^53 + 3 becomes
+        // 2^53 + 4. The usual products table has a 32-bit key, so these
+        // keys need a table of their own.
         Schema::create('big_integer_products', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->softDeletes();
@@ -66,7 +40,7 @@ final class RangePlannerTest extends IntegrationTestCase
 
             $plan = RangePlanner::plan($this->source(ProductWithBigIntegerKey::class), 1, 1);
 
-            $this->assertGreaterThan(1, count($plan->ranges()), 'the keys should be split into ranges');
+            $this->assertGreaterThan(1, count($plan->ranges()), 'precondition: the keys are split into ranges');
             $this->assertSame(3, $this->coveredRows(ProductWithBigIntegerKey::class, $plan));
         } finally {
             Schema::dropIfExists('big_integer_products');
@@ -75,8 +49,7 @@ final class RangePlannerTest extends IntegrationTestCase
 
     public function test_covers_keys_at_both_ends_of_the_signed_integer_range(): void
     {
-        // A signed key spanning almost the whole 64-bit range: computing
-        // the span or the boundaries in plain integer math would overflow.
+        // The widest span a signed 64-bit key can have.
         Schema::create('big_integer_products', function (Blueprint $table) {
             $table->bigInteger('id')->primary();
             $table->softDeletes();
@@ -91,7 +64,7 @@ final class RangePlannerTest extends IntegrationTestCase
 
             $plan = RangePlanner::plan($this->source(ProductWithBigIntegerKey::class), 1, 1);
 
-            $this->assertGreaterThan(1, count($plan->ranges()), 'the keys should still be split into ranges');
+            $this->assertGreaterThan(1, count($plan->ranges()), 'precondition: the keys are split into ranges');
             $this->assertSame(3, $this->coveredRows(ProductWithBigIntegerKey::class, $plan));
         } finally {
             Schema::dropIfExists('big_integer_products');

@@ -67,7 +67,7 @@ final class WaitForImportRangesTest extends IntegrationTestCase
         $this->assertSame(1, $wait->advance());
 
         // Three jobs hand on the rest of their ranges. The finished share
-        // drops to 1 of 6, but the bar must not move back.
+        // drops to 1 of 6, but the bar stays where it was.
         $repository->incrementTotalJobs($batchId, 3);
         $wait->handle();
         $this->assertSame(0, $wait->advance());
@@ -83,40 +83,40 @@ final class WaitForImportRangesTest extends IntegrationTestCase
         $this->assertTrue($wait->completed());
     }
 
-    public function test_keeps_waiting_when_the_batch_finishes_before_its_ranges(): void
+    public function test_waits_until_every_range_is_recorded(): void
     {
         [$dispatch, $wait] = $this->dispatchedStages(9);
         $repository = app(BatchRepository::class);
         $batchId = $dispatch->batchId();
         $this->assertNotNull($batchId);
-        $records = $dispatch->state();
-        $this->assertNotNull($records);
+        $state = $dispatch->state();
+        $this->assertNotNull($state);
 
-        // Range 0 was delivered twice and counted twice: three successes
-        // bring the batch to zero, although range 2 has not run.
+        // Range 0 ran twice, so the batch counts three finished jobs and
+        // marks itself finished, although range 2 has not run.
         foreach (['delivery-1', 'delivery-2', 'delivery-3'] as $delivery) {
             $repository->decrementPendingJobs($batchId, $delivery);
         }
         $repository->markAsFinished($batchId);
-        $records->recordFinished($this->elasticsearch, 0);
-        $records->recordFinished($this->elasticsearch, 1);
+        $state->recordFinished($this->elasticsearch, 0);
+        $state->recordFinished($this->elasticsearch, 1);
 
         $wait->handle();
-        $this->assertFalse($wait->completed(), 'range 2 is not finished yet');
+        $this->assertFalse($wait->completed(), 'range 2 is not recorded yet');
 
-        $records->recordFinished($this->elasticsearch, 2);
+        $state->recordFinished($this->elasticsearch, 2);
         $wait->handle();
         $this->assertTrue($wait->completed());
     }
 
-    public function test_completes_when_repeated_deliveries_take_the_pending_count_below_zero(): void
+    public function test_completes_once_every_range_is_recorded_after_jobs_ran_twice(): void
     {
         [$dispatch, $wait] = $this->dispatchedStages(9);
         $repository = app(BatchRepository::class);
         $batchId = $dispatch->batchId();
         $this->assertNotNull($batchId);
 
-        // Five successes for three jobs: pending is -2. The batch was never
+        // Five successes for three jobs: pending is -2. The batch is not
         // marked finished — a hand-off that adds a job clears that mark.
         foreach (range(1, 5) as $delivery) {
             $repository->decrementPendingJobs($batchId, 'delivery-'.$delivery);
@@ -128,7 +128,7 @@ final class WaitForImportRangesTest extends IntegrationTestCase
         $this->assertTrue($wait->completed());
     }
 
-    public function test_completes_once_every_range_is_recorded_although_the_batch_still_counts_jobs(): void
+    public function test_completes_once_every_range_is_recorded_while_jobs_are_still_queued(): void
     {
         // Repeats of a job may still be queued; they write nothing new.
         [$dispatch, $wait] = $this->dispatchedStages(9);

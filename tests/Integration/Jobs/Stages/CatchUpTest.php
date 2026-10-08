@@ -21,33 +21,25 @@ final class CatchUpTest extends IntegrationTestCase
 {
     private const INDEX = 'products_import';
 
-    /**
-     * @group parallel-import-regressions
-     */
     public function test_removes_a_row_that_became_unsearchable_after_its_range_was_imported(): void
     {
-        $product = Product::withoutEvents(function () {
-            return factory(Product::class)->create(['updated_at' => '2000-01-01 00:00:00']);
-        });
-        $this->elasticsearch->indices()->create([
-            'index' => self::INDEX,
-            'body' => ['aliases' => [ImportAlias::of(self::INDEX) => new stdClass()]],
-        ]);
-        $source = DefaultImportSourceFactory::from(Product::class);
-        (new ImportRange($source, Range::between((int) $product->getKey(), null), 'id', ImportAlias::of(self::INDEX), 3))
-            ->handle($this->elasticsearch);
-        $this->assertSame(1, $this->indexedCount());
+        $product = $this->importedProduct();
 
-        // SQL writes bypass Scout observers, which is why catch-up is needed.
+        // An SQL update fires no model events, so only catch-up sees it.
+        // Archived products are not searchable.
         DB::table('products')->where('id', $product->getKey())->update([
             'type' => 'archive',
             'updated_at' => '2000-01-02 00:00:00',
         ]);
-        $stage = new CatchUp($source, new Index(self::INDEX), new \DateTimeImmutable('2000-01-01'));
+        $stage = new CatchUp(
+            DefaultImportSourceFactory::from(Product::class),
+            new Index(self::INDEX),
+            new \DateTimeImmutable('2000-01-01 12:00:00')
+        );
 
         $stage->handle($this->elasticsearch);
 
-        $this->assertSame(0, $this->indexedCount(), 'catch-up must remove a snapshot that is no longer searchable');
+        $this->assertSame(0, $this->indexedCount());
     }
 
     public function test_removes_a_row_soft_deleted_by_sql_after_its_range_was_imported(): void
@@ -65,7 +57,7 @@ final class CatchUpTest extends IntegrationTestCase
 
         $stage->handle($this->elasticsearch);
 
-        $this->assertSame(0, $this->indexedCount(), 'catch-up must remove a row trashed during the import');
+        $this->assertSame(0, $this->indexedCount());
     }
 
     public function test_marks_a_row_soft_deleted_by_sql_when_soft_deletes_stay_searchable(): void
@@ -86,15 +78,17 @@ final class CatchUpTest extends IntegrationTestCase
             'index' => self::INDEX,
             'id' => (string) $product->getKey(),
         ])->asArray();
-        $this->assertSame(1, $document['_source']['__soft_deleted'], 'catch-up must mark the row as soft deleted');
+        $this->assertSame(1, $document['_source']['__soft_deleted']);
     }
 
     /**
-     * @group parallel-import-regressions
+     * Catch-up reads a row and writes its copy a moment later. A live
+     * update made in between, even in the same second, is newer and
+     * stays in the index.
      */
-    public function test_preserves_a_live_update_from_the_same_second(): void
+    public function test_keeps_a_live_update_made_in_the_same_second(): void
     {
-        // Freeze the clock so both writes have the same second without sleeps.
+        // A frozen clock puts both writes in the same second.
         Carbon::setTestNow('2000-01-01 00:00:00');
 
         try {
@@ -110,8 +104,7 @@ final class CatchUpTest extends IntegrationTestCase
                 ]],
             ]);
 
-            // The observer writes the new title after catch-up reads its copy,
-            // but before catch-up submits that older copy to Elasticsearch.
+            // The live update lands after catch-up has read the row.
             $updated = false;
             Product::retrieved(function (Product $model) use ($writer, &$updated) {
                 if (! $updated && $model->getKey() === $writer->getKey()) {
@@ -132,7 +125,7 @@ final class CatchUpTest extends IntegrationTestCase
                 'index' => self::INDEX,
                 'id' => (string) $writer->getKey(),
             ])->asArray();
-            $this->assertSame('live title', $document['_source']['title'], 'catch-up must not roll back the live update');
+            $this->assertSame('live title', $document['_source']['title']);
         } finally {
             Carbon::setTestNow();
         }
@@ -166,8 +159,8 @@ final class CatchUpTest extends IntegrationTestCase
 
     /**
      * A repeated run of the finishing job comes after the alias switch
-     * took the import alias away. Catch-up has nothing left to do then,
-     * and must not fail the job that already published the import.
+     * took the import alias away. Catch-up then has nothing to do, and
+     * ends without an error.
      */
     public function test_stops_quietly_once_the_import_alias_is_gone(): void
     {

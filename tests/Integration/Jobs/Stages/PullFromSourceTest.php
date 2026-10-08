@@ -15,7 +15,8 @@ final class PullFromSourceTest extends IntegrationTestCase
 {
     /**
      * The sequential import reads a chunk and writes it a moment later.
-     * A live change made in between, in the same second, must win.
+     * A live change made in between, even in the same second, is newer
+     * and stays in the index.
      */
     public function test_keeps_a_live_update_made_in_the_same_second(): void
     {
@@ -37,13 +38,13 @@ final class PullFromSourceTest extends IntegrationTestCase
                 'index' => 'products',
                 'id' => (string) $product->getKey(),
             ])->asArray();
-            $this->assertSame('live title', $document['_source']['title'], 'the import must not roll back the live update');
+            $this->assertSame('live title', $document['_source']['title']);
         } finally {
             Carbon::setTestNow();
         }
     }
 
-    public function test_does_not_bring_back_a_row_deleted_in_the_same_second(): void
+    public function test_keeps_a_live_delete_made_in_the_same_second(): void
     {
         Carbon::setTestNow('2000-01-01 00:00:00');
 
@@ -60,15 +61,14 @@ final class PullFromSourceTest extends IntegrationTestCase
             PullFromSource::chunked(DefaultImportSourceFactory::from(Product::class))->handle();
 
             $this->assertFalse(
-                $this->elasticsearch->exists(['index' => 'products', 'id' => (string) $product->getKey()])->asBool(),
-                'a product deleted while its chunk was in memory must not come back'
+                $this->elasticsearch->exists(['index' => 'products', 'id' => (string) $product->getKey()])->asBool()
             );
         } finally {
             Carbon::setTestNow();
         }
     }
 
-    public function test_moves_past_a_chunk_where_no_row_is_searchable(): void
+    public function test_imports_rows_that_follow_a_chunk_with_no_searchable_row(): void
     {
         // The test chunk size is 3: the first chunk holds only archived
         // products, which are not searchable.
@@ -88,7 +88,7 @@ final class PullFromSourceTest extends IntegrationTestCase
 
         $this->elasticsearch->indices()->refresh(['index' => 'products']);
         $count = $this->elasticsearch->count(['index' => 'products'])->asArray();
-        $this->assertSame(7, $count['count'], 'every searchable product after the unsearchable chunk must be imported');
+        $this->assertSame(7, $count['count']);
     }
 
     private function productInLiveIndex(): Product
