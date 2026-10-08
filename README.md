@@ -210,7 +210,9 @@ How it works:
 
 1. The import reads `MIN` and `MAX` of the partition key and splits the data into many small key ranges. It needs only one cheap query — no scan of the whole table.
 2. Every range becomes one queued job in a [job batch](https://laravel.com/docs/queues#job-batching). The jobs run on your queue workers, so parallelism equals the number of workers you run.
-3. When the batch finishes, the new index is refreshed and the alias switches atomically — zero downtime, same as a normal import.
+3. When a range is done, its job records that in a small Elasticsearch index. The job that records the last range starts the final step: it refreshes the new index and switches the alias atomically — zero downtime, same as a normal import.
+
+The batch shows progress and lets a newer import cancel this one, but it does not decide when the import is complete. Any queue can deliver a job twice — for example after a worker crash, or when the database queue fails to delete a finished job — and the batch counts every delivery. The records count each range once.
 
 #### Requirements
 
@@ -233,8 +235,10 @@ How it works:
 
 #### Behaviour notes
 
-- The command follows the range jobs and shows how many have finished, so you can watch the import progress. It exits when the last range is done. If you would rather start the import and return to the shell immediately, set `scout.queue` — the whole import then runs on a worker.
-- If range jobs fail, the command stops with an error and the alias is **not** switched, so searches keep using the old index.
+- The command follows the range jobs and shows how many have finished, so you can watch the import progress. It exits after the alias switch, so when it reports success, searches already use the new index. If you would rather start the import and return to the shell immediately, set `scout.queue` — the whole import then runs on a worker.
+- If range jobs fail, or the final step fails, the command stops with an error and the alias is **not** switched, so searches keep using the old index.
+- Range jobs and the final job set `$tries = 3`, which overrides your worker's `--tries`. Running a job again is safe: it writes the same documents with the same versions, and the same records.
+- While an import runs, its records live in an index named after the import's index, for example `products_1791455338-state-0`, with the alias `products_1791455338-state`. The final step deletes it. If an import dies, the next import of the same model deletes what it left behind. If your Elasticsearch user may only use some indices, a permission for `products_*` covers both.
 - Starting a new `--parallel` import for an index cancels a still-running one. The superseded import stops with a message and never switches the alias, so only the newest import can publish its index.
 - Live model changes during the import are indexed through Scout observers as usual. A change made while an import is running is not overwritten by the import's older copy of the row, and a deleted record does not come back. This relies on the model's `updated_at` column; a model without one keeps the old behaviour, where the last write to arrive wins.
 - If your application also writes to the database without Eloquent events, add `--catch-up`. Right before the alias switch, it re-imports rows changed since the import started, and removes rows that stopped being searchable or were soft-deleted. A change counts only when it moved `updated_at` or `deleted_at`. A row deleted outright by raw SQL leaves nothing to read, so catch-up cannot remove it.
@@ -258,7 +262,7 @@ php artisan scout:import:status
 
 Pass a model name to check one index, for example `php artisan scout:import:status "App\Models\Product"`.
 
-Closing the terminal never stops an import. The range jobs are already on the queue, and the alias switch runs on a worker when the last one finishes.
+Closing the terminal never stops an import. The range jobs are already on the queue, and the alias switch runs on a worker after the last range is imported.
 
 If you use [Laravel Horizon](https://laravel.com/docs/horizon), the same import appears on its Batches screen, named `scout-import:{index}`.
 
