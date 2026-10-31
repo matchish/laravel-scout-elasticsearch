@@ -45,8 +45,9 @@ Don't forget to :star: the package if you like it. :pray:
 - Full power of ElasticSearch in your queries.
 ## :warning: Requirements
 
-- PHP version >= 8.0
-- Laravel Framework version >= 8.0.0
+- PHP version >= 8.2
+- Laravel Framework version >= 12.0
+- Laravel Scout version >= 11.0
 
 | Elasticsearch version | ElasticsearchDSL version |
 |-----------------------|--------------------------|
