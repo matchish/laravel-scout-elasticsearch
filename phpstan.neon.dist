@@ -5,8 +5,9 @@ parameters:
     paths:
         - src
     reportUnmatchedIgnoredErrors: false
-    checkMissingIterableValueType: false
     ignoreErrors:
+        -
+            identifier: missingType.iterableValue
         - '#Call to an undefined method Illuminate\\Support\\HigherOrder#'
         -
             path: %currentWorkingDirectory%/src/Engines/ElasticSearchEngine.php
