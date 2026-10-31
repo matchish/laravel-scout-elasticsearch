@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 - `suggest` dependency on `mateusjunges/laravel-trackable-jobs` from `composer.json`.
 - `stubs/` directory (fallback no-op implementations are no longer needed).
 
+### Fixed
+- `paginate()` on a `MixedSearch` with a `query()` callback now works. Before, it failed with "Base table or view not found", because Scout counted rows in a table that does not exist. [#227](https://github.com/matchish/laravel-scout-elasticsearch/issues/227)
+
 ## [8.0.0-alpha.3] - 2026-02-09
 ### Changed
 - The usage of mateusjunges/laravel-trackable-jobs package for parallel import

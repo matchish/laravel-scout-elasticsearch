@@ -18,9 +18,22 @@ final class MixedSearch
     // @phpstan-ignore-next-line - This method is not actually called, so the class string is not validated
     public static function search(string $query = '', $callback = null): Builder
     {
-        return new Builder(new class extends Model
+        $model = new class extends Model
         {
             use Searchable;
-        }, $query, $callback);
+        };
+
+        return new class($model, $query, $callback) extends Builder
+        {
+            protected function getTotalCount($results)
+            {
+                /** @var \Laravel\Scout\Engines\Engine */
+                $engine = $this->engine();
+
+                // There is no table to count rows in, so use the Elasticsearch total.
+                // Scout's docs say query() must not filter rows; filters belong in where().
+                return $engine->getTotalCount($results);
+            }
+        };
     }
 }
