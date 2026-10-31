@@ -9,6 +9,7 @@ use InvalidArgumentException;
 use Laravel\Scout\Builder;
 use Matchish\ScoutElasticSearch\ElasticSearch\SearchFactory;
 use ONGR\ElasticsearchDSL\Query\TermLevel\RangeQuery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class SearchFactoryTest extends TestCase
@@ -127,9 +128,7 @@ class SearchFactoryTest extends TestCase
         ], $query);
     }
 
-    /**
-     * @dataProvider unsupportedOperators
-     */
+    #[DataProvider('unsupportedOperators')]
     public function test_where_unsupported_operator_throws_exception(string $operator): void
     {
         $builder = new Builder(new Product(), '');
@@ -189,9 +188,7 @@ class SearchFactoryTest extends TestCase
         ], $query);
     }
 
-    /**
-     * @dataProvider notEqualsOperators
-     */
+    #[DataProvider('notEqualsOperators')]
     public function test_where_not_equals_null_adds_exists_query_to_filter(string $operator): void
     {
         $builder = new Builder(new Product(), '');
