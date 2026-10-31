@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ## [Unreleased]
 ### Fixed
 - `paginate()` on a `MixedSearch` with a `query()` callback now works. Before, it failed with "Base table or view not found", because Scout counted rows in a table that does not exist. [#227](https://github.com/matchish/laravel-scout-elasticsearch/issues/227)
+- `MixedSearch` now leaves out soft-deleted models when `scout.soft_delete` is `true`, as `Model::search()` does. Before, it returned them. Use `withTrashed()` to include them.
 
 ## [7.14.0] - 2026-10-31
 ### Removed
