@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 - `suggest` dependency on `mateusjunges/laravel-trackable-jobs` from `composer.json`.
 - `stubs/` directory (fallback no-op implementations are no longer needed).
 
+### Fixed
+- `MixedSearch` now leaves out soft-deleted models when `scout.soft_delete` is `true`, as `Model::search()` does. Before, it returned them. Use `withTrashed()` to include them.
+
 ## [8.0.0-alpha.3] - 2026-02-09
 ### Changed
 - The usage of mateusjunges/laravel-trackable-jobs package for parallel import

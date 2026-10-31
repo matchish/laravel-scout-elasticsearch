@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Book;
+use App\Post;
 use App\Product;
 use App\Ticket;
 use Illuminate\Pagination\Paginator;
@@ -255,6 +256,39 @@ final class SearchTest extends IntegrationTestCase
             implode(',', [(new Book)->searchableAs(),
                 (new Ticket())->searchableAs(),
             ]))->cursor();
+    }
+
+    public function test_mixed_soft_delete()
+    {
+        $this->app['config']->set('scout.soft_delete', true);
+
+        $dispatcher = Book::getEventDispatcher();
+        Book::unsetEventDispatcher();
+
+        factory(Book::class, 2)->state('barcelona')->create()->first()->delete();
+
+        Book::setEventDispatcher($dispatcher);
+
+        // Post has no soft deletes, so its document has no __soft_deleted field
+        $dispatcher = Post::getEventDispatcher();
+        Post::unsetEventDispatcher();
+
+        factory(Post::class)->state('published')->create(['title' => 'Barcelona']);
+
+        Post::setEventDispatcher($dispatcher);
+
+        Artisan::call('scout:import');
+
+        $within = implode(',', [(new Book)->searchableAs(), (new Post)->searchableAs()]);
+
+        $mixed = MixedSearch::search('Barcelona')->within($within)->get();
+        $this->assertEquals(['books' => 1, 'posts' => 1], $mixed->map->getTable()->countBy()->all());
+
+        $mixed = MixedSearch::search('Barcelona')->within($within)->withTrashed()->get();
+        $this->assertEquals(['books' => 2, 'posts' => 1], $mixed->map->getTable()->countBy()->all());
+
+        $mixed = MixedSearch::search('Barcelona')->within($within)->onlyTrashed()->get();
+        $this->assertEquals(['books' => 1], $mixed->map->getTable()->countBy()->all());
     }
 
     public function test_cursor()
