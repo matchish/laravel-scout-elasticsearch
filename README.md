@@ -45,8 +45,16 @@ Don't forget to :star: the package if you like it. :pray:
 - Full power of ElasticSearch in your queries.
 ## :warning: Requirements
 
-- PHP version >= 8.0
-- Laravel Framework version >= 8.0.0
+- PHP version >= 8.2
+- Laravel Framework version >= 12.0
+- Laravel Scout version >= 11.0
+
+We support only the PHP and Laravel versions that still get security fixes
+from their maintainers ([PHP](https://www.php.net/supported-versions.php),
+[Laravel](https://laravel.com/docs/releases#support-policy)). When a version
+reaches its end of life, the next minor release of this package drops it.
+Composer does not install the new release on the old version, so your
+application keeps the last release that supports it.
 
 | Elasticsearch version | ElasticsearchDSL version |
 |-----------------------|--------------------------|

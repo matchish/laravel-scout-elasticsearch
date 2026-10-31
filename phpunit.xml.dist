@@ -10,7 +10,7 @@
           processIsolation="false" 
           stopOnError="false" 
           stopOnFailure="false" 
-          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd" 
+          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd" 
           cacheDirectory=".phpunit.cache" 
           backupStaticProperties="false"
 >
