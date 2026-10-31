@@ -31,7 +31,7 @@ final class RangePlanner
             ->cloneWithoutBindings(['select', 'order']);
         $wrapped = $base->getGrammar()->wrap($model->qualifyColumn($column));
 
-        /** @var object{total: int|string, non_null: int|string, min_key: int|string|null, max_key: int|string|null}|null $stats */
+        /** @var object{total: int|string, non_null: int|string, min_key: int|float|string|null, max_key: int|float|string|null}|null $stats */
         $stats = $base->selectRaw(
             "count(*) as total, count({$wrapped}) as non_null, min({$wrapped}) as min_key, max({$wrapped}) as max_key"
         )->first();
@@ -51,15 +51,11 @@ final class RangePlanner
                     get_class($model)
                 ));
             }
-            $min = (int) floor((float) $stats->min_key);
-            $max = (int) $stats->max_key;
-            $rangesCount = max(1, (int) ceil($nonNull / ($chunkSize * $chunksPerRange)));
-            $width = max(1, (int) ceil(($max - $min + 1) / $rangesCount));
-
-            for ($from = $min; $from <= $max; $from += $width) {
-                $to = $from + $width;
-                $ranges[] = Range::between($from, $to > $max ? null : $to);
-            }
+            $ranges = self::split(
+                self::approximate($stats->min_key),
+                self::approximate($stats->max_key),
+                max(1, (int) ceil($nonNull / ($chunkSize * $chunksPerRange)))
+            );
         }
 
         if ((int) $stats->total > $nonNull) {
@@ -67,6 +63,72 @@ final class RangePlanner
         }
 
         return new RangePlan($column, $ranges);
+    }
+
+    /**
+     * Cuts the key space into at most $count ranges. The first range has
+     * no lower bound and the last has no upper bound, and each boundary
+     * is shared exactly by the two ranges beside it, so every key falls
+     * in exactly one range whatever the boundaries are. $min and $max
+     * only steer the balance: rounding them, or a row that arrives
+     * below $min or above $max during the import, cannot lose a row.
+     *
+     * @return array<int, Range>
+     */
+    private static function split(?int $min, ?int $max, int $count): array
+    {
+        if ($min === null || $max === null || $count < 2 || $max <= $min) {
+            return [Range::between(null, null)];
+        }
+
+        // Float precision is enough here: the width only spreads the work.
+        $width = (int) min(4.6e18, max(1.0, ceil(((float) $max - (float) $min) / $count)));
+
+        $ranges = [];
+        $from = null;
+        $boundary = $min;
+        for ($i = 1; $i < $count; $i++) {
+            if ($boundary > PHP_INT_MAX - $width) {
+                break; // the next boundary would overflow
+            }
+            $boundary += $width;
+            if ($boundary > $max) {
+                break;
+            }
+            $ranges[] = Range::between($from, $boundary);
+            $from = $boundary;
+        }
+        $ranges[] = Range::between($from, null);
+
+        return $ranges;
+    }
+
+    /**
+     * The key as an integer, or null when it cannot be one. Exact for
+     * integers and integer strings; anything else is floored through a
+     * float, which is precise enough to steer the balance.
+     *
+     * @param  int|float|string  $value
+     */
+    private static function approximate($value): ?int
+    {
+        if (is_int($value)) {
+            return $value;
+        }
+        if (is_string($value)) {
+            $int = filter_var($value, FILTER_VALIDATE_INT);
+            if ($int !== false) {
+                return $int;
+            }
+        }
+        $float = (float) $value;
+        // Stay clear of the edges of the integer range, where casting a
+        // float is undefined.
+        if (! is_finite($float) || abs($float) >= 9.2e18) {
+            return null;
+        }
+
+        return (int) floor($float);
     }
 
     /**

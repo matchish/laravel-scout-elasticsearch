@@ -47,6 +47,49 @@ final class CleanUp implements StageInterface
                 }
             }
         }
+
+        $this->reclaimLeakedIndices($elasticsearch);
+    }
+
+    /**
+     * An import that dies between creating its index and finishing —
+     * a crashed worker, a lost process — leaks that index and its state
+     * index: no search goes to them, so nothing else will ever delete
+     * them. Reclaim such indices here, but only ones that carry this
+     * package's provenance marker and are named the way an import of
+     * this model names them; anything else is not ours to delete.
+     */
+    private function reclaimLeakedIndices(Client $elasticsearch): void
+    {
+        try {
+            /** @var Elasticsearch $elasticResponse */
+            $elasticResponse = $elasticsearch->indices()->get([
+                'index' => $this->source->searchableAs().'_*',
+            ]);
+            $indices = $elasticResponse->asArray();
+        } catch (ClientResponseException $e) {
+            return;
+        }
+
+        $searchableAs = $this->source->searchableAs();
+        // An import index is {searchableAs}_{time}, its state index
+        // {searchableAs}_{time}-state-0 (see ImportState). The listing
+        // above also matches other models whose name extends this one,
+        // such as products_archive_{time}; the exact shape excludes them.
+        $ours = '/^'.preg_quote($searchableAs, '/').'_\d+(?:-state-0)?$/';
+
+        foreach ($indices as $indexName => $info) {
+            if (preg_match($ours, (string) $indexName) !== 1) {
+                continue;
+            }
+            $marked = (bool) ($info['mappings']['_meta']['scout_import'] ?? false);
+            $aliases = $info['aliases'] ?? [];
+            $serving = is_array($aliases) && array_key_exists($searchableAs, $aliases);
+            if ($marked && ! $serving) {
+                $params = new DeleteIndexParams((string) $indexName);
+                $elasticsearch->indices()->delete($params->toArray());
+            }
+        }
     }
 
     public function title(): string

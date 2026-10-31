@@ -26,6 +26,24 @@ final class ImportBatches
     }
 
     /**
+     * Why a cancelled import batch stopped, for the console to report.
+     */
+    public static function cancelledError(Batch $batch): \Exception
+    {
+        if ($batch->failedJobs > 0) {
+            return new \Exception(sprintf(
+                '%d of %d range jobs failed, so the search alias was not switched. The old index still serves searches; check the failed_jobs table for the cause.',
+                $batch->failedJobs,
+                $batch->totalJobs
+            ));
+        }
+
+        return new \Exception(
+            'This import was cancelled before it finished, most likely because a newer import for the same index started. The search alias was not changed.'
+        );
+    }
+
+    /**
      * The most recent import batch for an index, finished or not.
      */
     public static function latest(string $searchableAs): ?Batch

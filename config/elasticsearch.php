@@ -31,5 +31,10 @@ return [
                 'number_of_replicas' => 0,
             ],
         ],
+        // How long a deleted document's version is kept, so an import
+        // write that arrives late cannot bring the document back. Applied
+        // to every index the package creates, unless its settings define
+        // gc_deletes. Set to null to keep Elasticsearch's default (60s).
+        'gc_deletes' => '12h',
     ],
 ];

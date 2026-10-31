@@ -10,6 +10,12 @@ final class CreateJobBatchesTable extends Migration
 {
     public function up(): void
     {
+        // A real application usually has Laravel's own job_batches
+        // migration already.
+        if (Schema::hasTable('job_batches')) {
+            return;
+        }
+
         Schema::create('job_batches', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->string('name');

@@ -95,14 +95,16 @@ class ImportTest extends IntegrationTestCase
 
         dispatch($job);
 
-        // One range covers all 7 products, so the bar reaches 5 of 5
-        // only after that range job reports back.
+        // One range covers all 7 products, so the bar reaches 5 of 6
+        // only after that range job reports back, and 6 of 6 only once
+        // the finishing job has switched the alias.
         $this->assertEquals([
-            'Stop previous import 1/5',
-            'Clean up 2/5',
-            'Create write index 3/5',
-            'Planning ranges 4/5',
-            'Indexing... 5/5',
+            'Stop previous import 1/6',
+            'Clean up 2/6',
+            'Create write index 3/6',
+            'Planning ranges 4/6',
+            'Indexing... 5/6',
+            'Switching to the new index 6/6',
         ], $output->getLogs());
     }
 }
