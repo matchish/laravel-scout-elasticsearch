@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 - `where()` with an unsupported operator, for example `like`, now throws an `InvalidArgumentException` that names the operator. Before, Elasticsearch rejected the query with a 400 error. `<>` now works the same as `!=`.
 - `where()` with a `null` value now checks if the field has a value: `= null` finds documents without a value, and `!= null` finds documents with a value. Before, Elasticsearch rejected the query with a 400 error.
 
+## [7.14.0] - 2026-10-31
+### Removed
+- Support for PHP 8.0 and 8.1, Laravel 8–11 and Laravel Scout 8–10. These versions no longer get security fixes, and Composer refuses to install any Laravel 8–11 release because of open security advisories. The package now requires PHP 8.2+, Laravel 12 or 13 and Scout 11. Composer keeps applications on older versions on 7.13.x. [#339](https://github.com/matchish/laravel-scout-elasticsearch/pull/339)
+### Changed
+- Tests run on PHP 8.2–8.5 with Laravel 12 and 13, PHPUnit 11/12 and Orchestra Testbench 10/11. `nunomaduro/larastan` is replaced by `larastan/larastan` 3. [#339](https://github.com/matchish/laravel-scout-elasticsearch/pull/339)
+- README lists the supported versions and the support policy. [#339](https://github.com/matchish/laravel-scout-elasticsearch/pull/339)
+- README documents full-text queries and scoring for `where()`. [#332](https://github.com/matchish/laravel-scout-elasticsearch/pull/332)
+
 ## [7.13.0] - 2026-05-09
 ### Added
 - Support for Laravel Scout v11.1.0+ by updating query where handling for the new Scout where structure and operators. [#322](https://github.com/matchish/laravel-scout-elasticsearch/pull/322)
