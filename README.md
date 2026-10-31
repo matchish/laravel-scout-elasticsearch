@@ -308,7 +308,7 @@ Product::search('(title:this OR description:this) AND (title:that OR description
     ->where('price', new RangeQuery('price', [
         RangeQuery::GTE => 100,
         RangeQuery::LTE => 1000,
-    ]);
+    ]));
 ```
 
 And if you just want to search using RangeQuery without any query_string, you can call the search() method directly and leave the param empty.
@@ -320,7 +320,7 @@ use ONGR\ElasticsearchDSL\Query\TermLevel\RangeQuery;
 Product::search()
     ->where('price', new RangeQuery('price', [
         RangeQuery::GTE => 100,
-    ]);
+    ]));
 ```
 
 Full list of ElasticSearch terms is in `vendor/handcraftedinthealps/elasticsearch-dsl/src/Query/TermLevel`.
