@@ -1,12 +1,13 @@
 includes:
-    - vendor/nunomaduro/larastan/extension.neon
+    - vendor/larastan/larastan/extension.neon
 parameters:
     level: max
     paths:
         - src
     reportUnmatchedIgnoredErrors: false
-    checkMissingIterableValueType: false
     ignoreErrors:
+        -
+            identifier: missingType.iterableValue
         - '#Call to an undefined method Illuminate\\Support\\HigherOrder#'
         -
             path: %currentWorkingDirectory%/src/Engines/ElasticSearchEngine.php
