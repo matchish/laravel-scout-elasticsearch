@@ -5,6 +5,8 @@ namespace Matchish\ScoutElasticSearch;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Searchable;
+use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 
 final class MixedSearch
 {
@@ -23,7 +25,7 @@ final class MixedSearch
             use Searchable;
         };
 
-        return new class($model, $query, $callback) extends Builder
+        $builder = new class($model, $query, $callback) extends Builder
         {
             protected function getTotalCount($results)
             {
@@ -35,5 +37,13 @@ final class MixedSearch
                 return $engine->getTotalCount($results);
             }
         };
+
+        if (config('scout.soft_delete', false)) {
+            // Only soft-deletable models index __soft_deleted, so use "not 1" instead of Scout's "= 0".
+            // where() stores it the way Scout does, so withTrashed() and onlyTrashed() still work.
+            $builder->where('__soft_deleted', new BoolQuery([BoolQuery::MUST_NOT => new TermQuery('__soft_deleted', 1)]));
+        }
+
+        return $builder;
     }
 }
