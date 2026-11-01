@@ -33,6 +33,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 - Full instructions, including the two interface changes that affect custom `HitsIteratorAggregate` and `ImportSource` implementations, are in [UPGRADE.md](UPGRADE.md).
 - Alpha testers: the `tracked_jobs` table is no longer used, and parallel import now needs the standard `job_batches` table instead.
 
+### Fixed
+- `paginate()` on a `MixedSearch` with a `query()` callback now works. Before, it failed with "Base table or view not found", because Scout counted rows in a table that does not exist. [#227](https://github.com/matchish/laravel-scout-elasticsearch/issues/227)
+- `MixedSearch` now leaves out soft-deleted models when `scout.soft_delete` is `true`, as `Model::search()` does. Before, it returned them. Use `withTrashed()` to include them.
+
 ## [8.0.0-alpha.3] - 2026-02-09
 ### Changed
 - The usage of mateusjunges/laravel-trackable-jobs package for parallel import
