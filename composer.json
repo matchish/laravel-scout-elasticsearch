@@ -20,7 +20,9 @@
         "elasticsearch/elasticsearch": "^8.0",
         "handcraftedinthealps/elasticsearch-dsl": "^8.0",
         "illuminate/support": "^12.0|^13.0",
-        "laravel/scout": "^11.0"
+        "laravel/scout": "^11.0",
+        "nikic/php-parser": "^5.0",
+        "symfony/finder": "^7.2|^8.0"
     },
     "require-dev": {
         "larastan/larastan": "^3.0",

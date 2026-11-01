@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 - `where()` with an unsupported operator, for example `like`, now throws an `InvalidArgumentException` that names the operator. Before, Elasticsearch rejected the query with a 400 error. `<>` now works the same as `!=`.
 - `where()` with a `null` value now checks if the field has a value: `= null` finds documents without a value, and `!= null` finds documents with a value. Before, Elasticsearch rejected the query with a 400 error.
 
+## [7.14.1] - 2026-11-01
+### Fixed
+- `paginate()` on a `MixedSearch` with a `query()` callback now works. Before, it failed with "Base table or view not found", because Scout counted rows in a table that does not exist. [#227](https://github.com/matchish/laravel-scout-elasticsearch/issues/227) [#341](https://github.com/matchish/laravel-scout-elasticsearch/pull/341)
+- `MixedSearch` now leaves out soft-deleted models when `scout.soft_delete` is `true`, as `Model::search()` does. Before, it returned them. Use `withTrashed()` to include them. [#342](https://github.com/matchish/laravel-scout-elasticsearch/pull/342)
+
 ## [7.14.0] - 2026-10-31
 ### Removed
 - Support for PHP 8.0 and 8.1, Laravel 8–11 and Laravel Scout 8–10. These versions no longer get security fixes, and Composer refuses to install any Laravel 8–11 release because of open security advisories. The package now requires PHP 8.2+, Laravel 12 or 13 and Scout 11. Composer keeps applications on older versions on 7.13.x. [#339](https://github.com/matchish/laravel-scout-elasticsearch/pull/339)
