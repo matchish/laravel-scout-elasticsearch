@@ -15,6 +15,7 @@ final class CreateProductsTable extends Migration
             $table->string('custom_key');
             $table->string('title');
             $table->integer('price');
+            $table->integer('weight')->nullable();
             $table->string('type')->default('new');
             $table->string('slug')->nullable();
             $table->string('description')->nullable();

@@ -31,10 +31,13 @@ services:
       - default
   db:
     image: mysql:5.7.22
+    # 5.7 ships no arm64 image; emulation keeps Apple Silicon on the same
+    # version the CI workflow uses.
+    platform: linux/amd64
     environment:
       MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
+      # The app connects as root (see DB_USERNAME in .env.example). Passing
+      # MYSQL_USER=root makes the entrypoint fail: the user already exists.
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     networks:
       - default

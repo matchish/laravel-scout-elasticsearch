@@ -27,4 +27,9 @@ class BookWithCustomKey extends Book
     {
         return 'books_with_custom_key';
     }
+
+    public function searchablePartitionKey(): string
+    {
+        return 'id';
+    }
 }

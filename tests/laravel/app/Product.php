@@ -17,6 +17,7 @@ class Product extends Model
         'slug',
         'description',
         'price',
+        'weight',
     ];
 
     public function getScoutKeyName()

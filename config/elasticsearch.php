@@ -11,12 +11,9 @@ return [
     'ssl_verification' => env('ELASTICSEARCH_SSL_VERIFICATION', true),
     'queue' => [
         'timeout' => env('SCOUT_QUEUE_TIMEOUT'),
-        'name' => env('SCOUT_QUEUE_NAME'),
     ],
-    'tracked_jobs' => [
-        'table' => env('ELASTICSEARCH_TRACKED_JOBS_TABLE', 'tracked_jobs'),
-        'model' => \Matchish\ScoutElasticSearch\Jobs\TrackableJobs\TrackedJob::class,
-        'using_uuid' => false,
+    'parallel' => [
+        'chunks_per_range' => env('ELASTICSEARCH_PARALLEL_CHUNKS_PER_RANGE', 8),
     ],
     'indices' => [
         'mappings' => [
@@ -34,5 +31,10 @@ return [
                 'number_of_replicas' => 0,
             ],
         ],
+        // How long a deleted document's version is kept, so an import
+        // write that arrives late cannot bring the document back. Applied
+        // to every index the package creates, unless its settings define
+        // gc_deletes. Set to null to keep Elasticsearch's default (60s).
+        'gc_deletes' => '12h',
     ],
 ];

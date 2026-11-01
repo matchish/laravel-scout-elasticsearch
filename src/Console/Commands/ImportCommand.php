@@ -17,7 +17,7 @@ final class ImportCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected $signature = 'scout:import {searchable?* : The name of the searchable} {--P|parallel : Index items in parallel}';
+    protected $signature = 'scout:import {searchable?* : The name of the searchable} {--P|parallel : Index items in parallel} {--catch-up : After a parallel import, re-import rows changed while it ran, before switching the alias}';
 
     /**
      * {@inheritdoc}
@@ -29,15 +29,12 @@ final class ImportCommand extends Command
      */
     public function handle(): void
     {
-        $parallel = false;
-
-        if ($this->option('parallel')) {
-            $parallel = true;
-        }
+        $parallel = (bool) $this->option('parallel');
+        $catchUp = (bool) $this->option('catch-up');
 
         $this->searchableList((array) $this->argument('searchable'))
-        ->each(function (string $searchable) use ($parallel) {
-            $this->import($searchable, $parallel);
+        ->each(function (string $searchable) use ($parallel, $catchUp) {
+            $this->import($searchable, $parallel, $catchUp);
         });
     }
 
@@ -57,9 +54,10 @@ final class ImportCommand extends Command
     /**
      * @param  string  $searchable
      * @param  bool  $parallel
+     * @param  bool  $catchUp
      * @return void
      */
-    private function import(string $searchable, bool $parallel): void
+    private function import(string $searchable, bool $parallel, bool $catchUp = false): void
     {
         $sourceFactory = app(ImportSourceFactory::class);
         $source = $sourceFactory::from($searchable);
@@ -71,6 +69,11 @@ final class ImportCommand extends Command
             $job->timeout = (int) $queueTimeout;
         }
         $job->parallel = $parallel;
+        $job->catchUp = $catchUp;
+        // Without scout.queue the import runs here, in the console, so it
+        // can follow the range jobs. Queued, it would run on a worker and
+        // waiting there could block the very worker the range jobs need.
+        $job->watchProgress = $parallel && ! config('scout.queue');
 
         if (config('scout.queue')) {
             $job = (new QueueableJob())->chain([$job]);
