@@ -128,33 +128,31 @@ final class ImportState
         // calls stop after one request.
         $last = $this->ranges - 1;
         for ($first = $last - ($last % self::IDS_PER_REQUEST); $first >= 0; $first -= self::IDS_PER_REQUEST) {
-            $ids = array_map(function (int $range) {
-                return 'range-'.$range;
-            }, range($first, min($last, $first + self::IDS_PER_REQUEST - 1)));
-
-            try {
-                /** @var Elasticsearch $response */
-                $response = $elasticsearch->mget([
-                    'index' => $this->alias,
-                    '_source' => false,
-                    'body' => ['ids' => $ids],
-                ]);
-            } catch (ClientResponseException $e) {
+            $to = min($last, $first + self::IDS_PER_REQUEST - 1);
+            if ($this->found($elasticsearch, $first, $to) !== $to - $first + 1) {
                 return false;
-            }
-
-            $docs = $response->asArray()['docs'] ?? null;
-            if (! is_array($docs) || count($docs) !== count($ids)) {
-                return false;
-            }
-            foreach ($docs as $doc) {
-                if (! is_array($doc) || ($doc['found'] ?? false) !== true) {
-                    return false;
-                }
             }
         }
 
         return true;
+    }
+
+    /**
+     * How many planned ranges have recorded that they are finished, for
+     * the status command. Null when Elasticsearch rejects the read.
+     */
+    public function recorded(Client $elasticsearch): ?int
+    {
+        $recorded = 0;
+        for ($first = 0; $first < $this->ranges; $first += self::IDS_PER_REQUEST) {
+            $found = $this->found($elasticsearch, $first, min($this->ranges - 1, $first + self::IDS_PER_REQUEST - 1));
+            if ($found === null) {
+                return null;
+            }
+            $recorded += $found;
+        }
+
+        return $recorded;
     }
 
     public function handedOff(Client $elasticsearch, string $job): bool
@@ -224,6 +222,42 @@ final class ImportState
                 throw $e;
             }
         }
+    }
+
+    /**
+     * How many of the ranges $from to $to are recorded, or null when
+     * Elasticsearch rejects the read or answers for other documents.
+     */
+    private function found(Client $elasticsearch, int $from, int $to): ?int
+    {
+        $ids = array_map(function (int $range) {
+            return 'range-'.$range;
+        }, range($from, $to));
+
+        try {
+            /** @var Elasticsearch $response */
+            $response = $elasticsearch->mget([
+                'index' => $this->alias,
+                '_source' => false,
+                'body' => ['ids' => $ids],
+            ]);
+        } catch (ClientResponseException $e) {
+            return null;
+        }
+
+        $docs = $response->asArray()['docs'] ?? null;
+        if (! is_array($docs) || count($docs) !== count($ids)) {
+            return null;
+        }
+
+        $found = 0;
+        foreach ($docs as $doc) {
+            if (is_array($doc) && ($doc['found'] ?? false) === true) {
+                $found++;
+            }
+        }
+
+        return $found;
     }
 
     /**

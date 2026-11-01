@@ -49,6 +49,7 @@ Instead, each import has a small **state index** next to its own index, for exam
 - Decisions that must happen once use **create-if-absent** (`op_type=create`): only one job can create the `finish` record. Another delivery of that same job may start the final step again, which is safe.
 - Records are written through the alias with `require_alias`, so a late write after the state is gone is rejected instead of creating the index again.
 - `FinishImport` deletes the state as its very last step. The console waits for that, and then checks that the search alias really points at the new index.
+- `scout:import:status` reads the same records. Its progress is the recorded ranges out of the planned ranges, and it reports an import as finished only when the state is gone and the search alias points at the new index.
 
 ## Ranges and the partition key
 

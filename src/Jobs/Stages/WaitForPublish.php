@@ -89,7 +89,7 @@ final class WaitForPublish implements StageInterface
         // The state is gone: either this import was published, or a newer
         // import removed it together with this import's index.
         $this->done = true;
-        if (! $this->published($elasticsearch)) {
+        if (! self::published($elasticsearch, $this->index->name(), $this->source->searchableAs())) {
             throw new \Exception(
                 'A newer import for the same index replaced this one before it was published. The search alias was not changed by this import.'
             );
@@ -97,23 +97,24 @@ final class WaitForPublish implements StageInterface
     }
 
     /**
-     * The switch gives the import's index the search alias and takes
-     * its import alias away, in one atomic step.
+     * Whether the import that writes to $indexName is published. The
+     * switch gives that index the search alias and takes its import
+     * alias away, in one atomic step. The status command asks the same.
      */
-    private function published(Client $elasticsearch): bool
+    public static function published(Client $elasticsearch, string $indexName, string $searchableAs): bool
     {
-        $name = $this->index->name();
         try {
             /** @var Elasticsearch $response */
-            $response = $elasticsearch->indices()->getAlias(['index' => $name]);
+            $response = $elasticsearch->indices()->getAlias(['index' => $indexName]);
         } catch (ClientResponseException $e) {
             return false;
         }
-        $aliases = $response->asArray()[$name]['aliases'] ?? null;
+        $index = $response->asArray()[$indexName] ?? null;
+        $aliases = is_array($index) ? ($index['aliases'] ?? null) : null;
 
         return is_array($aliases)
-            && array_key_exists($this->source->searchableAs(), $aliases)
-            && ! array_key_exists(ImportAlias::of($name), $aliases);
+            && array_key_exists($searchableAs, $aliases)
+            && ! array_key_exists(ImportAlias::of($indexName), $aliases);
     }
 
     public function title(): string
