@@ -11,6 +11,8 @@ namespace Matchish\ScoutElasticSearch\Searchable;
  * its outer ends, so every key is covered whatever bounds were chosen,
  * including keys that appear after planning.
  * A null-bucket range matches rows where the partition key IS NULL.
+ *
+ * @internal
  */
 final class Range
 {
