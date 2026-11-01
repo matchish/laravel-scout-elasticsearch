@@ -11,7 +11,7 @@ use Matchish\ScoutElasticSearch\Searchable\ImportSource;
 /**
  * Cancels a still-running parallel import for the same index, so a
  * new import supersedes it. Cancelled ImportRange jobs stop at their
- * next chunk boundary; because they write to the concrete index of
+ * next chunk boundary; because they write through the import alias of
  * the superseded import, late writes can never reach the new index.
  *
  * @internal

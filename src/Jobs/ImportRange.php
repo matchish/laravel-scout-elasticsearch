@@ -19,12 +19,12 @@ use Matchish\ScoutElasticSearch\Searchable\Partitionable;
 use Matchish\ScoutElasticSearch\Searchable\Range;
 
 /**
- * Imports one key range of an import source into a concrete index.
+ * Imports one key range of an import source into the index of its import.
  *
  * The job pages through its range with keyset pagination and bulk
- * indexes every chunk. It writes to the concrete index name instead
- * of the write alias, so a job from a superseded import can never
- * pollute the index of a newer import.
+ * indexes every chunk. It writes through its import's own alias
+ * (ImportAlias) instead of the shared write alias, so a job from a
+ * superseded import can never pollute the index of a newer import.
  *
  * Inside a batch, one job processes at most $maxChunks chunks and then
  * hands the rest of its range to a new job in the same batch. A range
@@ -111,7 +111,7 @@ final class ImportRange implements ShouldQueue
      * @param  Partitionable  $source
      * @param  Range  $range
      * @param  string  $column  partition column, unqualified
-     * @param  string  $indexName  concrete index name to write to
+     * @param  string  $indexName  the import alias to write through, see ImportAlias
      * @param  int  $chunkSize
      * @param  int  $maxChunks  chunks one job processes before it hands on the rest; 0 for no limit
      * @param  array{0: mixed, 1: mixed}|null  $after  (partition, key) of the last row a previous job wrote

@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 - Indices leaked by a crashed import (created, then never finished or cleaned) are now reclaimed on the next import, together with the import's state index. New indices carry a `_meta.scout_import` provenance marker. Cleanup deletes only marked indices that are named the way this model's imports name them, and that the model's search alias does not point to. So it never touches an index the package did not create, or the index of another model whose name starts the same.
 
 ### Changed
-- Parallel import was rebuilt on Laravel job batching (`Bus::batch()`): key ranges are computed up front with one aggregate query and imported by independent queued jobs on a single shared queue. Range jobs write to the concrete index name instead of the write alias, so jobs of a superseded import can never pollute a newer index. A new `--parallel` import cancels a still-running one for the same index. Requires the `job_batches` table (shipped by default since Laravel 11).
+- Parallel import was rebuilt on Laravel job batching (`Bus::batch()`): key ranges are computed up front with one aggregate query and imported by independent queued jobs on a single shared queue. Range jobs write through a per-import alias instead of the shared write alias, so jobs of a superseded import can never pollute a newer index. A new `--parallel` import cancels a still-running one for the same index. Requires the `job_batches` table (shipped by default since Laravel 11).
 
 ### Removed
 - The custom job tracking subsystem used by parallel import (`TrackedJob` model, `tracked_jobs` table and migration, `elasticsearch.tracked_jobs` config) — superseded by Laravel job batching.
