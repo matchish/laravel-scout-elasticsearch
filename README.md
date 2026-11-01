@@ -329,18 +329,23 @@ Product::search('(title:this OR description:this) AND (title:that OR description
     ->whereNotIn('type', ['new', 'refurbished']);
 ```
 
-With Scout 11.1 or newer `->where()` also accepts an operator: `->where(column, operator, value)`.
-Supported operators are `=`, `!=`, `>`, `>=`, `<` and `<=`:
+Since Scout 11.1, `->where()` also accepts an operator: `->where(column, operator, value)`.
+The supported operators are `=`, `!=`, `<>`, `>`, `>=`, `<` and `<=`. Any other operator, for example `like`, throws an `InvalidArgumentException`.
 
 ```php
-Product::search('(title:this OR description:this) AND (title:that OR description:that)')
-    ->where('price', '>=', 100)
-    ->where('type', '!=', 'used');
+Product::search()
+    ->where('type', '!=', 'used')
+    ->where('price', '>=', 100);
 ```
 
-Other operators (for example `<>` or `like`) and `null` values are not supported.
+With a `null` value, `->where()` checks whether the field has a value. Elasticsearch does not index `null`, so a field with `null` and a missing field are the same.
 
-With any Scout version you can pass ElasticSearch terms like `RangeQuery` as value to `->where()`:
+```php
+Product::search()->where('description', null);       // products without a description
+Product::search()->where('description', '!=', null); // products with a description
+```
+
+For other conditions, you can pass ElasticSearch terms like `RangeQuery` as value to `->where()`:
 
 ```php
 
