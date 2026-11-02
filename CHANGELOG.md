@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 - Indices leaked by a crashed import (created, then never finished or cleaned) are now reclaimed on the next import, together with the import's state index. New indices carry a `_meta.scout_import` provenance marker. Cleanup deletes only marked indices that are named the way this model's imports name them, and that the model's search alias does not point to. So it never touches an index the package did not create, or the index of another model whose name starts the same. [#325](https://github.com/matchish/laravel-scout-elasticsearch/pull/325) [#336](https://github.com/matchish/laravel-scout-elasticsearch/pull/336)
 - `paginate()` on a `MixedSearch` with a `query()` callback now works. Before, it failed with "Base table or view not found", because Scout counted rows in a table that does not exist. [#227](https://github.com/matchish/laravel-scout-elasticsearch/issues/227) [#337](https://github.com/matchish/laravel-scout-elasticsearch/pull/337)
 - `MixedSearch` now leaves out soft-deleted models when `scout.soft_delete` is `true`, as `Model::search()` does. Before, it returned them. Use `withTrashed()` to include them. [#338](https://github.com/matchish/laravel-scout-elasticsearch/pull/338)
+- `where()` with an unsupported operator, for example `like`, now throws an `InvalidArgumentException` that names the operator. Before, Elasticsearch rejected the query with a 400 error. `<>` now works the same as `!=`. [#335](https://github.com/matchish/laravel-scout-elasticsearch/pull/335)
+- `where()` with a `null` value now checks if the field has a value: `= null` finds documents without a value, and `!= null` finds documents with a value. Before, Elasticsearch rejected the query with a 400 error. [#335](https://github.com/matchish/laravel-scout-elasticsearch/pull/335)
 
 ### Changed
 - Parallel import was rebuilt on Laravel job batching (`Bus::batch()`): key ranges are computed up front with one aggregate query and imported by independent queued jobs on a single shared queue. Range jobs write through a per-import alias instead of the shared write alias, so jobs of a superseded import can never pollute a newer index. A new `--parallel` import cancels a still-running one for the same index. Requires the `job_batches` table (shipped by default since Laravel 11). [#325](https://github.com/matchish/laravel-scout-elasticsearch/pull/325)
@@ -34,10 +36,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ### Upgrading
 - Full instructions, including the two interface changes that affect custom `HitsIteratorAggregate` and `ImportSource` implementations, are in [UPGRADE.md](UPGRADE.md).
 - Alpha testers: the `tracked_jobs` table is no longer used, and parallel import now needs the standard `job_batches` table instead.
-
-### Fixed
-- `where()` with an unsupported operator, for example `like`, now throws an `InvalidArgumentException` that names the operator. Before, Elasticsearch rejected the query with a 400 error. `<>` now works the same as `!=`.
-- `where()` with a `null` value now checks if the field has a value: `= null` finds documents without a value, and `!= null` finds documents with a value. Before, Elasticsearch rejected the query with a 400 error.
 
 ## [8.0.0-alpha.3] - 2026-02-09
 ### Changed
