@@ -254,12 +254,22 @@ php artisan scout:import:status
 ```
 
 ```
-+----------+---------+----------+-------+--------+----------------+
-| Index    | Status  | Progress | Jobs  | Failed | Started        |
-+----------+---------+----------+-------+--------+----------------+
-| products | running | 45%      | 9/20  | 0      | 2 minutes ago  |
-+----------+---------+----------+-------+--------+----------------+
++----------+---------+----------+--------+--------+---------------+
+| Index    | Status  | Progress | Ranges | Failed | Started       |
++----------+---------+----------+--------+--------+---------------+
+| products | running | 45%      | 9/20   | 0      | 2 minutes ago |
++----------+---------+----------+--------+--------+---------------+
 ```
+
+The status is one of:
+
+- `running`: some ranges are not imported yet. Progress counts imported ranges, not rows.
+- `switching`: every range is imported, and the final step (catch-up, refresh, alias switch) has not finished yet.
+- `finished`: searches use the new index.
+- `failed`: a range job failed, or the final step failed. The reason is printed below the table, and searches still use the old index.
+- `cancelled`: a newer import replaced this one.
+
+The command reads the same records that the import uses to decide that it is complete, so a job that the queue delivers twice does not change what it shows.
 
 Pass a model name to check one index, for example `php artisan scout:import:status "App\Models\Product"`.
 
@@ -319,18 +329,23 @@ Product::search('(title:this OR description:this) AND (title:that OR description
     ->whereNotIn('type', ['new', 'refurbished']);
 ```
 
-With Scout 11.1 or newer `->where()` also accepts an operator: `->where(column, operator, value)`.
-Supported operators are `=`, `!=`, `>`, `>=`, `<` and `<=`:
+Since Scout 11.1, `->where()` also accepts an operator: `->where(column, operator, value)`.
+The supported operators are `=`, `!=`, `<>`, `>`, `>=`, `<` and `<=`. Any other operator, for example `like`, throws an `InvalidArgumentException`.
 
 ```php
-Product::search('(title:this OR description:this) AND (title:that OR description:that)')
-    ->where('price', '>=', 100)
-    ->where('type', '!=', 'used');
+Product::search()
+    ->where('type', '!=', 'used')
+    ->where('price', '>=', 100);
 ```
 
-Other operators (for example `<>` or `like`) and `null` values are not supported.
+With a `null` value, `->where()` checks whether the field has a value. Elasticsearch does not index `null`, so a field with `null` and a missing field are the same.
 
-With any Scout version you can pass ElasticSearch terms like `RangeQuery` as value to `->where()`:
+```php
+Product::search()->where('description', null);       // products without a description
+Product::search()->where('description', '!=', null); // products with a description
+```
+
+For other conditions, you can pass ElasticSearch terms like `RangeQuery` as value to `->where()`:
 
 ```php
 

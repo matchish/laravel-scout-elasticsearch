@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Model;
  * (COUNT, MIN, MAX over the partition column). Ranges are equal-width
  * in key space, so they do not need a second pass over the data;
  * uneven ranges only affect balance, never correctness.
+ *
+ * @internal
  */
 final class RangePlanner
 {

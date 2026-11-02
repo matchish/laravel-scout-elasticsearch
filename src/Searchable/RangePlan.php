@@ -7,6 +7,8 @@ namespace Matchish\ScoutElasticSearch\Searchable;
 /**
  * The partition column and the ranges that together cover
  * every row of an import source.
+ *
+ * @internal
  */
 final class RangePlan
 {

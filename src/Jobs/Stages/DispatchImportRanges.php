@@ -6,7 +6,6 @@ namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
 use Elastic\Elasticsearch\Client;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Bus;
 use Matchish\ScoutElasticSearch\ElasticSearch\ImportAlias;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\Jobs\FinishImport;
@@ -155,7 +154,7 @@ final class DispatchImportRanges implements StageInterface
         // The batch only reports progress and lets a newer import cancel
         // this one. It does not decide when the import is finished: it
         // counts deliveries, and any queue may deliver a job twice.
-        $batch = Bus::batch($jobs)->name(ImportBatches::name($this->source->searchableAs()));
+        $batch = ImportBatches::make($jobs, $this->source->searchableAs(), $index->name(), count($plan->ranges()));
 
         if ($connection !== null) {
             $batch->onConnection($connection);
