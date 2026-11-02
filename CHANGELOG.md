@@ -4,10 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
-## [Unreleased]
+## [7.14.2] - 2026-11-02
 ### Fixed
-- `where()` with an unsupported operator, for example `like`, now throws an `InvalidArgumentException` that names the operator. Before, Elasticsearch rejected the query with a 400 error. `<>` now works the same as `!=`.
-- `where()` with a `null` value now checks if the field has a value: `= null` finds documents without a value, and `!= null` finds documents with a value. Before, Elasticsearch rejected the query with a 400 error.
+- `scout:import` without a model argument failed with a class-not-found error wherever `nikic/php-parser` was absent — for example after `composer install --no-dev`. The package uses it to find searchable models but never declared it: until 7.12.0 it arrived through `roave/better-reflection`. `nikic/php-parser` and `symfony/finder` are now direct dependencies. [#273](https://github.com/matchish/laravel-scout-elasticsearch/issues/273) [#326](https://github.com/matchish/laravel-scout-elasticsearch/pull/326)
+- `where()` with an unsupported operator, for example `like`, now throws an `InvalidArgumentException` that names the operator. Before, Elasticsearch rejected the query with a 400 error. `<>` now works the same as `!=`. [#333](https://github.com/matchish/laravel-scout-elasticsearch/pull/333)
+- `where()` with a `null` value now checks if the field has a value: `= null` finds documents without a value, and `!= null` finds documents with a value. Before, Elasticsearch rejected the query with a 400 error. [#333](https://github.com/matchish/laravel-scout-elasticsearch/pull/333)
+
+### Changed
+- `where()` with the `<>` operator and an Elasticsearch query object now excludes the documents that match it (`must_not`). Before, the operator was ignored and the query object became a filter. [#333](https://github.com/matchish/laravel-scout-elasticsearch/pull/333)
+- README documents how to work with results, with a custom `HitsIteratorAggregate` that keeps the highlights from a search. [#328](https://github.com/matchish/laravel-scout-elasticsearch/pull/328)
 
 ## [7.14.1] - 2026-11-01
 ### Fixed
