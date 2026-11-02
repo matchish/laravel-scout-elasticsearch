@@ -11,6 +11,7 @@ use Illuminate\Support\LazyCollection;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Engines\Engine;
 use Matchish\ScoutElasticSearch\Contracts\SearchableContract;
+use Matchish\ScoutElasticSearch\ElasticSearch\BulkResult;
 use Matchish\ScoutElasticSearch\ElasticSearch\HitsIteratorAggregate;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Bulk;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Refresh;
@@ -48,19 +49,15 @@ final class ElasticSearchEngine extends Engine
      */
     public function update($models)
     {
-        $params = new Bulk();
+        $params = new Bulk(null, false, Bulk::WRITER_LIVE);
         $params->index($models);
         /** @var Elasticsearch $elasticResponse */
         $elasticResponse = $this->elasticsearch->bulk($params->toArray());
-        $response = $elasticResponse->asArray();
-        if (array_key_exists('errors', $response) && $response['errors']) {
-            /** @var string|bool $json */
-            $json = json_encode($response, JSON_PRETTY_PRINT);
-            if ($json === false) {
-                throw new \Exception('Bulk update error');
-            }
-            /** @var string $json */
-            $error = new ServerResponseException($json);
+        $result = new BulkResult($elasticResponse->asArray());
+        // A version conflict here means a newer change already reached
+        // the document, so dropping this write is the correct outcome.
+        if ($result->hasFatalErrors()) {
+            $error = new ServerResponseException($result->toJson());
             throw new \Exception('Bulk update error', $error->getCode(), $error);
         }
     }
@@ -70,7 +67,7 @@ final class ElasticSearchEngine extends Engine
      */
     public function delete($models)
     {
-        $params = new Bulk();
+        $params = new Bulk(null, false, Bulk::WRITER_LIVE);
         $params->delete($models);
         $this->elasticsearch->bulk($params->toArray());
     }

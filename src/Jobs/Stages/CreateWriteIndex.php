@@ -5,6 +5,7 @@ namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 use Elastic\Elasticsearch\Client;
 use Matchish\ScoutElasticSearch\ElasticSearch\DefaultAlias;
 use Matchish\ScoutElasticSearch\ElasticSearch\FilteredAlias;
+use Matchish\ScoutElasticSearch\ElasticSearch\ImportAlias;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Create;
 use Matchish\ScoutElasticSearch\ElasticSearch\WriteAlias;
@@ -43,6 +44,7 @@ final class CreateWriteIndex implements StageInterface
                 $this->index
             )
         );
+        $this->index->addAlias(new ImportAlias($this->index->name()));
 
         $params = new Create(
             $this->index->name(),

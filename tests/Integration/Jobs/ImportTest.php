@@ -66,16 +66,45 @@ class ImportTest extends IntegrationTestCase
         dispatch($job);
 
         $this->assertEquals([
-            'Stopping queued jobs for this index. 1/9',
-            'Clean up 2/9',
-            'Create write index 3/9',
-            'Indexing... 3/9',
-            'Indexing... 4/9',
-            'Indexing... 5/9',
-            'Indexing... 6/9',
-            'Cleaning up tracked jobs records for this index. 7/9',
-            'Refreshing index 8/9',
-            'Switching to the new index 9/9',
+            'Stop previous import 1/4',
+            'Clean up 2/4',
+            'Create write index 3/4',
+            'Planning ranges 4/4',
+        ], $output->getLogs());
+    }
+
+    public function test_progress_report_parallel_watching_ranges()
+    {
+        $dispatcher = Product::getEventDispatcher();
+        Product::unsetEventDispatcher();
+        $productsAmount = 7;
+        factory(Product::class, $productsAmount)->create();
+        Product::setEventDispatcher($dispatcher);
+
+        $job = new Import(DefaultImportSourceFactory::from(Product::class));
+        $job->parallel = true;
+        $job->watchProgress = true;
+        $output = new DummyOutput();
+        $outputStyle = new OutputStyle(new ArrayInput([]), $output);
+        $progressBar = $outputStyle->createProgressBar();
+        $progressBar->setRedrawFrequency(1);
+        $progressBar->maxSecondsBetweenRedraws(0);
+        $progressBar->minSecondsBetweenRedraws(0);
+        $progressBar->setFormat('[%message%] %current%/%max%');
+        $job->withProgressReport($progressBar);
+
+        dispatch($job);
+
+        // One range covers all 7 products, so the bar reaches 5 of 6
+        // only after that range job reports back, and 6 of 6 only once
+        // the finishing job has switched the alias.
+        $this->assertEquals([
+            'Stop previous import 1/6',
+            'Clean up 2/6',
+            'Create write index 3/6',
+            'Planning ranges 4/6',
+            'Indexing... 5/6',
+            'Switching to the new index 6/6',
         ], $output->getLogs());
     }
 }
