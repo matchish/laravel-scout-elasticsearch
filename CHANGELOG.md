@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
+## [Unreleased]
+### Added
+- `scout:import` and `scout:flush` without a model argument now show a hint when a fatal error stops PHP during the model search. The hint gives the class, the file and the line, and tells how to prevent the search.
+
 ## [7.14.2] - 2026-11-02
 ### Fixed
 - `scout:import` without a model argument failed with a class-not-found error wherever `nikic/php-parser` was absent — for example after `composer install --no-dev`. The package uses it to find searchable models but never declared it: until 7.12.0 it arrived through `roave/better-reflection`. `nikic/php-parser` and `symfony/finder` are now direct dependencies. [#273](https://github.com/matchish/laravel-scout-elasticsearch/issues/273) [#326](https://github.com/matchish/laravel-scout-elasticsearch/pull/326)
