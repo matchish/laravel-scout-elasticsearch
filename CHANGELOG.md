@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
+## [Unreleased]
+### Fixed
+- `scout:import` and `scout:flush` without a model argument no longer fail with "Cannot use ... because the name is already in use" when the files are valid. Before, the model search used one list of `use` statements for all files in `app/`, and the result depended on the file order. A real duplicate `use` in one file now skips that file, as a syntax error does. [#284](https://github.com/matchish/laravel-scout-elasticsearch/issues/284)
+
 ## [7.14.2] - 2026-11-02
 ### Fixed
 - `scout:import` without a model argument failed with a class-not-found error wherever `nikic/php-parser` was absent — for example after `composer install --no-dev`. The package uses it to find searchable models but never declared it: until 7.12.0 it arrived through `roave/better-reflection`. `nikic/php-parser` and `symfony/finder` are now direct dependencies. [#273](https://github.com/matchish/laravel-scout-elasticsearch/issues/273) [#326](https://github.com/matchish/laravel-scout-elasticsearch/pull/326)

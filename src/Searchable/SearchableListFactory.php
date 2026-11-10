@@ -116,15 +116,15 @@ final class SearchableListFactory
         $stmts = [];
         foreach (Finder::create()->files()->name('*.php')->in($this->appPath) as $file) {
             try {
-                $stmts[] = $parser->parse($file->getContents());
+                // Traverse each file on its own. The use statements of one file
+                // must not stay active for the next file.
+                $stmts[] = $nodeTraverser->traverse($parser->parse($file->getContents()) ?? []);
             } catch (Error $e) {
                 $this->errors[] = $e->getMessage();
             }
         }
 
-        $stmts = Collection::make($stmts)->flatten(1)->toArray();
-
-        return $nodeTraverser->traverse($stmts);
+        return Collection::make($stmts)->flatten(1)->toArray();
     }
 
     /**
