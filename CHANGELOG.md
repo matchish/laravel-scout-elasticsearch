@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
+### Added
+- `scout:import` and `scout:flush` without a model argument now show a hint when a fatal error stops PHP during the model search. The hint gives the class, the file and the line, and tells how to prevent the search.
+
 ### Fixed
 - `scout:import` and `scout:flush` without a model argument no longer fail with "Cannot use ... because the name is already in use" when the files are valid. Before, the model search used one list of `use` statements for all files in `app/`, and the result depended on the file order. A real duplicate `use` in one file now skips that file, as a syntax error does. [#284](https://github.com/matchish/laravel-scout-elasticsearch/issues/284)
 

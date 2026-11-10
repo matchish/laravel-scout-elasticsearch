@@ -34,6 +34,12 @@ final class SearchableListFactory
      * @var array
      */
     private array $errors = [];
+    /**
+     * The class that PHP loads now. It is null when no class load is in progress.
+     *
+     * @var string|null
+     */
+    private ?string $loadingClass = null;
 
     /**
      * @param  string  $namespace
@@ -81,6 +87,10 @@ final class SearchableListFactory
     private function getSearchableClasses(): array
     {
         if (self::$searchableClasses === null) {
+            register_shutdown_function(function (): void {
+                $this->showFatalErrorHint();
+            });
+
             self::$searchableClasses = $this->getProjectClasses()->filter(function ($class) {
                 return $this->findSearchableTraitRecursively($class);
             })->toArray();
@@ -177,9 +187,45 @@ final class SearchableListFactory
             }
 
             // Try to autoload, but catch any errors
+            $this->loadingClass = $class;
+
             return class_exists($class, true);
         } catch (\Throwable $e) {
             return false;
+        } finally {
+            // PHP does not execute this block after a fatal error,
+            // so showFatalErrorHint() can still see the class.
+            $this->loadingClass = null;
         }
+    }
+
+    /**
+     * Show which class discovery loaded when PHP stopped with a fatal error.
+     *
+     * A fatal error, for example a class that does not implement an abstract
+     * method, stops PHP at once. A catch block does not see it, so a shutdown
+     * function is the only place that can add this context.
+     *
+     * @return void
+     */
+    private function showFatalErrorHint(): void
+    {
+        $error = error_get_last();
+
+        if ($this->loadingClass === null
+            || $error === null
+            || ! in_array($error['type'], [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE], true)) {
+            return;
+        }
+
+        file_put_contents('php://stderr', sprintf(
+            "\nPHP stopped when laravel-scout-elasticsearch loaded %s to find the searchable models.\n"
+            ."The error is in %s on line %d. Correct this file.\n"
+            ."To prevent this search, give the model class to the command, for example:\n"
+            ."php artisan scout:import \"App\\Models\\YourModel\"\n",
+            $this->loadingClass,
+            $error['file'],
+            $error['line'],
+        ));
     }
 }
