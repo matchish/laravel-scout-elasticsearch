@@ -154,22 +154,23 @@ final class ImportCommandTest extends IntegrationTestCase
         $output = new BufferedOutput();
         Artisan::call('scout:import', ['searchable' => [Product::class, Book::class]], $output);
 
-        $output = explode("\n", $output->fetch());
+        // The number of blank lines around the progress bar depends on the symfony/console version.
+        $output = array_values(array_filter(array_map('trim', explode("\n", $output->fetch()))));
         $this->assertEquals(
             trans('scout::import.start', ['searchable' => Product::class]),
-            trim($output[0])
+            $output[0]
         );
         $this->assertEquals(
             '[OK] '.trans('scout::import.done', ['searchable' => Product::class]),
-            trim($output[14])
+            $output[9]
         );
         $this->assertEquals(
             trans('scout::import.start', ['searchable' => Book::class]),
-            trim($output[16])
+            $output[10]
         );
         $this->assertEquals(
             '[OK] '.trans('scout::import.done', ['searchable' => Book::class]),
-            trim($output[30])
+            $output[19]
         );
     }
 
