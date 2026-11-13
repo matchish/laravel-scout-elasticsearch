@@ -329,6 +329,31 @@ $results = Product::search('', function(\Elastic\Elasticsearch\Client $client, $
 Sometimes your indexed models have fields that should not appear in returned result.
 You can set returned fields in `source` option `->options(['source' => ['this', 'that', 'something', 'else']])` 
 
+### Search options
+You can pass these options to the search body with the `options()` method of the builder:
+
+| Option | Elasticsearch parameter |
+|---|---|
+| `from` | [`from`](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html) |
+| `size` | [`size`](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html), used when `take()` is not called |
+| `source` | [`_source`](#limiting-returned-fields) |
+| `track_total_hits` | [`track_total_hits`](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-your-data.html#track-total-hits), `true` counts all the matches, or an integer to count up to it |
+| `min_score` | [`min_score`](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-search.html#request-body-search-min-score) |
+| `search_after` | [`search_after`](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html#search-after), the sort values of the last hit of the previous page. Use `orderBy()` to sort by a unique field |
+
+```php
+Product::search('shoes')
+    ->orderBy('id')
+    ->options([
+        'size' => 100,
+        'track_total_hits' => true,
+        'search_after' => [4200],
+    ])
+    ->get();
+```
+
+Other options are ignored. For anything else use the callback from the [Search](#search) section.
+
 ### Pagination
 The engine supports [Elasticsearch pagination](https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html)
 with [Scout Builder pagination](https://laravel.com/docs/11.x/scout#pagination) or by setting page sizes 

@@ -47,6 +47,15 @@ final class SearchFactory
         if (array_key_exists('source', $options)) {
             $search->setSource($options['source']);
         }
+        if (array_key_exists('track_total_hits', $options)) {
+            $search->setTrackTotalHits($options['track_total_hits']);
+        }
+        if (array_key_exists('min_score', $options)) {
+            $search->setMinScore($options['min_score']);
+        }
+        if (array_key_exists('search_after', $options)) {
+            $search->setSearchAfter($options['search_after']);
+        }
         if (! empty($builder->orders)) {
             foreach ($builder->orders as $order) {
                 $search->addSort(new FieldSort($order['column'], $order['direction']));
@@ -170,20 +179,25 @@ final class SearchFactory
 
     private static function prepareOptions(Builder $builder, array $enforceOptions = []): array
     {
-        $options = [];
+        $options = self::supportedOptions($builder);
 
+        // The limit of the builder takes precedence over the size option
         if (isset($builder->limit)) {
             $options['size'] = $builder->limit;
         }
 
-        return array_merge($options, self::supportedOptions($builder), $enforceOptions);
+        return array_merge($options, $enforceOptions);
     }
 
     private static function supportedOptions(Builder $builder): array
     {
         return Arr::only($builder->options, [
             'from',
+            'size',
             'source',
+            'track_total_hits',
+            'min_score',
+            'search_after',
         ]);
     }
 }
