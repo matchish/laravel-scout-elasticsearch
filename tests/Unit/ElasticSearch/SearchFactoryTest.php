@@ -50,6 +50,82 @@ class SearchFactoryTest extends TestCase
         $this->assertEquals($expectedSize, $search->getSize());
     }
 
+    public function test_size_set_in_options_take_effect_without_limit(): void
+    {
+        $builder = new Builder(new Product(), '*');
+        $builder->options([
+            'size' => $expectedSize = 100,
+        ]);
+
+        $search = SearchFactory::create($builder);
+
+        $this->assertEquals($expectedSize, $search->getSize());
+    }
+
+    public function test_size_set_in_options_dont_take_effect_on_pagination(): void
+    {
+        $builder = new Builder(new Product(), '*');
+        $builder->options([
+            'size' => 100,
+        ]);
+
+        $search = SearchFactory::create($builder, [
+            'from' => 0,
+            'size' => $expectedSize = 50,
+        ]);
+
+        $this->assertEquals($expectedSize, $search->getSize());
+    }
+
+    public function test_track_total_hits_can_be_set_from_options(): void
+    {
+        $builder = new Builder(new Product(), '*');
+        $builder->options([
+            'track_total_hits' => true,
+        ]);
+
+        $search = SearchFactory::create($builder);
+
+        $this->assertTrue($search->toArray()['track_total_hits']);
+    }
+
+    public function test_min_score_can_be_set_from_options(): void
+    {
+        $builder = new Builder(new Product(), '*');
+        $builder->options([
+            'min_score' => 0.5,
+        ]);
+
+        $search = SearchFactory::create($builder);
+
+        $this->assertEquals(0.5, $search->toArray()['min_score']);
+    }
+
+    public function test_search_after_can_be_set_from_options(): void
+    {
+        $builder = new Builder(new Product(), '*');
+        $builder->orderBy('id')
+            ->options([
+                'search_after' => $expected = [42],
+            ]);
+
+        $search = SearchFactory::create($builder);
+
+        $this->assertEquals($expected, $search->toArray()['search_after']);
+    }
+
+    public function test_unsupported_options_are_ignored(): void
+    {
+        $builder = new Builder(new Product(), '*');
+        $builder->options([
+            'timeout' => '5s',
+        ]);
+
+        $search = SearchFactory::create($builder);
+
+        $this->assertArrayNotHasKey('timeout', $search->toArray());
+    }
+
     public function test_from_set_in_options_take_effect(): void
     {
         $builder = new Builder(new Product(), '*');

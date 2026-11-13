@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
+## [Unreleased]
+### Added
+- The `options()` method of the Scout builder now accepts `size`, `track_total_hits`, `min_score` and `search_after`. Before, only `from` and `source` had an effect, and `Model::search()->options(['size' => 100])` returned the default 10 hits. `size` is used when `take()` is not called. `track_total_hits` and `search_after` give access to more than 10,000 hits. [#252](https://github.com/matchish/laravel-scout-elasticsearch/issues/252) [#311](https://github.com/matchish/laravel-scout-elasticsearch/issues/311)
+
 ## [7.14.3] - 2026-11-10
 ### Added
 - `scout:import` and `scout:flush` without a model argument now show a hint when a fatal error stops PHP during the model search. The hint gives the class, the file and the line, and tells how to prevent the search. [#345](https://github.com/matchish/laravel-scout-elasticsearch/pull/345)
