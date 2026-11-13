@@ -19,9 +19,11 @@ use Symfony\Component\Finder\Finder;
 final class SearchableListFactory
 {
     /**
-     * @var array|null
+     * Searchable classes found in a directory, by directory.
+     *
+     * @var array<string, string[]>
      */
-    private static ?array $searchableClasses = null;
+    private static array $searchableClasses = [];
     /**
      * @var string
      */
@@ -49,6 +51,27 @@ final class SearchableListFactory
     {
         $this->namespace = $namespace;
         $this->appPath = $appPath;
+    }
+
+    /**
+     * Get the searchable models of the namespaces and directories to search.
+     *
+     * The `elasticsearch.searchable_namespaces` config maps a namespace to the
+     * directory with its classes. Without it the application namespace and
+     * the application directory are searched.
+     *
+     * @return Collection
+     */
+    public static function fromConfig(): Collection
+    {
+        $namespaces = config('elasticsearch.searchable_namespaces') ?: [
+            app()->getNamespace() => app()->path(),
+        ];
+
+        return Collection::make($namespaces)
+            ->flatMap(fn (string $path, string $namespace) => (new self(rtrim($namespace, '\\').'\\', $path))->make())
+            ->unique()
+            ->values();
     }
 
     /**
@@ -86,17 +109,17 @@ final class SearchableListFactory
      */
     private function getSearchableClasses(): array
     {
-        if (self::$searchableClasses === null) {
+        if (! isset(self::$searchableClasses[$this->appPath])) {
             register_shutdown_function(function (): void {
                 $this->showFatalErrorHint();
             });
 
-            self::$searchableClasses = $this->getProjectClasses()->filter(function ($class) {
+            self::$searchableClasses[$this->appPath] = $this->getProjectClasses()->filter(function ($class) {
                 return $this->findSearchableTraitRecursively($class);
             })->toArray();
         }
 
-        return self::$searchableClasses;
+        return self::$searchableClasses[$this->appPath];
     }
 
     /**

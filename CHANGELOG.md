@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
+## [Unreleased]
+### Added
+- The `elasticsearch.searchable_namespaces` config sets the namespaces and directories that `scout:import` and `scout:flush` search for searchable models when no model is given. Before, they searched only the application namespace, so models in another namespace were not found. Without the config, the behavior does not change. [#243](https://github.com/matchish/laravel-scout-elasticsearch/issues/243)
+
 ## [7.14.3] - 2026-11-10
 ### Added
 - `scout:import` and `scout:flush` without a model argument now show a hint when a fatal error stops PHP during the model search. The hint gives the class, the file and the line, and tells how to prevent the search. [#345](https://github.com/matchish/laravel-scout-elasticsearch/pull/345)

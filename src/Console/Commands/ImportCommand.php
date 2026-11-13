@@ -38,9 +38,7 @@ final class ImportCommand extends Command
     private function searchableList(array $argument): Collection
     {
         return collect($argument)->whenEmpty(function () {
-            $factory = new SearchableListFactory(app()->getNamespace(), app()->path());
-
-            return $factory->make();
+            return SearchableListFactory::fromConfig();
         });
     }
 

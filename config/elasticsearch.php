@@ -12,6 +12,11 @@ return [
     'queue' => [
         'timeout' => env('SCOUT_QUEUE_TIMEOUT'),
     ],
+    // Namespaces and directories that `scout:import` and `scout:flush` search
+    // for searchable models when no model is given, for example:
+    // ['Domain\\' => base_path('src/Domain')]
+    // The application namespace and directory are searched when it is empty.
+    'searchable_namespaces' => [],
     'indices' => [
         'mappings' => [
             'default' => [

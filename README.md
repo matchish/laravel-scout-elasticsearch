@@ -120,6 +120,19 @@ For index `products` it will be
 And for default settings  
 `elasticsearch.indices.settings.default`
 
+### Searchable models outside the application namespace
+Without a model argument, `scout:import` and `scout:flush` search the application namespace (`App\`) for searchable models. If your models live elsewhere, list the namespaces and the directories with their classes in the `searchable_namespaces` config:
+
+```php
+// config/elasticsearch.php
+'searchable_namespaces' => [
+    'Domain\\' => base_path('src/Domain'),
+    'App\\' => app_path(),
+],
+```
+
+When the list is empty, the application namespace and directory are used.
+
 ### Eager load
 To speed up import you can eager load relations on import using global scopes.
 
