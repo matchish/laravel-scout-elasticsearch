@@ -88,3 +88,36 @@ jobs:
                     path: coverage.xml
                     retention-days: 1
                     compression-level: 9
+
+    phpstan:
+        name: 'PHPStan'
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Checkout project
+                uses: actions/checkout@v4
+
+            -   name: Install and configure PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.5'
+                    coverage: 'none'
+                    tools: 'composer'
+
+            -   name: Get composer cache directory
+                id: composer-cache-dir
+                run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+            -   name: Cache dependencies
+                uses: actions/cache@v4
+                with:
+                    path: ${{ steps.composer-cache-dir.outputs.dir }}
+                    key: ${{ runner.os }}-composer-phpstan-${{ hashFiles('composer.json') }}
+                    restore-keys: |
+                        ${{ runner.os }}-composer-phpstan-
+
+            -   name: Install dependencies
+                run: composer update --no-interaction --prefer-dist
+
+            -   name: Run PHPStan
+                run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
