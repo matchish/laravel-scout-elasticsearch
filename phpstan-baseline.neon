@@ -1,0 +1,1069 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Cannot call static method removeAllFromSearch\(\) on mixed\.$#'
+			identifier: staticMethod.nonObject
+			count: 1
+			path: src/Console/Commands/FlushCommand.php
+
+		-
+			message: '#^Parameter \#1 \$value of function collect expects Illuminate\\Contracts\\Support\\Arrayable\<\(int\|string\), mixed\>\|iterable\<\(int\|string\), mixed\>\|null, array\|bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Console/Commands/FlushCommand.php
+
+		-
+			message: '#^Parameter \#2 \$replace of function trans expects array\<string, bool\|\(Closure\(string\)\: string\)\|float\|int\|string\|null\>, array\{searchable\: mixed\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Console/Commands/FlushCommand.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Console\\Commands\\ImportCommand\:\:searchableList\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Console/Commands/ImportCommand.php
+
+		-
+			message: '#^Parameter \#1 \$searchable of method Matchish\\ScoutElasticSearch\\Console\\Commands\\ImportCommand\:\:import\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Console/Commands/ImportCommand.php
+
+		-
+			message: '#^Property Matchish\\ScoutElasticSearch\\Jobs\\Import\:\:\$timeout \(int\|null\) does not accept Matchish\\ScoutElasticSearch\\ElasticSearch\\Config\\Config\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Console/Commands/ImportCommand.php
+
+		-
+			message: '#^Property Matchish\\ScoutElasticSearch\\Jobs\\QueueableJob\:\:\$timeout \(int\|null\) does not accept Matchish\\ScoutElasticSearch\\ElasticSearch\\Config\\Config\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Console/Commands/ImportCommand.php
+
+		-
+			message: '#^Static call to instance method Matchish\\ScoutElasticSearch\\ElasticSearch\\Config\\Config\:\:queueTimeout\(\)\.$#'
+			identifier: method.staticCall
+			count: 2
+			path: src/Console/Commands/ImportCommand.php
+
+		-
+			message: '#^Class Matchish\\ScoutElasticSearch\\Database\\Scopes\\ChunkScope implements generic interface Illuminate\\Database\\Eloquent\\Scope but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Database/Scopes/ChunkScope.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Database\\Scopes\\ChunkScope\:\:apply\(\) has parameter \$builder with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Database/Scopes/ChunkScope.php
+
+		-
+			message: '#^Class Matchish\\ScoutElasticSearch\\Database\\Scopes\\PageScope implements generic interface Illuminate\\Database\\Eloquent\\Scope but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Database/Scopes/PageScope.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Database\\Scopes\\PageScope\:\:apply\(\) has parameter \$builder with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Database/Scopes/PageScope.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 1
+			path: src/ElasticSearch/Config/Storage.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\ElasticSearch\\Config\\Storage\:\:apiKey\(\) should return string\|null but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/ElasticSearch/Config/Storage.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\ElasticSearch\\Config\\Storage\:\:elasticCloudId\(\) should return string\|null but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/ElasticSearch/Config/Storage.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\ElasticSearch\\Config\\Storage\:\:password\(\) should return string\|null but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/ElasticSearch/Config/Storage.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\ElasticSearch\\Config\\Storage\:\:user\(\) should return string\|null but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/ElasticSearch/Config/Storage.php
+
+		-
+			message: '#^Parameter \#2 \$string of function explode expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/Config/Storage.php
+
+		-
+			message: '#^Binary operation "\." between mixed and ''\:\:'' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Binary operation "\." between non\-falsy\-string and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 2
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Call to method getScoutModelsByIds\(\) on an unknown class Laravel\\Scout\\Searchable\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Call to method setKeyType\(\) on an unknown class Laravel\\Scout\\Searchable\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Cannot access offset ''__class_name'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Cannot access offset ''_id'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Cannot access offset ''_source'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Cannot access offset ''hits'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Cannot access offset ''total'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Cannot call method getScoutKey\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Class Matchish\\ScoutElasticSearch\\ElasticSearch\\EloquentHitsIteratorAggregate implements generic interface IteratorAggregate but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^PHPDoc tag @var for variable \$model has invalid type Laravel\\Scout\\Searchable\.$#'
+			identifier: varTag.trait
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Parameter \#1 \$model of class Laravel\\Scout\\Builder constructor expects TModel of Illuminate\\Database\\Eloquent\\Model, Laravel\\Scout\\Searchable given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Parameter \#1 \$object of function get_class expects object, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Parameter \#1 \$value of function collect expects Illuminate\\Contracts\\Support\\Arrayable\<\(int\|string\), mixed\>\|iterable\<\(int\|string\), mixed\>\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Unable to resolve the template type TKey in call to function collect$#'
+			identifier: argument.templateType
+			count: 2
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Unable to resolve the template type TValue in call to function collect$#'
+			identifier: argument.templateType
+			count: 2
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Interface Matchish\\ScoutElasticSearch\\ElasticSearch\\HitsIteratorAggregate extends generic interface IteratorAggregate but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/ElasticSearch/HitsIteratorAggregate.php
+
+		-
+			message: '#^Parameter \#2 \$settings of class Matchish\\ScoutElasticSearch\\ElasticSearch\\Index constructor expects array\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/Index.php
+
+		-
+			message: '#^Parameter \#3 \$mappings of class Matchish\\ScoutElasticSearch\\ElasticSearch\\Index constructor expects array\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/Index.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getScoutKey\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Cannot access an offset on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Cannot access property \$routing on mixed\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Cannot call method getAttributes\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Cannot call method getScoutKey\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Cannot call method pushSoftDeleteMetadata\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Cannot call method scoutMetadata\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Cannot call method searchableAs\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Cannot call method toSearchableArray\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Cannot call static method usesSoftDelete\(\) on mixed\.$#'
+			identifier: staticMethod.nonObject
+			count: 1
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\ElasticSearch\\Params\\Bulk\:\:toArray\(\) should return array but returns array\|ArrayAccess\.$#'
+			identifier: return.type
+			count: 1
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Parameter \#1 \$docs of method Matchish\\ScoutElasticSearch\\ElasticSearch\\Params\\Bulk\:\:delete\(\) expects array\|object, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Parameter \#1 \$docs of method Matchish\\ScoutElasticSearch\\ElasticSearch\\Params\\Bulk\:\:index\(\) expects array\|object, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Parameter \#1 \$object of function get_class expects object, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Parameter \#1 \.\.\.\$arrays of function array_merge expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Parameter \#2 \$array of function array_key_exists expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Parameter \#2 \.\.\.\$arrays of function array_merge expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Possibly invalid array key type mixed\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 2
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Cannot access offset ''column'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Cannot access offset ''direction'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 6
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\ElasticSearch\\SearchFactory\:\:addWhereIns\(\) has parameter \$builder with generic class Laravel\\Scout\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\ElasticSearch\\SearchFactory\:\:addWhereNotIns\(\) has parameter \$builder with generic class Laravel\\Scout\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\ElasticSearch\\SearchFactory\:\:addWheres\(\) has parameter \$builder with generic class Laravel\\Scout\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\ElasticSearch\\SearchFactory\:\:create\(\) has parameter \$builder with generic class Laravel\\Scout\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\ElasticSearch\\SearchFactory\:\:hasWhereFilters\(\) has parameter \$builder with generic class Laravel\\Scout\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\ElasticSearch\\SearchFactory\:\:hasWhereIns\(\) has parameter \$builder with generic class Laravel\\Scout\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\ElasticSearch\\SearchFactory\:\:hasWhereNotIns\(\) has parameter \$builder with generic class Laravel\\Scout\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\ElasticSearch\\SearchFactory\:\:hasWheres\(\) has parameter \$builder with generic class Laravel\\Scout\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\ElasticSearch\\SearchFactory\:\:prepareOptions\(\) has parameter \$builder with generic class Laravel\\Scout\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\ElasticSearch\\SearchFactory\:\:supportedOptions\(\) has parameter \$builder with generic class Laravel\\Scout\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Parameter \#1 \$field of class ONGR\\ElasticsearchDSL\\Sort\\FieldSort constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Parameter \#1 \$from of method ONGR\\ElasticsearchDSL\\Search\:\:setFrom\(\) expects int\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Parameter \#1 \$size of method ONGR\\ElasticsearchDSL\\Search\:\:setSize\(\) expects int\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Parameter \#1 \$source of method ONGR\\ElasticsearchDSL\\Search\:\:setSource\(\) expects array\|bool\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Parameter \#2 \$order of class ONGR\\ElasticsearchDSL\\Sort\\FieldSort constructor expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Parameter \#2 \$terms of class ONGR\\ElasticsearchDSL\\Query\\TermLevel\\TermsQuery constructor expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Parameter \#2 \$value of class ONGR\\ElasticsearchDSL\\Query\\TermLevel\\TermQuery constructor expects bool\|float\|int\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Property Laravel\\Scout\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$whereIns \(array\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Property Laravel\\Scout\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$whereNotIns \(array\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Interface Matchish\\ScoutElasticSearch\\ElasticSearch\\SearchResults extends generic interface Illuminate\\Contracts\\Support\\Arrayable but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/ElasticSearch/SearchResults.php
+
+		-
+			message: '#^Interface Matchish\\ScoutElasticSearch\\ElasticSearch\\SearchResults extends generic interface IteratorAggregate but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/ElasticSearch/SearchResults.php
+
+		-
+			message: '#^Cannot call method setApiKey\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/ElasticSearchServiceProvider.php
+
+		-
+			message: '#^If condition is always true\.$#'
+			identifier: if.alwaysTrue
+			count: 2
+			path: src/ElasticSearchServiceProvider.php
+
+		-
+			message: '#^Parameter \#1 \$cloudId of method Elastic\\Elasticsearch\\ClientBuilder\:\:setElasticCloudId\(\) expects string, Matchish\\ScoutElasticSearch\\ElasticSearch\\Config\\Config given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearchServiceProvider.php
+
+		-
+			message: '#^Parameter \#1 \$username of method Elastic\\Elasticsearch\\ClientBuilder\:\:setBasicAuthentication\(\) expects string, Matchish\\ScoutElasticSearch\\ElasticSearch\\Config\\Config given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearchServiceProvider.php
+
+		-
+			message: '#^Parameter \#1 \$value of method Elastic\\Elasticsearch\\ClientBuilder\:\:setSSLVerification\(\) expects bool, Matchish\\ScoutElasticSearch\\ElasticSearch\\Config\\Config given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearchServiceProvider.php
+
+		-
+			message: '#^Parameter \#2 \$password of method Elastic\\Elasticsearch\\ClientBuilder\:\:setBasicAuthentication\(\) expects string, Matchish\\ScoutElasticSearch\\ElasticSearch\\Config\\Config given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearchServiceProvider.php
+
+		-
+			message: '#^Static call to instance method Matchish\\ScoutElasticSearch\\ElasticSearch\\Config\\Config\:\:apiKey\(\)\.$#'
+			identifier: method.staticCall
+			count: 1
+			path: src/ElasticSearchServiceProvider.php
+
+		-
+			message: '#^Static call to instance method Matchish\\ScoutElasticSearch\\ElasticSearch\\Config\\Config\:\:elasticCloudId\(\)\.$#'
+			identifier: method.staticCall
+			count: 1
+			path: src/ElasticSearchServiceProvider.php
+
+		-
+			message: '#^Static call to instance method Matchish\\ScoutElasticSearch\\ElasticSearch\\Config\\Config\:\:password\(\)\.$#'
+			identifier: method.staticCall
+			count: 1
+			path: src/ElasticSearchServiceProvider.php
+
+		-
+			message: '#^Static call to instance method Matchish\\ScoutElasticSearch\\ElasticSearch\\Config\\Config\:\:sslVerification\(\)\.$#'
+			identifier: method.staticCall
+			count: 1
+			path: src/ElasticSearchServiceProvider.php
+
+		-
+			message: '#^Static call to instance method Matchish\\ScoutElasticSearch\\ElasticSearch\\Config\\Config\:\:user\(\)\.$#'
+			identifier: method.staticCall
+			count: 1
+			path: src/ElasticSearchServiceProvider.php
+
+		-
+			message: '#^Call to an undefined method Elastic\\Elasticsearch\\Response\\Elasticsearch\|Http\\Promise\\Promise\:\:asArray\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Call to an undefined method Elastic\\Elasticsearch\\Response\\Elasticsearch\|Http\\Promise\\Promise\:\:asBool\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:queryScoutModelsByIds\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Cannot access offset ''hits'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 6
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Cannot access offset ''total'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Cannot access offset ''value'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Cannot call method cursor\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Cannot call method filter\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Cannot call method getScoutKey\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Cannot call method sortBy\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Cannot call method values\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Engines\\ElasticSearchEngine\:\:delete\(\) has parameter \$models with generic class Illuminate\\Database\\Eloquent\\Collection but does not specify its types\: TKey, TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Engines\\ElasticSearchEngine\:\:getTotalCount\(\) should return int but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Engines\\ElasticSearchEngine\:\:lazyMap\(\) has parameter \$builder with generic class Laravel\\Scout\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Engines\\ElasticSearchEngine\:\:lazyMap\(\) return type with generic class Illuminate\\Support\\LazyCollection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Engines\\ElasticSearchEngine\:\:lazyMap\(\) should return Illuminate\\Support\\LazyCollection but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Engines\\ElasticSearchEngine\:\:map\(\) has parameter \$builder with generic class Laravel\\Scout\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Engines\\ElasticSearchEngine\:\:map\(\) return type with generic class Illuminate\\Database\\Eloquent\\Collection does not specify its types\: TKey, TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Engines\\ElasticSearchEngine\:\:mapIds\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Engines\\ElasticSearchEngine\:\:paginate\(\) has parameter \$builder with generic class Laravel\\Scout\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Engines\\ElasticSearchEngine\:\:performSearch\(\) has parameter \$builder with generic class Laravel\\Scout\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Engines\\ElasticSearchEngine\:\:search\(\) has parameter \$builder with generic class Laravel\\Scout\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Engines\\ElasticSearchEngine\:\:update\(\) has parameter \$models with generic class Illuminate\\Database\\Eloquent\\Collection but does not specify its types\: TKey, TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#1 \$array of function array_flip expects array\<int\|string\>, array\<int, mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#1 \$index of class Matchish\\ScoutElasticSearch\\ElasticSearch\\Params\\Indices\\Refresh constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#1 \$index of class Matchish\\ScoutElasticSearch\\ElasticSearch\\Params\\Search constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#1 \$message of class Elastic\\Elasticsearch\\Exception\\ServerResponseException constructor expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Client\:\:bulk\(\) expects array\{index\?\: string, wait_for_active_shards\?\: string, refresh\?\: string, routing\?\: string, timeout\?\: int\|string, type\?\: string, _source\?\: array\<string\>\|string, _source_excludes\?\: array\<string\>\|string, \.\.\.\}\|null, array given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Client\:\:deleteByQuery\(\) expects array\{index\: array\<string\>\|string, analyzer\?\: string, analyze_wildcard\?\: bool, default_operator\?\: string, df\?\: string, from\?\: int, ignore_unavailable\?\: bool, allow_no_indices\?\: bool, \.\.\.\}\|null, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Client\:\:search\(\) expects array\{index\?\: array\<string\>\|string, analyzer\?\: string, analyze_wildcard\?\: bool, ccs_minimize_roundtrips\?\: bool, default_operator\?\: string, df\?\: string, explain\?\: bool, stored_fields\?\: array\<string\>\|string, \.\.\.\}\|null, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Endpoints\\Indices\:\:exists\(\) expects array\{index\: array\<string\>\|string, local\?\: bool, ignore_unavailable\?\: bool, allow_no_indices\?\: bool, expand_wildcards\?\: string, flat_settings\?\: bool, include_defaults\?\: bool, pretty\?\: bool, \.\.\.\}\|null, array\{index\: mixed\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Endpoints\\Indices\:\:refresh\(\) expects array\{index\?\: array\<string\>\|string, ignore_unavailable\?\: bool, allow_no_indices\?\: bool, expand_wildcards\?\: string, pretty\?\: bool, human\?\: bool, error_trace\?\: bool, source\?\: string, \.\.\.\}\|null, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#1 \$value of function collect expects Illuminate\\Contracts\\Support\\Arrayable\<\(int\|string\), mixed\>\|iterable\<\(int\|string\), mixed\>\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#1 \$value of function count expects array\|Countable, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#2 \$body of class Matchish\\ScoutElasticSearch\\ElasticSearch\\Params\\Search constructor expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Possibly invalid array key type mixed\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Unable to resolve the template type TKey in call to function collect$#'
+			identifier: argument.templateType
+			count: 2
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Unable to resolve the template type TValue in call to function collect$#'
+			identifier: argument.templateType
+			count: 2
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Jobs\\Import\:\:stages\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Jobs/Import.php
+
+		-
+			message: '#^Class Matchish\\ScoutElasticSearch\\Jobs\\ImportStages extends generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Jobs/ImportStages.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Jobs\\ImportStages\:\:fromSource\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Jobs/ImportStages.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: src/Jobs/Stages/CleanUp.php
+
+		-
+			message: '#^Call to an undefined method Elastic\\Elasticsearch\\Response\\Elasticsearch\|Http\\Promise\\Promise\:\:asArray\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Jobs/Stages/CleanUp.php
+
+		-
+			message: '#^Cannot access offset ''aliases'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Jobs/Stages/CleanUp.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Endpoints\\Indices\:\:delete\(\) expects array\{index\: array\<string\>\|string, timeout\?\: int\|string, master_timeout\?\: int\|string, ignore_unavailable\?\: bool, allow_no_indices\?\: bool, expand_wildcards\?\: string, pretty\?\: bool, human\?\: bool, \.\.\.\}\|null, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/Stages/CleanUp.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Endpoints\\Indices\:\:getAlias\(\) expects array\{name\?\: array\<string\>\|string, index\?\: array\<string\>\|string, ignore_unavailable\?\: bool, allow_no_indices\?\: bool, expand_wildcards\?\: string, local\?\: bool, pretty\?\: bool, human\?\: bool, \.\.\.\}\|null, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/Stages/CleanUp.php
+
+		-
+			message: '#^Parameter \#2 \$array of function array_key_exists expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/Stages/CleanUp.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Endpoints\\Indices\:\:create\(\) expects array\{index\: string, wait_for_active_shards\?\: string, timeout\?\: int\|string, master_timeout\?\: int\|string, pretty\?\: bool, human\?\: bool, error_trace\?\: bool, source\?\: string, \.\.\.\}\|null, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/Stages/CreateWriteIndex.php
+
+		-
+			message: '#^Cannot call method first\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Jobs/Stages/PullFromSource.php
+
+		-
+			message: '#^Cannot call method isEmpty\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Jobs/Stages/PullFromSource.php
+
+		-
+			message: '#^Cannot call method searchableUsing\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Jobs/Stages/PullFromSource.php
+
+		-
+			message: '#^Cannot call method update\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Jobs/Stages/PullFromSource.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Jobs\\Stages\\PullFromSource\:\:chunked\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Jobs/Stages/PullFromSource.php
+
+		-
+			message: '#^Parameter \#1 \$source of class Matchish\\ScoutElasticSearch\\Jobs\\Stages\\PullFromSource constructor expects Matchish\\ScoutElasticSearch\\Searchable\\ImportSource, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/Stages/PullFromSource.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Endpoints\\Indices\:\:refresh\(\) expects array\{index\?\: array\<string\>\|string, ignore_unavailable\?\: bool, allow_no_indices\?\: bool, expand_wildcards\?\: string, pretty\?\: bool, human\?\: bool, error_trace\?\: bool, source\?\: string, \.\.\.\}\|null, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/Stages/RefreshIndex.php
+
+		-
+			message: '#^Call to an undefined method Elastic\\Elasticsearch\\Response\\Elasticsearch\|Http\\Promise\\Promise\:\:asArray\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Jobs/Stages/SwitchToNewAndRemoveOldIndex.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Endpoints\\Indices\:\:getAlias\(\) expects array\{name\?\: array\<string\>\|string, index\?\: array\<string\>\|string, ignore_unavailable\?\: bool, allow_no_indices\?\: bool, expand_wildcards\?\: string, local\?\: bool, pretty\?\: bool, human\?\: bool, \.\.\.\}\|null, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/Stages/SwitchToNewAndRemoveOldIndex.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Endpoints\\Indices\:\:updateAliases\(\) expects array\{timeout\?\: int\|string, master_timeout\?\: int\|string, pretty\?\: bool, human\?\: bool, error_trace\?\: bool, source\?\: string, filter_path\?\: array\<string\>\|string, body\: array\<mixed\>\|string\}\|null, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/Stages/SwitchToNewAndRemoveOldIndex.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\MixedSearch\:\:search\(\) return type with generic class Laravel\\Scout\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/MixedSearch.php
+
+		-
+			message: '#^Cannot call method getQualifiedKeyName\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Cannot call method newQuery\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Cannot call method orderBy\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Cannot call method searchableAs\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Cannot call method syncWithSearchUsing\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Cannot call method syncWithSearchUsingQueue\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Cannot call method when\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Cannot call method withGlobalScope\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Cannot call method withTrashed\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Searchable\\DefaultImportSource\:\:chunked\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Searchable\\DefaultImportSource\:\:get\(\) return type with generic class Illuminate\\Database\\Eloquent\\Collection does not specify its types\: TKey, TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Searchable\\DefaultImportSource\:\:newQuery\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Searchable\\DefaultImportSource\:\:newQuery\(\) should return Illuminate\\Database\\Eloquent\\Builder but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Searchable\\DefaultImportSource\:\:searchableAs\(\) should return string but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Searchable\\DefaultImportSource\:\:syncWithSearchUsing\(\) should return string\|null but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Searchable\\DefaultImportSource\:\:syncWithSearchUsingQueue\(\) should return string\|null but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^PHPDoc tag @var for variable \$models contains generic class Illuminate\\Database\\Eloquent\\Collection but does not specify its types\: TKey, TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Parameter \#1 \$object of function get_class expects object, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Searchable\\ImportSource\:\:chunked\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Searchable/ImportSource.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Searchable\\ImportSource\:\:get\(\) return type with generic class Illuminate\\Database\\Eloquent\\Collection does not specify its types\: TKey, TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Searchable/ImportSource.php
+
+		-
+			message: '#^Cannot call method toCodeString\(\) on PhpParser\\Node\\Name\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Searchable/SearchableListFactory.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Searchable\\SearchableListFactory\:\:getProjectClasses\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Searchable/SearchableListFactory.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Searchable\\SearchableListFactory\:\:getSearchableClasses\(\) should return array\<string\> but returns array\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Searchable/SearchableListFactory.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Searchable\\SearchableListFactory\:\:make\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Searchable/SearchableListFactory.php
+
+		-
+			message: '#^Parameter \#1 \$class of method Matchish\\ScoutElasticSearch\\Searchable\\SearchableListFactory\:\:findSearchableTraitRecursively\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Searchable/SearchableListFactory.php
+
+		-
+			message: '#^Parameter \#1 \$nodes of method PhpParser\\NodeFinder\:\:find\(\) expects array\<PhpParser\\Node\>\|PhpParser\\Node, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Searchable/SearchableListFactory.php
+
+		-
+			message: '#^Parameter \#1 \$objectOrClass of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Searchable/SearchableListFactory.php
