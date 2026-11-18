@@ -1,0 +1,577 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Cannot call static method removeAllFromSearch\(\) on mixed\.$#'
+			identifier: staticMethod.nonObject
+			count: 1
+			path: src/Console/Commands/FlushCommand.php
+
+		-
+			message: '#^Parameter \#2 \$replace of function trans expects array\<string, bool\|\(Closure\(string\)\: string\)\|float\|int\|string\|null\>, array\{searchable\: mixed\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Console/Commands/FlushCommand.php
+
+		-
+			message: '#^Parameter \#1 \$argument of method Matchish\\ScoutElasticSearch\\Console\\Commands\\ImportCommand\:\:searchableList\(\) expects array\<string\>, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Console/Commands/ImportCommand.php
+
+		-
+			message: '#^Parameter \#1 \$argument of method Matchish\\ScoutElasticSearch\\Console\\Commands\\ImportStatusCommand\:\:searchableList\(\) expects array\<string\>, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Console/Commands/ImportStatusCommand.php
+
+		-
+			message: '#^Class Matchish\\ScoutElasticSearch\\Database\\Scopes\\FromScope implements generic interface Illuminate\\Database\\Eloquent\\Scope but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Database/Scopes/FromScope.php
+
+		-
+			message: '#^Parameter \#1 \$builder \(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\) of method Matchish\\ScoutElasticSearch\\Database\\Scopes\\FromScope\:\:apply\(\) should be compatible with parameter \$builder \(Illuminate\\Database\\Eloquent\\Builder\<covariant Illuminate\\Database\\Eloquent\\Model\>\) of method Illuminate\\Database\\Eloquent\\Scope\<Illuminate\\Database\\Eloquent\\Model\>\:\:apply\(\)$#'
+			identifier: method.childParameterType
+			count: 1
+			path: src/Database/Scopes/FromScope.php
+
+		-
+			message: '#^Class Matchish\\ScoutElasticSearch\\Database\\Scopes\\PageScope implements generic interface Illuminate\\Database\\Eloquent\\Scope but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Database/Scopes/PageScope.php
+
+		-
+			message: '#^Parameter \#1 \$builder \(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\) of method Matchish\\ScoutElasticSearch\\Database\\Scopes\\PageScope\:\:apply\(\) should be compatible with parameter \$builder \(Illuminate\\Database\\Eloquent\\Builder\<covariant Illuminate\\Database\\Eloquent\\Model\>\) of method Illuminate\\Database\\Eloquent\\Scope\<Illuminate\\Database\\Eloquent\\Model\>\:\:apply\(\)$#'
+			identifier: method.childParameterType
+			count: 1
+			path: src/Database/Scopes/PageScope.php
+
+		-
+			message: '#^Cannot access offset ''error'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/ElasticSearch/BulkResult.php
+
+		-
+			message: '#^Cannot access offset ''type'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/ElasticSearch/BulkResult.php
+
+		-
+			message: '#^Anonymous function has an unused use \$hasTrait\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Binary operation "\." between mixed and ''\:\:'' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Binary operation "\." between non\-falsy\-string and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 2
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Call to function is_array\(\) with array\<mixed\> will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Cannot access offset ''__class_name'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Cannot access offset ''hits'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Cannot access offset ''total'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Offset non\-falsy\-string on Illuminate\\Support\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\> in isset\(\) does not exist\.$#'
+			identifier: isset.offset
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Parameter \#1 \$keyBy of method Illuminate\\Support\\Collection\<int,mixed\>\:\:keyBy\(\) expects \(callable\(mixed, int\)\: non\-falsy\-string\)\|list\<Closure\|string\>\|string, Closure\(Illuminate\\Database\\Eloquent\\Model\)\: non\-falsy\-string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Support\\Collection\<int,\*NEVER\*\>\:\:all\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: src/ElasticSearch/EloquentHitsIteratorAggregate.php
+
+		-
+			message: '#^Cannot access an offset on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Parameter \#1 \$docs of method Matchish\\ScoutElasticSearch\\ElasticSearch\\Params\\Bulk\:\:delete\(\) expects array\<Illuminate\\Database\\Eloquent\\Model\>\|object, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Parameter \#1 \$docs of method Matchish\\ScoutElasticSearch\\ElasticSearch\\Params\\Bulk\:\:index\(\) expects array\<Illuminate\\Database\\Eloquent\\Model\>\|object, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Parameter \#1 \$key of method Illuminate\\Database\\Eloquent\\Model\:\:getAttribute\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Possibly invalid array key type mixed\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 2
+			path: src/ElasticSearch/Params/Bulk.php
+
+		-
+			message: '#^Call to function property_exists\(\) with Laravel\\Scout\\Builder\<Illuminate\\Database\\Eloquent\\Model\> and ''whereNotIns'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Cannot access offset ''column'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Cannot access offset ''direction'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 6
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Parameter \#1 \$field of class ONGR\\ElasticsearchDSL\\Sort\\FieldSort constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Parameter \#1 \$from of method ONGR\\ElasticsearchDSL\\Search\:\:setFrom\(\) expects int\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Parameter \#1 \$size of method ONGR\\ElasticsearchDSL\\Search\:\:setSize\(\) expects int\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Parameter \#1 \$source of method ONGR\\ElasticsearchDSL\\Search\:\:setSource\(\) expects array\|bool\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Parameter \#2 \$order of class ONGR\\ElasticsearchDSL\\Sort\\FieldSort constructor expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Parameter \#2 \$terms of class ONGR\\ElasticsearchDSL\\Query\\TermLevel\\TermsQuery constructor expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Parameter \#2 \$value of class ONGR\\ElasticsearchDSL\\Query\\TermLevel\\TermQuery constructor expects bool\|float\|int\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ElasticSearch/SearchFactory.php
+
+		-
+			message: '#^Cannot call method setApiKey\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/ElasticSearchServiceProvider.php
+
+		-
+			message: '#^PHPDoc tag @var with type string is not subtype of native type non\-falsy\-string\.$#'
+			identifier: varTag.nativeType
+			count: 2
+			path: src/ElasticSearchServiceProvider.php
+
+		-
+			message: '#^Cannot access offset ''hits'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Cannot access offset ''total'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Cannot access offset ''value'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Engines\\ElasticSearchEngine\:\:getTotalCount\(\) should return int but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#1 \$index of class Matchish\\ScoutElasticSearch\\ElasticSearch\\Params\\Indices\\Refresh constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#1 \$index of class Matchish\\ScoutElasticSearch\\ElasticSearch\\Params\\Search constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Client\:\:bulk\(\) expects array\{index\?\: string, wait_for_active_shards\?\: string, refresh\?\: string, routing\?\: string, timeout\?\: int\|string, type\?\: string, _source\?\: array\<string\>\|string, _source_excludes\?\: array\<string\>\|string, \.\.\.\}\|null, array\<mixed\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Client\:\:deleteByQuery\(\) expects array\{index\: array\<string\>\|string, analyzer\?\: string, analyze_wildcard\?\: bool, default_operator\?\: string, df\?\: string, from\?\: int, ignore_unavailable\?\: bool, allow_no_indices\?\: bool, \.\.\.\}\|null, array\<mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Client\:\:search\(\) expects array\{index\?\: array\<string\>\|string, analyzer\?\: string, analyze_wildcard\?\: bool, ccs_minimize_roundtrips\?\: bool, default_operator\?\: string, df\?\: string, explain\?\: bool, stored_fields\?\: array\<string\>\|string, \.\.\.\}\|null, array\<mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Endpoints\\Indices\:\:exists\(\) expects array\{index\: array\<string\>\|string, local\?\: bool, ignore_unavailable\?\: bool, allow_no_indices\?\: bool, expand_wildcards\?\: string, flat_settings\?\: bool, include_defaults\?\: bool, pretty\?\: bool, \.\.\.\}\|null, array\{index\: mixed\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Endpoints\\Indices\:\:refresh\(\) expects array\{index\?\: array\<string\>\|string, ignore_unavailable\?\: bool, allow_no_indices\?\: bool, expand_wildcards\?\: string, pretty\?\: bool, human\?\: bool, error_trace\?\: bool, source\?\: string, \.\.\.\}\|null, array\<string, string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#1 \$value of function count expects array\|Countable, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Parameter \#2 \$body of class Matchish\\ScoutElasticSearch\\ElasticSearch\\Params\\Search constructor expects array\<mixed\>, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Possibly invalid array key type mixed\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 1
+			path: src/Engines/ElasticSearchEngine.php
+
+		-
+			message: '#^Instanceof between Illuminate\\Bus\\DatabaseBatchRepository and Illuminate\\Bus\\DatabaseBatchRepository will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/Jobs/ImportBatches.php
+
+		-
+			message: '#^Cannot call method isNotEmpty\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Jobs/ImportRange.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Client\:\:bulk\(\) expects array\{index\?\: string, wait_for_active_shards\?\: string, refresh\?\: string, routing\?\: string, timeout\?\: int\|string, type\?\: string, _source\?\: array\<string\>\|string, _source_excludes\?\: array\<string\>\|string, \.\.\.\}\|null, array\<mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/ImportRange.php
+
+		-
+			message: '#^Parameter \#2 \$models of method Matchish\\ScoutElasticSearch\\Jobs\\ImportRange\:\:flush\(\) expects Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/ImportRange.php
+
+		-
+			message: '#^Parameter \#1 \$items of class Matchish\\ScoutElasticSearch\\Jobs\\ImportStages constructor expects Illuminate\\Contracts\\Support\\Arrayable\<int, Matchish\\ScoutElasticSearch\\Jobs\\Stages\\StageInterface\>\|iterable\<int, Matchish\\ScoutElasticSearch\\Jobs\\Stages\\StageInterface\>\|null, array\<Matchish\\ScoutElasticSearch\\Jobs\\Stages\\StageInterface\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/ImportStages.php
+
+		-
+			message: '#^Cannot access offset ''job'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Jobs/ImportState.php
+
+		-
+			message: '#^Cannot access offset ''reason'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Jobs/ImportState.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Client\:\:mget\(\) expects array\{index\?\: string, force_synthetic_source\?\: bool, stored_fields\?\: array\<string\>\|string, preference\?\: string, realtime\?\: bool, refresh\?\: bool, routing\?\: string, _source\?\: array\<string\>\|string, \.\.\.\}\|null, array\{index\: string, _source\: false, body\: array\{ids\: non\-empty\-list\<non\-falsy\-string\>\}\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/ImportState.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Model\:\:qualifyColumn\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/Stages/CatchUp.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Client\:\:bulk\(\) expects array\{index\?\: string, wait_for_active_shards\?\: string, refresh\?\: string, routing\?\: string, timeout\?\: int\|string, type\?\: string, _source\?\: array\<string\>\|string, _source_excludes\?\: array\<string\>\|string, \.\.\.\}\|null, array\<mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/Stages/CatchUp.php
+
+		-
+			message: '#^Parameter \#2 \$current of method Matchish\\ScoutElasticSearch\\Jobs\\Stages\\CatchUp\:\:write\(\) expects Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>, Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/Stages/CatchUp.php
+
+		-
+			message: '#^Parameter \#3 \$gone of method Matchish\\ScoutElasticSearch\\Jobs\\Stages\\CatchUp\:\:write\(\) expects Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>, Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/Stages/CatchUp.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: src/Jobs/Stages/CleanUp.php
+
+		-
+			message: '#^Cannot access offset ''_meta'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Jobs/Stages/CleanUp.php
+
+		-
+			message: '#^Cannot access offset ''aliases'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: src/Jobs/Stages/CleanUp.php
+
+		-
+			message: '#^Cannot access offset ''mappings'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Jobs/Stages/CleanUp.php
+
+		-
+			message: '#^Cannot access offset ''scout_import'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Jobs/Stages/CleanUp.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Endpoints\\Indices\:\:delete\(\) expects array\{index\: array\<string\>\|string, timeout\?\: int\|string, master_timeout\?\: int\|string, ignore_unavailable\?\: bool, allow_no_indices\?\: bool, expand_wildcards\?\: string, pretty\?\: bool, human\?\: bool, \.\.\.\}\|null, array\<string, string\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Jobs/Stages/CleanUp.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Endpoints\\Indices\:\:getAlias\(\) expects array\{name\?\: array\<string\>\|string, index\?\: array\<string\>\|string, ignore_unavailable\?\: bool, allow_no_indices\?\: bool, expand_wildcards\?\: string, local\?\: bool, pretty\?\: bool, human\?\: bool, \.\.\.\}\|null, array\<string, string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/Stages/CleanUp.php
+
+		-
+			message: '#^Parameter \#2 \$array of function array_key_exists expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/Stages/CleanUp.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Endpoints\\Indices\:\:create\(\) expects array\{index\: string, wait_for_active_shards\?\: string, timeout\?\: int\|string, master_timeout\?\: int\|string, pretty\?\: bool, human\?\: bool, error_trace\?\: bool, source\?\: string, \.\.\.\}\|null, array\<mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/Stages/CreateWriteIndex.php
+
+		-
+			message: '#^Cannot call method isNotEmpty\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Jobs/Stages/PullFromSource.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Client\:\:bulk\(\) expects array\{index\?\: string, wait_for_active_shards\?\: string, refresh\?\: string, routing\?\: string, timeout\?\: int\|string, type\?\: string, _source\?\: array\<string\>\|string, _source_excludes\?\: array\<string\>\|string, \.\.\.\}\|null, array\<mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/Stages/PullFromSource.php
+
+		-
+			message: '#^Parameter \#2 \$models of method Matchish\\ScoutElasticSearch\\Jobs\\Stages\\PullFromSource\:\:flush\(\) expects Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/Stages/PullFromSource.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Endpoints\\Indices\:\:refresh\(\) expects array\{index\?\: array\<string\>\|string, ignore_unavailable\?\: bool, allow_no_indices\?\: bool, expand_wildcards\?\: string, pretty\?\: bool, human\?\: bool, error_trace\?\: bool, source\?\: string, \.\.\.\}\|null, array\<string, string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/Stages/RefreshIndex.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Endpoints\\Indices\:\:getAlias\(\) expects array\{name\?\: array\<string\>\|string, index\?\: array\<string\>\|string, ignore_unavailable\?\: bool, allow_no_indices\?\: bool, expand_wildcards\?\: string, local\?\: bool, pretty\?\: bool, human\?\: bool, \.\.\.\}\|null, array\<string, string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/Stages/SwitchToNewAndRemoveOldIndex.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Endpoints\\Indices\:\:updateAliases\(\) expects array\{timeout\?\: int\|string, master_timeout\?\: int\|string, pretty\?\: bool, human\?\: bool, error_trace\?\: bool, source\?\: string, filter_path\?\: array\<string\>\|string, body\: array\<mixed\>\|string\}\|null, array\<mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Jobs/Stages/SwitchToNewAndRemoveOldIndex.php
+
+		-
+			message: '#^Cannot call method orderBy\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Cannot call method when\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Cannot call method withGlobalScope\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Cannot call method withTrashed\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Searchable\\DefaultImportSource\:\:__construct\(\) has parameter \$chunkScope with generic interface Illuminate\\Database\\Eloquent\\Scope but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Searchable\\DefaultImportSource\:\:__construct\(\) has parameter \$scopes with generic interface Illuminate\\Database\\Eloquent\\Scope but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Searchable\\DefaultImportSource\:\:newQuery\(\) should return Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\> but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Searchable\\DefaultImportSource\:\:setChunkScope\(\) has parameter \$scope with generic interface Illuminate\\Database\\Eloquent\\Scope but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Searchable\\DefaultImportSource\:\:syncWithSearchUsing\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Searchable\\DefaultImportSource\:\:syncWithSearchUsingQueue\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Property Matchish\\ScoutElasticSearch\\Searchable\\DefaultImportSource\:\:\$chunkScope with generic interface Illuminate\\Database\\Eloquent\\Scope does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Property Matchish\\ScoutElasticSearch\\Searchable\\DefaultImportSource\:\:\$scopes with generic interface Illuminate\\Database\\Eloquent\\Scope does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Searchable/DefaultImportSource.php
+
+		-
+			message: '#^Method Matchish\\ScoutElasticSearch\\Searchable\\ImportSource\:\:setChunkScope\(\) has parameter \$scope with generic interface Illuminate\\Database\\Eloquent\\Scope but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Searchable/ImportSource.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: src/Searchable/RangePlanner.php
+
+		-
+			message: '#^Parameter \#1 \$expression of method Illuminate\\Database\\Query\\Builder\:\:selectRaw\(\) expects literal\-string, non\-falsy\-string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Searchable/RangePlanner.php
+
+		-
+			message: '#^Trait Matchish\\ScoutElasticSearch\\Traits\\ElasticParams is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: src/Traits/ElasticParams.php
